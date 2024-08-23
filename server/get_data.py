@@ -407,6 +407,7 @@ label_mapping = {
 
 
 def calculate_competition_insights(filtered_df, companies, is_competition, date_filter=None):
+    print(f"ADADAD {date_filter}")
     if date_filter:
         # Convert start and end dates from 'MM-YYYY' format to a datetime object representing the start and end of the month.
         start_date = pd.to_datetime(date_filter['start'], format='%m-%Y')
