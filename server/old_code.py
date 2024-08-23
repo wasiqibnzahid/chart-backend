@@ -78,12 +78,12 @@ company_colors = {
 }
 
 # Function to calculate insights for TV Azteca
-def calculate_relevant_insights(filtered_df, companies, title):
+def calculate_relevant_insights(df_data, companies, title):
     significant_changes = []
 
     for company in companies:
-        initial_value = filtered_df[company].iloc[0]
-        final_value = filtered_df[company].iloc[-1]
+        initial_value = df_data[company].iloc[0]
+        final_value = df_data[company].iloc[-1]
         percentage_change = ((final_value - initial_value) / initial_value) * 100
 
         if abs(percentage_change) >= 5:  
