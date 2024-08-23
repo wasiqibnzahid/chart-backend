@@ -19,7 +19,7 @@ azteca_columns_raw = [
 competition_columns_raw = [
     'Milenio', 'El Heraldo',
     'El Universal', 'Televisa',
-    'Terra', 'AS', 
+    'Terra', 'AS',
     'Infobae',  'NY Times',
 ]
 competition_columns = [
