@@ -17,10 +17,10 @@ azteca_columns_raw = [
 ]
 
 competition_columns_raw = [
-    'Milenio', 'Milenio', 'El Heraldo', 'El Heraldo',
-    'El Universal', 'El Universal', 'Televisa', 'Televisa',
-    'Terra', 'Terra', 'AS', 'AS',
-    'Infobae', 'Infobae', 'NY Times', 'NY Times'
+    'Milenio', 'El Heraldo',
+    'El Universal', 'Televisa',
+    'Terra', 'AS', 
+    'Infobae',  'NY Times',
 ]
 competition_columns = [
     'Milenio (Note)', 'Milenio (Video)', 'El Heraldo (Note)', 'El Heraldo (Video)',
@@ -154,7 +154,7 @@ def transform_data(data, include_columns=[], start_date=None, end_date=None):
     return result
 
 
-def calculate_relevant_insights(filtered_df, companies, title, date_filter={"start": "11-2024", "end": "12-2024"}):
+def calculate_relevant_insights(filtered_df, companies, title, date_filter=None):
     if date_filter:
         # Convert start and end dates from 'MM-YYYY' format to a datetime object representing the start and end of the month.
         start_date = pd.to_datetime(date_filter['start'], format='%m-%Y')
@@ -406,8 +406,19 @@ label_mapping = {
 }
 
 
-def calculate_competition_insights(filtered_df, companies, is_competition):
+def calculate_competition_insights(filtered_df, companies, is_competition, date_filter=None):
+    if date_filter:
+        # Convert start and end dates from 'MM-YYYY' format to a datetime object representing the start and end of the month.
+        start_date = pd.to_datetime(date_filter['start'], format='%m-%Y')
+        end_date = pd.to_datetime(
+            date_filter['end'], format='%m-%Y') + pd.offsets.MonthEnd(1)
 
+        # Convert the 'Date' column to datetime format if it's not already
+        filtered_df['Date'] = pd.to_datetime(
+            filtered_df['Date'], format='%Y-%m-%d')
+
+        filtered_df = filtered_df[(filtered_df['Date'] >= start_date) & (
+            filtered_df['Date'] <= end_date)]
     significant_changes = []
     for company in companies:
         try:
