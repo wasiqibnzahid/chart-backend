@@ -240,17 +240,17 @@ def calculate_quarterly_averages(df):
             prev_competition_avg_note = prev_quarter['Competition Note Avg']
 
             tv_azteca_change = (
-                tv_azteca_avg - prev_tv_azteca_avg) / prev_tv_azteca_avg * 100
+                tv_azteca_avg - prev_tv_azteca_avg) * 100 / prev_tv_azteca_avg
             competition_change = (
-                competition_avg - prev_competition_avg) / prev_competition_avg * 100
+                competition_avg - prev_competition_avg) * 100 / prev_competition_avg
             tv_azteca_change_video = (
-                tv_azteca_avg_video - prev_tv_azteca_avg_video) / prev_tv_azteca_avg_video * 100
+                tv_azteca_avg_video - prev_tv_azteca_avg_video) * 100 / prev_tv_azteca_avg_video
             competition_change_video = (
-                competition_avg_video - prev_competition_avg_video) / prev_competition_avg_video * 100
+                competition_avg_video - prev_competition_avg_video) * 100 / prev_competition_avg_video
             tv_azteca_change_note = (
-                tv_azteca_avg_note - prev_tv_azteca_avg_note) / prev_tv_azteca_avg_note * 100
+                tv_azteca_avg_note - prev_tv_azteca_avg_note) * 100 / prev_tv_azteca_avg_note
             competition_change_note = (
-                competition_avg_note - prev_competition_avg_note) / prev_competition_avg_note * 100
+                competition_avg_note - prev_competition_avg_note) * 100 / prev_competition_avg_note
         else:
             tv_azteca_change = ""
             competition_change = ""
@@ -294,11 +294,11 @@ def calculate_quarterly_averages(df):
                 prev_company_avg_note = item["note"]
                 prev_company_avg = item["total"]
                 company_change = (
-                    company_avg - prev_company_avg) / prev_company_avg * 100
+                    company_avg - prev_company_avg) * 100 / prev_company_avg
                 company_change_video = (
-                    company_avg_video - prev_company_avg_video) / prev_company_avg_video * 100
+                    company_avg_video - prev_company_avg_video) * 100 / prev_company_avg_video
                 company_change_note = (
-                    company_avg_note - prev_company_avg_note) / prev_company_avg_note * 100
+                    company_avg_note - prev_company_avg_note) * 100 / prev_company_avg_note
                 prev_quarter = quarters[-1]
             else:
                 company_change = ''
@@ -331,11 +331,11 @@ def calculate_quarterly_averages(df):
                 prev_company_avg_note = item["note"]
                 prev_company_avg = item["total"]
                 company_change = (
-                    company_avg - prev_company_avg) / prev_company_avg * 100
+                    company_avg - prev_company_avg) * 100 / prev_company_avg
                 company_change_video = (
-                    company_avg_video - prev_company_avg_video) / prev_company_avg_video * 100
+                    company_avg_video - prev_company_avg_video) * 100 / prev_company_avg_video
                 company_change_note = (
-                    company_avg_note - prev_company_avg_note) / prev_company_avg_note * 100
+                    company_avg_note - prev_company_avg_note) * 100 / prev_company_avg_note
                 prev_quarter = quarters[-1]
             else:
                 company_change = ''
@@ -407,7 +407,6 @@ label_mapping = {
 
 
 def calculate_competition_insights(filtered_df, companies, is_competition, date_filter=None):
-    print(f"ADADAD {date_filter}")
     if date_filter:
         # Convert start and end dates from 'MM-YYYY' format to a datetime object representing the start and end of the month.
         start_date = pd.to_datetime(date_filter['start'], format='%m-%Y')
@@ -460,23 +459,22 @@ def formatLolData(df):
     video = []
     video_other = calculate_competition_insights(
         df, [
-            col for col in df.columns if 'Video' in col and 'Azteca' not in col], '')
+            col for col in competition_columns if 'Video' in col], '')
     video_self = calculate_relevant_insights(
         df, [col for col in list(
             label_mapping.keys()) if 'Video' in col], '')
     note_other = calculate_competition_insights(
         df, [
-            col for col in df.columns if 'Note' in col and 'Azteca' not in col], '')
+            col for col in competition_columns if 'Note' in col], '')
     note_self = calculate_relevant_insights(
         df, [col for col in list(
             label_mapping.keys()) if 'Note' in col], '')
     total_self = calculate_relevant_insights(
         df, list(label_mapping.keys()), '')
-    total_competition = calculate_competition_insights(df, [
-        col for col in df.columns if col not in list(label_mapping.keys())], '')
+    total_competition = calculate_competition_insights(
+        df, competition_columns, '')
 
     # Dictionaries to store the combined data and totals
-    combined_data = {}
 
     for index, item in enumerate(data_as_json):
         item["Date"] = mainData["Date"][index]
@@ -497,25 +495,31 @@ def formatLolData(df):
                 item['name'] = item['name'].replace(" (Note)", "")
             note.append(item)
 
+    combined_data = {}
     # Combine video and note data
     for item in video + note:
         name = item['name']
         for entry in item['data']:
             date = entry['x']
             value = entry['y']
+
+            # Initialize combined_data entry if it doesn't exist
             if name not in combined_data:
                 combined_data[name] = {}
             if date not in combined_data[name]:
-                combined_data[name][date] = 0
-            combined_data[name][date] += value
+                combined_data[name][date] = {'sum': 0, 'count': 0}
 
-    # Format the totals output
+            # Add value to sum and increment count
+            combined_data[name][date]['sum'] += value
+            combined_data[name][date]['count'] += 1
+
+    # Format the averages output
     totals = []
     for name, dates in combined_data.items():
-        data = [{'x': date, 'y': value}
-                for date, value in sorted(dates.items())]
+        # Calculate averages for each date
+        data = [{'x': date, 'y': values['sum'] / values['count']}
+                for date, values in sorted(dates.items())]
         totals.append({'name': name, 'data': data})
-
     return {
         "videos": video,
         "notes": note,
@@ -565,20 +569,20 @@ def get_insights(date_filter=None):
     df = init()
     video_other = calculate_competition_insights(
         df, [
-            col for col in df.columns if 'Video' in col and 'Azteca' not in col], '', date_filter)
+            col for col in competition_columns if 'Video' in col], '', date_filter)
     video_self = calculate_relevant_insights(
         df, [col for col in list(
             label_mapping.keys()) if 'Video' in col], '', date_filter)
     note_other = calculate_competition_insights(
         df, [
-            col for col in df.columns if 'Note' in col and 'Azteca' not in col], '', date_filter)
+            col for col in competition_columns if 'Note' in col], '', date_filter)
     note_self = calculate_relevant_insights(
         df, [col for col in list(
             label_mapping.keys()) if 'Note' in col], '', date_filter)
     total_self = calculate_relevant_insights(
         df, list(label_mapping.keys()), '', date_filter)
     total_competition = calculate_competition_insights(df, [
-        col for col in df.columns if col not in list(label_mapping.keys())], '', date_filter)
+        col for col in competition_columns if col not in list(label_mapping.keys())], '', date_filter)
     return {
         "videos": {
             "self": video_self,
