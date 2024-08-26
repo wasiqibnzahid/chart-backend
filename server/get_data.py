@@ -289,7 +289,7 @@ def calculate_quarterly_averages(df):
                 col for col in tv_azteca_columns if 'Note' in col and company in col]].mean(
                 axis=1).mean().round(1)
             if (len(quarters) > 0):
-                item = prev_quarter.get("competition")[index]
+                item = prev_quarter.get("azteca")[index]
                 prev_company_avg_video = item["video"]
                 prev_company_avg_note = item["note"]
                 prev_company_avg = item["total"]
