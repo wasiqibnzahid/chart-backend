@@ -1,4 +1,9 @@
 import pandas as pd
+import threading
+
+from collections import defaultdict
+from .models import Record
+from django.utils.dateparse import parse_date
 from datetime import datetime
 import json
 from .old_code import df as df2, data
@@ -30,12 +35,38 @@ competition_columns = [
 ]
 
 
-mainData = data
+def fetch_records():
+    # Initialize a dictionary to store the results
+    data = defaultdict(list)
+
+    # Fetch all records, you can add filtering if necessary (e.g., for specific date range)
+    records = Record.objects.all().order_by('date')
+
+    # Group records by date
+    grouped_records = defaultdict(list)
+
+    for record in records:
+        grouped_records[record.date].append(record)
+
+    # Iterate over the grouped records and populate the dictionary
+    for date, records_on_date in grouped_records.items():
+        # Convert date to string format 'YYYY-MM-DD'
+        data['Date'].append(str(date))
+
+        for record in records_on_date:
+            # Example: Azteca UNO (Note), Azteca UNO (Video)
+            name = record.name
+            data[f"{name} (Note)"].append(record.note_value)
+            data[f"{name} (Video)"].append(record.video_value)
+
+    # Convert defaultdict to a normal dictionary for output
+    return dict(data)
 
 
-def init():
-
-    df = pd.DataFrame(mainData)
+def init(inner_data=None):
+    if (inner_data is None):
+        inner_data = fetch_records()
+    df = pd.DataFrame(inner_data)
 
     # Calculating averages
 
@@ -416,7 +447,7 @@ def calculate_competition_insights(filtered_df, companies, is_competition, date_
     return insight
 
 
-def formatLolData(df):
+def formatLolData(df, inner_data):
     data_as_json = formatToJson(df2)
     note = []
     video = []
@@ -440,7 +471,7 @@ def formatLolData(df):
     # Dictionaries to store the combined data and totals
 
     for index, item in enumerate(data_as_json):
-        item["Date"] = mainData["Date"][index]
+        item["Date"] = inner_data["Date"][index]
 
     transformed_data = transform_data(data_as_json)
 
@@ -505,11 +536,12 @@ def formatLolData(df):
 
 
 def get_data():
-    df = init()
+    inner_data = fetch_records()
+    df = init(inner_data)
     data = formatToJson(df)
     average_data = transform_data(data, columns)
     percentages = transform_data(data, changeKeys)
-    other = formatLolData(df)
+    other = formatLolData(df, inner_data)
 
     return {
         "weekly": {
