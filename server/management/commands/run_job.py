@@ -130,6 +130,6 @@ class Command(BaseCommand):
     help = 'Run a long function in a separate thread'
 
     def handle(self, *args, **kwargs):
-        threading.Thread(target=run_job).start()
+        threading.Thread(target=run_job, daemon=True).start()
         self.stdout.write(self.style.SUCCESS(
             'Started long function in background.'))

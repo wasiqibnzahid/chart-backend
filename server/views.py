@@ -36,7 +36,7 @@ def get_insights_api(request):
 
 
 def run_job(_request):
-    threading.Thread(target=run_proj).start()
+    threading.Thread(target=run_proj, daemon=True).start()
     return JsonResponse({
         "status": "success"}, safe=False)
 
