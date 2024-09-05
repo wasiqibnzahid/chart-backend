@@ -1,18 +1,21 @@
-from django.shortcuts import render
 import threading
 from django.core.management import call_command
-import os
-import subprocess
-import json
 from django.http import JsonResponse
 from .get_data import get_data, get_averages, get_insights
-from .models import Record, Site, ErrorLog
-from .generate_reports import fetch_data, get_latest_urls, get_sorted_rss_items
+from .models import ErrorLog
 # Create your views here.
 
 
 def handle_request(_request):
     data = get_data()
+    errors = ErrorLog.objects.all().order_by("-created_at")[:5]
+    formatted_errors = [{"id": error.id, "message": error.message,
+                         "created_at": error.created_at.isoformat()} for error in errors]
+
+    # Add errors to the data dictionary
+    data["errors"] = formatted_errors
+    data["errors"] = data['errors'] + data["errors"]
+    data["errors"] = data['errors'] + data["errors"]
     return JsonResponse(data, safe=False)
 
 
