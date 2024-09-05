@@ -76,7 +76,7 @@ WSGI_APPLICATION = 'tv_charts.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
+ALLOWED_HOSTS = ['3.91.27.247']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
