@@ -25,7 +25,6 @@ SECRET_KEY = 'django-insecure-ax8$_z0us^y+wz1!7t)!q#sm9-v8*k^)o5_f3##hvqn*4gis)x
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -76,7 +75,7 @@ WSGI_APPLICATION = 'tv_charts.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-ALLOWED_HOSTS = ['3.91.27.247']
+ALLOWED_HOSTS = ['*']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
