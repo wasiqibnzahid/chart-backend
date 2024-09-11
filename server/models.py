@@ -20,7 +20,7 @@ class Record(models.Model):
     video_value = models.FloatField(null=True, blank=True)
     total_value = models.FloatField(null=True, blank=True)
     azteca = models.BooleanField(default=False)
-    date = models.DateField()
+    date = models.DateField(null=True)
 
     def save(self, *args, **kwargs):
         # Set date to the Monday of the current week

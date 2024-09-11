@@ -70,7 +70,7 @@ def get_latest_urls(parsed_data, is_xml=True):
         if(len(entries) == 0):
             entries = parsed_data.findall(".//ns0:sitemap", namespaces)
         url_date_pairs = []
-
+        
         for entry in reversed(entries):
             loc = entry.find("ns0:loc", namespaces)
             time = entry.find("ns0:lastmod", namespaces)
@@ -83,7 +83,6 @@ def get_latest_urls(parsed_data, is_xml=True):
 
         # Extract sorted URLs
         sorted_urls = [url for url, _ in url_date_pairs]
-
         # if not sorted_urls:
         #     print("No URLs found in the XML data.")
 
