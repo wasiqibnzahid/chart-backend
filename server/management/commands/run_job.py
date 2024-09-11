@@ -141,7 +141,7 @@ def process_site(site: Site, semaphore):
 def run_job():
     sites = Site.objects.all()
     records = []
-    semaphore = threading.Semaphore(5)
+    semaphore = threading.Semaphore(1)
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
 
@@ -168,11 +168,14 @@ def get_lighthouse_mobile_score(url):
     report_file_path_rel = sanitize_filename(f"report_{url}.json")
     report_file_path = f'{os.getcwd()}/{report_file_path_rel}'
     try:
-        command = f'lighthouse --chrome-flags="--headless" --output=json --output-path="{
+        command = f'lighthouse --no-enable-error-reporting --chrome-flags="--headless --disable-gpu" --output=json --output-path="{
             report_file_path_rel}" "{url}"'
         result = subprocess.run(
             command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
-        result.check_returncode()
+        code = result.check_returncode()
+        if(code != 0):
+            print(result.stdout)
+
         # pipe = os.popen(
         #     f'lighthouse --chrome-flags="--headless" --output=json --output-path="{report_file_path_rel}" ' + url)
         # pipe.read()
