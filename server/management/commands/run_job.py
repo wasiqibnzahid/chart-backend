@@ -141,7 +141,7 @@ def process_site(site: Site, semaphore):
 def run_job():
     sites = Site.objects.all()
     records = []
-    semaphore = threading.Semaphore(1)
+    semaphore = threading.Semaphore(3)
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
 
