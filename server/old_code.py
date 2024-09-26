@@ -74,8 +74,7 @@ def calculate_relevant_insights(df_data, companies, title):
 
     if significant_changes:
         most_relevant = max(significant_changes, key=lambda x: abs(x[3]))
-        insight = f"TV Azteca {most_relevant[1]} {most_relevant[2]} by {
-            abs(most_relevant[3]):.1f}%, especially in {most_relevant[0]}."
+        insight = f"TV Azteca {most_relevant[1]} {most_relevant[2]} by {abs(most_relevant[3]):.1f}%, especially in {most_relevant[0]}."
     else:
         insight = "No significant changes were observed across the TV Azteca companies."
 
@@ -105,8 +104,7 @@ def calculate_competition_insights(filtered_df, companies, title):
 
     if significant_changes:
         most_relevant = max(significant_changes, key=lambda x: abs(x[3]))
-        insight = f"Competition {most_relevant[1]} {most_relevant[2]} by {
-            abs(most_relevant[3]):.1f}%, especially in {most_relevant[0]}."
+        insight = f"Competition {most_relevant[1]} {most_relevant[2]} by {abs(most_relevant[3]):.1f}%, especially in {most_relevant[0]}."
     else:
         insight = None
 
