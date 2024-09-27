@@ -74,12 +74,14 @@ WSGI_APPLICATION = 'tv_charts.wsgi.application'
 ALLOWED_HOSTS = ['*']
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'azteca',
-        'USER': 'root',
-        'PASSWORD': '123456789',
-        'HOST': 'localhost',   # Or the IP address of your MySQL server
-        'PORT': '3306',        # Default MySQL port
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'ENGINE': 'django.db.backends.mysql',
+        # 'NAME': 'azteca',
+        # 'USER': 'root',
+        # 'PASSWORD': '123456789',
+        # 'HOST': 'localhost',   # Or the IP address of your MySQL server
+        # 'PORT': '3306',        # Default MySQL port
     }
 }
 
