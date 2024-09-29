@@ -143,10 +143,12 @@ def process_site(site: Site, semaphore):
 
 
 def run_job():
+    
     sites = Site.objects.all()
     records = []
     semaphore = threading.Semaphore(3)
-
+    print(f"SIOTES ARE {sites}")
+    return;
     with concurrent.futures.ThreadPoolExecutor() as executor:
         print(f"STARINT PROCESSING SITE A")
         future_to_site = {executor.submit(
@@ -156,7 +158,7 @@ def run_job():
             result = future.result()  # Get the result of the future
             records.append(result)
             print(f"Processed site {site}: Result = {result}")
-
+    print(f"STATUS IS DONE")
     if records:
         Record.objects.bulk_create(records)
 
@@ -200,6 +202,7 @@ class Command(BaseCommand):
     help = 'Run a long function in a separate thread'
 
     def handle(self, *args, **kwargs):
+        print(f"SSTARTING")
         run_job()
         # threading.Thread(target=run_job, daemon=True).start()
         # self.stdout.write(self.style.SUCCESS(

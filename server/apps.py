@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 
 def get_next_monday_midnight():
     today = datetime.now()
-    today.replace(minute=today.minute + 3)
+    today = today.replace(minute=59)
     print(f"SCHEDULED FOR {today}")
     return today
     # days_ahead = 0 - today.weekday() if today.weekday() <= 0 else 7 - today.weekday()
@@ -38,7 +38,7 @@ class ServerConfig(AppConfig):
         # Add job to scheduler with interval trigger, starting at next Monday midnight and running every 7 days
         scheduler.add_job(
             self.run_job,
-            trigger=IntervalTrigger(weeks=1),
+            trigger=IntervalTrigger(seconds=6),
             start_date=next_monday_midnight
         )
 
@@ -48,7 +48,3 @@ class ServerConfig(AppConfig):
     def run_job(self):
         print(f"RUNNING")
         call_command("run_job")
-        while True:
-            print(f"RUNNING sleeping")
-            time.sleep(3600 * 48)  # Sleep for 2 days
-            call_command('run_job')

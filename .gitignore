@@ -1,2 +1,23 @@
-*venv*/
-report_*.json
+# Python cache files
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Django stuff:
+*.log
+*.sqlite3
+db.sqlite3
+media/
+
+# Environment variables
+.env
+
+# Virtual environment
+venv/
+.env/
+
+# Others
+*.DS_Store
+*.egg-info/
+*.egg
