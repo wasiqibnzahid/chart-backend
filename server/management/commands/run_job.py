@@ -12,6 +12,8 @@ from ...generate_reports import fetch_data, fetch_feed_urls, get_latest_urls, ge
 
 def process_site(site: Site, semaphore):
     with semaphore:
+        print(f"Init for site {site.name} {site.sitemap_url}, note: {
+              site.note_sitemap_url} video: {site.video_sitemap_url}")
         today = datetime.today()
         monday_of_current_week = today - timedelta(days=today.weekday())
         date = monday_of_current_week.date()
@@ -54,11 +56,14 @@ def process_site(site: Site, semaphore):
                     item for item in extracted_video_urls_inner if "entretenimiento" in item]
             extracted_nota_urls.extend(extracted_nota_urls_inner)
             extracted_video_urls.extend(extracted_video_urls_inner)
+
             if len(extracted_nota_urls_inner) == 0:
-                log = ErrorLog(message=f"Sitemap returned 0 urls: {note_sitemap_url}")
+                log = ErrorLog(message=f"Sitemap returned 0 urls: {
+                               note_sitemap_url}")
                 log.save()
             if len(extracted_video_urls_inner) == 0:
-                log = ErrorLog(message=f"Sitemap returned 0 urls: {video_sitemap_url}")
+                log = ErrorLog(message=f"Sitemap returned 0 urls: {
+                               video_sitemap_url}")
                 log.save()
 
             extracted_nota_urls.extend(extracted_nota_urls_inner)
@@ -71,11 +76,12 @@ def process_site(site: Site, semaphore):
             note_count = 0
             i = 0
             index = 0
-            while index < 1 and i < len(extracted_nota_urls):
+            while index < 0 and i < len(extracted_nota_urls):
                 try:
                     res = get_lighthouse_mobile_score(
                         extracted_nota_urls[i])
-                    print(f"FOR nota URL {extracted_nota_urls[i]} FOR SITE {site.name} score is {res}")
+                    print(f"FOR nota URL {extracted_nota_urls[i]} FOR SITE {
+                          site.name} score is {res}")
                     if res != 0:
                         note_val += res
                         note_count += 1
@@ -90,11 +96,12 @@ def process_site(site: Site, semaphore):
 
             i = 0
             index = 0
-            while index < 1 and i < len(extracted_video_urls):
+            while index < 3 and i < len(extracted_video_urls):
                 try:
                     res = get_lighthouse_mobile_score(
                         extracted_video_urls[i])
-                    print(f"FOR video URL {extracted_nota_urls[i]} FOR SITE {site.name} score is {res}")
+                    print(f"FOR video URL {extracted_nota_urls[i]} FOR SITE {
+                          site.name} score is {res}")
                     if res != 0:
                         video_val += res
                         video_count += 1
@@ -112,15 +119,16 @@ def process_site(site: Site, semaphore):
                 video_count = 1
             video_val = (video_val / video_count) * 100
             note_val = (note_val / note_count) * 100
-            record = Record(
-                name=site.name,
-                note_value=note_val,
-                video_value=video_val,
-                azteca=site.name == "Azteca",
-                date=date,
-                total_value=(note_val + video_val) / 2
-                # Set Azteca flag if applicable
-            )
+            print(f"SCORE IS {site.name} {note_val} vid: {video_val}")
+            # record = Record(
+            #     name=site.name,
+            #     note_value=note_val,
+            #     video_value=video_val,
+            #     azteca=site.name == "Azteca",
+            #     date=date,
+            #     total_value=(note_val + video_val) / 2
+            #     # Set Azteca flag if applicable
+            # )
             return record
 
         except Exception as e:
@@ -140,7 +148,7 @@ def run_job():
     semaphore = threading.Semaphore(3)
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
-
+        print(f"STARINT PROCESSING SITE A")
         future_to_site = {executor.submit(
             process_site, site, semaphore): site for site in sites}
         for future in concurrent.futures.as_completed(future_to_site):
@@ -164,7 +172,8 @@ def get_lighthouse_mobile_score(url):
     report_file_path_rel = sanitize_filename(f"report_{url}.json")
     report_file_path = f'{os.getcwd()}/{report_file_path_rel}'
     try:
-        command = f'lighthouse --no-enable-error-reporting --chrome-flags="--headless --disable-gpu" --output=json --output-path="{report_file_path_rel}" "{url}"'
+        command = f'lighthouse --no-enable-error-reporting --chrome-flags="--headless --disable-gpu" --output=json --output-path="{
+            report_file_path_rel}" "{url}"'
         result = subprocess.run(
             command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
         code = result.check_returncode()

@@ -11,11 +11,12 @@ from datetime import datetime, timedelta
 
 def get_next_monday_midnight():
     today = datetime.now()
-    # Monday is 0 and Sunday is 6, calculate days until next Monday
-    days_ahead = 0 - today.weekday() if today.weekday() <= 0 else 7 - today.weekday()
-    next_monday = today + timedelta(days=days_ahead)
-    # Set time to 12:00 AM (midnight)
-    return next_monday.replace(hour=0, minute=0, second=0, microsecond=0)
+    today.replace(minute=today.minute + 1)
+    print(f"SCHEDULED FOR {today}")
+    return today
+    # days_ahead = 0 - today.weekday() if today.weekday() <= 0 else 7 - today.weekday()
+    # next_monday = today + timedelta(days=days_ahead)
+    # return next_monday.replace(hour=0, minute=0, second=0, microsecond=0)
 
 
 class ServerConfig(AppConfig):
@@ -23,6 +24,8 @@ class ServerConfig(AppConfig):
     name = 'server'
 
     def ready(self):
+        if os.environ.get('RUN_MAIN', None) != 'true':
+            return
         scheduler = BackgroundScheduler()
 
         # Ensure the scheduler stops with the main thread
