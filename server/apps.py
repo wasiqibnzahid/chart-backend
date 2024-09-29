@@ -24,6 +24,7 @@ class ServerConfig(AppConfig):
     name = 'server'
 
     def ready(self):
+        print(f"THE ENV IS {os.environ.get("RUN_MAIN", None)}")
         if os.environ.get('RUN_MAIN', None) != 'true':
             return
         scheduler = BackgroundScheduler()
