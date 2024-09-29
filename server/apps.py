@@ -47,4 +47,4 @@ class ServerConfig(AppConfig):
 
     def run_job(self):
         print(f"RUNNING")
-        call_command("run_job")
+        # call_command("run_job")

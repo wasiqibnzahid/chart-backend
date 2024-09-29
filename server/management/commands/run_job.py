@@ -148,7 +148,6 @@ def run_job():
     records = []
     semaphore = threading.Semaphore(3)
     print(f"SIOTES ARE {sites}")
-    return;
     with concurrent.futures.ThreadPoolExecutor() as executor:
         print(f"STARINT PROCESSING SITE A")
         future_to_site = {executor.submit(
