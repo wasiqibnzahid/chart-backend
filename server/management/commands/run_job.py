@@ -120,15 +120,15 @@ def process_site(site: Site, semaphore):
             video_val = (video_val / video_count) * 100
             note_val = (note_val / note_count) * 100
             print(f"SCORE IS {site.name} {note_val} vid: {video_val}")
-            # record = Record(
-            #     name=site.name,
-            #     note_value=note_val,
-            #     video_value=video_val,
-            #     azteca=site.name == "Azteca",
-            #     date=date,
-            #     total_value=(note_val + video_val) / 2
-            #     # Set Azteca flag if applicable
-            # )
+            record = Record(
+                name=site.name,
+                note_value=note_val,
+                video_value=video_val,
+                azteca=site.name == "Azteca",
+                date=date,
+                total_value=(note_val + video_val) / 2
+                # Set Azteca flag if applicable
+            )
             return record
 
         except Exception as e:
@@ -143,7 +143,7 @@ def process_site(site: Site, semaphore):
 
 
 def run_job():
-    
+
     sites = Site.objects.all()
     records = []
     semaphore = threading.Semaphore(1)

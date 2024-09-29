@@ -3,7 +3,7 @@ import time
 from apscheduler.schedulers.background import BackgroundScheduler
 from django.core.management import call_command
 from apscheduler.triggers.interval import IntervalTrigger
-
+import calendar
 import threading
 import os
 from datetime import datetime, timedelta
@@ -23,27 +23,57 @@ class ServerConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'server'
 
-    def ready(self):
+    def ready(self, *args, **options):
         print(f"THE ENV IS {os.environ.get("RUN_MAIN", None)}")
         if os.environ.get('RUN_MAIN', None) != 'true':
             return
-        scheduler = BackgroundScheduler()
+        # Calculate the time for the next Monday at 12 AM
+        now = datetime.now()
+        monday = now + timedelta(days=(calendar.MONDAY - now.weekday()) %
+                                 7, weeks=(now.weekday() == calendar.MONDAY))
+        target_time = datetime(monday.year, monday.month, monday.day, 12, 0)
 
-        # Ensure the scheduler stops with the main thread
-        scheduler.daemonic = True
+        # Define the function for the background job
+        def background_job():
+            # Your background job logic here
+            print("Running background job!")
 
-        # Get the next Monday midnight
-        next_monday_midnight = get_next_monday_midnight()
+            # Schedule the next execution for the following Monday
+            self.schedule_next_run()
 
-        # Add job to scheduler with interval trigger, starting at next Monday midnight and running every 7 days
-        scheduler.add_job(
-            self.run_job,
-            trigger=IntervalTrigger(seconds=6),
-            start_date=next_monday_midnight
-        )
+        # Schedule the initial execution
+        if target_time > now:
+            delay = (target_time - now).total_seconds()
+            self.stdout.write(f"First run scheduled for {
+                              target_time} (delay: {delay:.2f} seconds)")
+            threading.Timer(delay, background_job).start()
+        else:
+            self.stdout.write(
+                "Current time is past Monday 12 AM. Starting job immediately.")
+            background_job()
 
-        # Start the scheduler
-        scheduler.start()
+        # Schedule the next execution within the background job function
+        def schedule_next_run(self):
+            next_monday = target_time + timedelta(days=7)
+            delay = (next_monday - datetime.now()).total_seconds()
+            threading.Timer(delay, background_job).start()
+        # scheduler = BackgroundScheduler()
+
+        # # Ensure the scheduler stops with the main thread
+        # scheduler.daemonic = True
+
+        # # Get the next Monday midnight
+        # next_monday_midnight = get_next_monday_midnight()
+
+        # # Add job to scheduler with interval trigger, starting at next Monday midnight and running every 7 days
+        # scheduler.add_job(
+        #     self.run_job,
+        #     trigger=IntervalTrigger(seconds=6),
+        #     start_date=next_monday_midnight
+        # )
+
+        # # Start the scheduler
+        # scheduler.start()
 
     def run_job(self):
         print(f"RUNNING")
