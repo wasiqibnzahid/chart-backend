@@ -146,7 +146,7 @@ def run_job():
     
     sites = Site.objects.all()
     records = []
-    semaphore = threading.Semaphore(3)
+    semaphore = threading.Semaphore(1)
     print(f"SIOTES ARE {sites}")
     with concurrent.futures.ThreadPoolExecutor() as executor:
         print(f"STARINT PROCESSING SITE A")
