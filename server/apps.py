@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 
 def get_next_monday_midnight():
     today = datetime.now()
-    today.replace(minute=today.minute + 1)
+    today.replace(minute=today.minute + 3)
     print(f"SCHEDULED FOR {today}")
     return today
     # days_ahead = 0 - today.weekday() if today.weekday() <= 0 else 7 - today.weekday()
