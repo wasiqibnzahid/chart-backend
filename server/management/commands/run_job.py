@@ -80,7 +80,7 @@ def process_site(site: Site, semaphore):
             note_count = 0
             i = 0
             index = 0
-            while index < 2 and i < len(extracted_nota_urls):
+            while index < 10 and i < len(extracted_nota_urls):
                 try:
                     res = get_lighthouse_mobile_score(
                         extracted_nota_urls[i])
@@ -100,7 +100,7 @@ def process_site(site: Site, semaphore):
 
             i = 0
             index = 0
-            while index < 2 and i < len(extracted_video_urls):
+            while index < 10 and i < len(extracted_video_urls):
                 try:
                     res = get_lighthouse_mobile_score(
                         extracted_video_urls[i])
