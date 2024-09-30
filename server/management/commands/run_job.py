@@ -41,6 +41,11 @@ def process_site(site: Site, semaphore):
                     nota_xml, is_xml="html" not in note_sitemap_url)
                 extracted_video_urls_inner = get_latest_urls(
                     video_xml, is_xml="html" not in video_sitemap_url)
+                if (site.name == "NY Times"):
+                    video_xml = fetch_data(extracted_video_urls_inner[0])
+                    extracted_video_urls_inner = get_latest_urls(
+                        video_xml, is_xml=True)
+            print(f"URLS ARE {extracted_video_urls_inner}")
             if site.name == "Milenio" or site.name == "El Universal":
                 extracted_nota_urls_inner = [
                     item for item in extracted_nota_urls_inner if "video" not in item]
@@ -129,6 +134,15 @@ def process_site(site: Site, semaphore):
                 total_value=(note_val + video_val) / 2
                 # Set Azteca flag if applicable
             )
+            record = Record(
+                name=site.name,
+                note_value=note_val,
+                video_value=video_val,
+                azteca=site.name == "Azteca",
+                date=date,
+                total_value=(note_val + video_val) / 2
+                # Set Azteca flag if applicable
+            )
             return record
 
         except Exception as e:
@@ -144,7 +158,7 @@ def process_site(site: Site, semaphore):
 
 def run_job():
 
-    sites = Site.objects.all()
+    sites = Site.objects.filter(name="NY Times")
     records = []
     semaphore = threading.Semaphore(1)
     print(f"SIOTES ARE {sites}")
