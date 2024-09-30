@@ -158,7 +158,7 @@ def process_site(site: Site, semaphore):
 
 def run_job():
 
-    sites = Site.objects.filter(name="NY Times")
+    sites = Site.objects.all()
     records = []
     semaphore = threading.Semaphore(1)
     print(f"SIOTES ARE {sites}")
