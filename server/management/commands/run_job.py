@@ -8,7 +8,7 @@ import os
 import threading
 from ...models import ErrorLog, Record, Site
 from ...generate_reports import fetch_data, fetch_feed_urls, get_latest_urls, get_sorted_rss_items
-
+from server.get_data import azteca_columns_raw
 
 def process_site(site: Site, semaphore):
     with semaphore:
@@ -128,20 +128,12 @@ def process_site(site: Site, semaphore):
                 name=site.name,
                 note_value=note_val,
                 video_value=video_val,
-                azteca=site.name == "Azteca",
+                azteca=site.name in azteca_columns_raw,
                 date=date,
                 total_value=(note_val + video_val) / 2
                 # Set Azteca flag if applicable
             )
-            record = Record(
-                name=site.name,
-                note_value=note_val,
-                video_value=video_val,
-                azteca=site.name == "Azteca",
-                date=date,
-                total_value=(note_val + video_val) / 2
-                # Set Azteca flag if applicable
-            )
+
             return record
 
         except Exception as e:
