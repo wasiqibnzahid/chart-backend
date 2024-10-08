@@ -83,6 +83,8 @@ def fetch_records():
     # Fetch all records, you can add filtering if necessary (e.g., for specific date range)
     records = Record.objects.all().order_by('date')
     print(f"RECORD ARE ", records)
+    for record in records:
+        print(f"{record}")
     # Group records by date
     grouped_records = defaultdict(list)
 
