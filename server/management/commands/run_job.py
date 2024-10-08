@@ -10,6 +10,7 @@ from ...models import ErrorLog, Record, Site
 from ...generate_reports import fetch_data, fetch_feed_urls, get_latest_urls, get_sorted_rss_items
 from server.get_data import azteca_columns_raw
 
+
 def process_site(site: Site, semaphore):
     with semaphore:
         print(f"Init for site {site.name} {site.sitemap_url}, note: {
@@ -153,6 +154,10 @@ def run_job():
     records = []
     semaphore = threading.Semaphore(1)
     print(f"SIOTES ARE {sites}")
+    today = datetime.today()
+    monday_of_current_week = today - timedelta(days=today.weekday())
+    date = monday_of_current_week.date()
+    Record.objects.filter(date=date).delete()
     with concurrent.futures.ThreadPoolExecutor() as executor:
         print(f"STARINT PROCESSING SITE A")
         future_to_site = {executor.submit(
