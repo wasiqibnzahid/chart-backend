@@ -79,7 +79,6 @@ def fetch_records():
     #     'NY Times (Video)': [36, 45, 30, 37, 25, 39, 54, 41, 40, 42, 39,37, 38],
     # }
     #     # Initialize a dictionary to store the results
-    data = defaultdict(list)
 
     # Fetch all records, you can add filtering if necessary (e.g., for specific date range)
     records = Record.objects.all().order_by('date')
