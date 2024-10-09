@@ -729,7 +729,7 @@ def formatLolData(df, inner_data):
                 combined_data[name][date] = {'sum': 0, 'count': 0}
 
             # Add value to sum and increment count
-            combined_data[name][date]['sum'] += value
+            combined_data[name][date]['sum'] += 0 if value is None else value
             combined_data[name][date]['count'] += 1
 
     # Format the averages output
