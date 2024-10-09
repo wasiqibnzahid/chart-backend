@@ -144,7 +144,9 @@ def init(inner_data=None):
     df = pd.DataFrame(inner_data)
 
     # Calculating averages
-
+    print(f"MY DATA IS {inner_data} ")
+    print(" --------------------------------------- ")
+    print(f"my df is {df}")
     df['TV Azteca Avg'] = df[tv_azteca_columns].mean(axis=1).round(1)
     print(f"AVG IS {df["TV Azteca Avg"]}")
     df['Competition Avg'] = df[competition_columns].mean(axis=1).round(1)
