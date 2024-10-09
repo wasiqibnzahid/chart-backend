@@ -81,9 +81,7 @@ def fetch_records():
 
     # Fetch all records, you can add filtering if necessary (e.g., for specific date range)
     records = Record.objects.all().order_by('date')
-    print(f"RECORD ARE ", records)
-    for record in records:
-        print(f"{record}")
+
     # Group records by date
     grouped_records = defaultdict(list)
     data = {
@@ -119,20 +117,16 @@ def fetch_records():
     }
     for record in records:
         grouped_records[record.date].append(record)
-    print(f"data date is {data["Date"]} and ")
     # Iterate over the grouped records and populate the dictionary
     for date, records_on_date in grouped_records.items():
         # Convert date to string format 'YYYY-MM-DD'
         data['Date'].append(str(date))
-        print(f"FOR RECORD DATE{date} records on date are {records_on_date}")
         for record in records_on_date:
             # Example: Azteca UNO (Note), Azteca UNO (Video)
             name = record.name
-            print(f"PUSHING FOR RECORD {name} for date {record.date}")
             data[f"{name} (Note)"].append(int(record.note_value))
             data[f"{name} (Video)"].append(int(record.video_value))
     # Convert defaultdict to a normal dictionary for output
-    print(f"AAA {dict(data)}")
     return dict(data)
 
 
@@ -142,11 +136,7 @@ def init(inner_data=None):
     df = pd.DataFrame(inner_data)
 
     # Calculating averages
-    print(f"MY DATA IS {inner_data} ")
-    print(" --------------------------------------- ")
-    print(f"my df is {df}")
     df['TV Azteca Avg'] = df[tv_azteca_columns].mean(axis=1).round(1)
-    print(f"AVG IS {df["TV Azteca Avg"]}")
     df['Competition Avg'] = df[competition_columns].mean(axis=1).round(1)
 
     df['TV Azteca Note Avg'] = df[[
@@ -694,7 +684,6 @@ def formatLolData(df, inner_data):
 
     for index, item in enumerate(data_as_json):
         item["Date"] = inner_data["Date"][index]
-        print(f"PROCESSING DATE {inner_data["Date"][index]}")
     transformed_data = transform_data(data_as_json)
 
     for item in transformed_data:
@@ -714,11 +703,8 @@ def formatLolData(df, inner_data):
     combined_data = {}
     # Combine video and note data
     for item in video + note:
-        print(f"item is {item}")
         name = item['name']
-        print(f"NAME IS {name}")
         for entry in item['data']:
-            print(f"ENTRY IS {entry}")
             date = entry['x']
             value = entry['y']
 

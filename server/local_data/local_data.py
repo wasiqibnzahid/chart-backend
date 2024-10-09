@@ -273,8 +273,6 @@ def fetch_records():
 def init(inner_data=None):
     if (inner_data is None):
         inner_data = fetch_records()
-    print(len(inner_data["Date"]))
-    print(inner_data)
     df = pd.DataFrame(inner_data)
 
     # Calculating averages

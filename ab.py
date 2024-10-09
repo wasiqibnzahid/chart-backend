@@ -25,13 +25,9 @@ def sort_urls_by_date(urls):
 def main():
     sitemap_url = 'https://www.tvazteca.com/aztecanoticias/sitemap-content.xml'
     xml_content = fetch_sitemap(sitemap_url)
-    print(xml_content)
     urls = parse_sitemap(xml_content)
-    print(urls)
     sorted_urls = sort_urls_by_date(urls)
 
-    for url, lastmod in sorted_urls:
-        print(f"URL: {url}, Last Modified: {lastmod}")
         
         
 main()
