@@ -728,6 +728,7 @@ def formatLolData(df, inner_data):
 
 def get_data():
     inner_data = fetch_records()
+    print(f"INNER DATA IS {inner_data}")
     df = init(inner_data)
     data = formatToJson(df)
     average_data = transform_data(data, columns)
