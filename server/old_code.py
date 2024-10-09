@@ -5,8 +5,7 @@ import numpy as np
 
 # Data setup
 data = {
-    'Date': [
-    ],
+    'Date': [],
     'Azteca UNO (Note)': [],
     'Azteca UNO (Video)': [],
     'Azteca 7 (Note)': [],
