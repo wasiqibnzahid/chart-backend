@@ -90,7 +90,7 @@ def fetch_records():
 
     for record in records:
         grouped_records[record.date].append(record)
-
+    print(f"GROUPED RECORDS ARE {grouped_records}");
     # Iterate over the grouped records and populate the dictionary
     for date, records_on_date in grouped_records.items():
         # Convert date to string format 'YYYY-MM-DD'
