@@ -90,12 +90,12 @@ def fetch_records():
 
     for record in records:
         grouped_records[record.date].append(record)
-    print(f"GROUPED RECORDS ARE {grouped_records}");
+    print(f"GROUPED RECORDS ARE {grouped_records}")
     # Iterate over the grouped records and populate the dictionary
     for date, records_on_date in grouped_records.items():
         # Convert date to string format 'YYYY-MM-DD'
         data['Date'].append(str(date))
-
+        print(f"FOR RECORD DATE{date} records on date are {records_on_date}")
         for record in records_on_date:
             # Example: Azteca UNO (Note), Azteca UNO (Video)
             name = record.name
