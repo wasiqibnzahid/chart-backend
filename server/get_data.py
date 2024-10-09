@@ -131,8 +131,8 @@ def fetch_records():
             # Example: Azteca UNO (Note), Azteca UNO (Video)
             name = record.name
             print(f"PUSHING FOR RECORD {name} for date {record.date}")
-            data[f"{name} (Note)"].append(record.note_value)
-            data[f"{name} (Video)"].append(record.video_value)
+            data[f"{name} (Note)"].append(int(record.note_value))
+            data[f"{name} (Video)"].append(int(record.video_value))
     # Convert defaultdict to a normal dictionary for output
     print(f"AAA {dict(data)}")
     return dict(data)
