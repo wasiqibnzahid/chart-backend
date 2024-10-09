@@ -714,8 +714,11 @@ def formatLolData(df, inner_data):
     combined_data = {}
     # Combine video and note data
     for item in video + note:
+        print(f"item is {item}")
         name = item['name']
+        print(f"NAME IS {name}")
         for entry in item['data']:
+            print(f"ENTRY IS {entry}")
             date = entry['x']
             value = entry['y']
 
