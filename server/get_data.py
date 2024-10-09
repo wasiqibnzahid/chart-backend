@@ -3,7 +3,6 @@ from collections import defaultdict
 from .models import Record
 from datetime import datetime
 import json
-from .old_code import df as df2, data
 is_calc = False
 tv_azteca_columns = [
     'Azteca UNO (Note)', 'Azteca UNO (Video)', 'Azteca 7 (Note)', 'Azteca 7 (Video)',
@@ -671,7 +670,7 @@ def calculate_competition_insights(filtered_df, companies, is_competition, date_
 
 
 def formatLolData(df, inner_data):
-    data_as_json = formatToJson(df2)
+    data_as_json = formatToJson(df)
     note = []
     video = []
     video_other = calculate_competition_insights(
