@@ -87,7 +87,7 @@ def fetch_records():
         print(f"{record}")
     # Group records by date
     grouped_records = defaultdict(list)
-
+    data = {}
     for record in records:
         grouped_records[record.date].append(record)
     print(f"GROUPED RECORDS ARE {grouped_records}")
