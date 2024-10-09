@@ -120,7 +120,6 @@ def fetch_records():
     }
     for record in records:
         grouped_records[record.date].append(record)
-    print(f"data is {data} and ")
     print(f"data date is {data["Date"]} and ")
     # Iterate over the grouped records and populate the dictionary
     for date, records_on_date in grouped_records.items():
@@ -761,18 +760,10 @@ def formatLolData(df, inner_data):
 
 def get_data():
     inner_data = fetch_records()
-    print(f"INNER DATA IS One {inner_data}")
-    print(f" Inner Data 2 {data}")
     df = init(inner_data)
-    df2 = init(data)
-    datata = formatToJson(df)
-    data2 = formatToJson(df)
-    print(f"inner data one as df after init fn {df}")
-    print(f"inner data two as df after init fn {df2}")
-    print(f"inner data one as json {datata}")
-    print(f"inner data two as json {data2}")
-    average_data = transform_data(datata, columns)
-    percentages = transform_data(datata, changeKeys)
+    data = formatToJson(df)
+    average_data = transform_data(data, columns)
+    percentages = transform_data(data, changeKeys)
     other = formatLolData(df, inner_data)
 
     return {
