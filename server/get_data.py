@@ -146,6 +146,7 @@ def init(inner_data=None):
     # Calculating averages
 
     df['TV Azteca Avg'] = df[tv_azteca_columns].mean(axis=1).round(1)
+    print(f"AVG IS {df["TV Azteca Avg"]}")
     df['Competition Avg'] = df[competition_columns].mean(axis=1).round(1)
 
     df['TV Azteca Note Avg'] = df[[
