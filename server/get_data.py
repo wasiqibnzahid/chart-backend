@@ -87,7 +87,37 @@ def fetch_records():
         print(f"{record}")
     # Group records by date
     grouped_records = defaultdict(list)
-    data = {}
+    data = {
+        'Date': [],
+        'Azteca UNO (Note)': [],
+        'Azteca UNO (Video)': [],
+        'Azteca 7 (Note)': [],
+        'Azteca 7 (Video)': [],
+        'Deportes (Note)': [],
+        'Deportes (Video)': [],
+        'ADN40 (Note)': [],
+        'ADN40 (Video)': [],
+        'A+ (Note)': [],
+        'A+ (Video)': [],
+        'Noticias (Note)': [],
+        'Noticias (Video)': [],
+        'Milenio (Note)': [],
+        'Milenio (Video)': [],
+        'El Heraldo (Note)': [],
+        'El Heraldo (Video)': [],
+        'El Universal (Note)': [],
+        'El Universal (Video)': [],
+        'Televisa (Note)': [],
+        'Televisa (Video)': [],
+        'Terra (Note)': [],
+        'Terra (Video)': [],
+        'AS (Note)': [],
+        'AS (Video)': [],
+        'Infobae (Note)': [],
+        'Infobae (Video)': [],
+        'NY Times (Note)': [],
+        'NY Times (Video)': [],
+    }
     for record in records:
         grouped_records[record.date].append(record)
     print(f"data is {data} and ")
