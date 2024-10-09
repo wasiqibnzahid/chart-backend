@@ -673,7 +673,6 @@ def calculate_competition_insights(filtered_df, companies, is_competition, date_
 
 def formatLolData(df, inner_data):
     data_as_json = formatToJson(df2)
-    print(f"DATA AS JSON IS {data_as_json}")
     note = []
     video = []
     video_other = calculate_competition_insights(
