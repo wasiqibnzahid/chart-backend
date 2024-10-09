@@ -162,14 +162,14 @@ def init(inner_data=None):
     def pct_change(series):
         return series.pct_change().apply(lambda x: x)
 
-    df['TV Azteca Avg Change'] = int(pct_change(df['TV Azteca Avg']))
-    df['Competition Avg Change'] = int(pct_change(df['Competition Avg']))
+    df['TV Azteca Avg Change'] = pct_change(df['TV Azteca Avg'])
+    df['Competition Avg Change'] = pct_change(df['Competition Avg'])
 
-    df['TV Azteca Note Change'] = int(pct_change(df['TV Azteca Note Avg']))
-    df['Competition Note Change'] = int(pct_change(df['Competition Note Avg']))
+    df['TV Azteca Note Change'] = pct_change(df['TV Azteca Note Avg'])
+    df['Competition Note Change'] = pct_change(df['Competition Note Avg'])
 
-    df['TV Azteca Video Change'] = int(pct_change(df['TV Azteca Video Avg']))
-    df['Competition Video Change'] = int(pct_change(df['Competition Video Avg']))
+    df['TV Azteca Video Change'] = pct_change(df['TV Azteca Video Avg'])
+    df['Competition Video Change'] = pct_change(df['Competition Video Avg'])
     return df
 
 
