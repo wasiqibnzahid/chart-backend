@@ -1,102 +1,11 @@
 import pandas as pd
 from collections import defaultdict
-from server.models import Record
+from server.models import LocalRecord
 from datetime import datetime
 import json
 
 is_calc = False
 
-# data1 = {
-#     'Date': [
-#         '2024-06-17',
-#         # '2024-06-25',
-#         # '2024-07-02',
-#         # '2024-07-08',
-#         # '2024-07-22',
-#         # '2024-07-29',
-#         # '2024-08-05',
-#         # '2024-08-12',
-#         # '2024-08-19'
-#     ],
-#     "Azteca Veracruz (Note)": [62],
-#     "Azteca Veracruz (Video)": [63],
-#     "Azteca Quintanaroo (Note)": [59],
-#     "Azteca Quintanaroo (Video)": [62],
-#     "Azteca BC (Note)": [59],
-#     "Azteca BC (Video)": [66],
-#     "Azteca Sinaloa (Note)": [61],
-#     "Azteca Sinaloa (Video)": [61],
-#     "Azteca CJ (Note)": [61],
-#     "Azteca CJ (Video)": [71],
-#     "Azteca Aguascalientes (Note)": [61],
-#     "Azteca Aguascalientes (Video)": [65],
-#     "Azteca Queretaro (Note)": [67],
-#     "Azteca Queretaro (Video)": [66],
-#     "Azteca Chiapas (Note)": [63],
-#     "Azteca Chiapas (Video)": [65],
-#     "Azteca Puebla (Note)": [63],
-#     "Azteca Puebla (Video)": [65],
-#     "Azteca Yucatan (Note)": [60],
-#     "Azteca Yucatan (Video)": [64],
-#     "Azteca Chihuahua (Note)": [59],
-#     "Azteca Chihuahua (Video)": [61],
-#     "Azteca Morelos (Note)": [58],
-#     "Azteca Morelos (Video)": [63],
-#     "Azteca Jalisco (Note)": [58],
-#     "Azteca Jalisco (Video)": [58],
-#     "Azteca Guerrero (Note)": [60],
-#     "Azteca Guerrero (Video)": [61],
-#     "Azteca Bajio (Note)": [63],
-#     "Azteca Bajio (Video)": [61]
-# }
-data1 = {
-        'Date': [
-            '2024-06-17',
-            '2024-06-25',
-            # '2024-07-02',
-            # '2024-07-08',
-            # '2024-07-22',
-            # '2024-07-29',
-            # '2024-08-05',
-            # '2024-08-12',
-            # '2024-08-19',
-            # '2024-08-26',
-            # '2024-09-02',
-            # '2024-09-16',
-            # '2024-09-09',
-        ],
-        "Azteca Veracruz (Note)": [58, 60],
-        "Azteca Veracruz (Video)": [60, 61],
-        "Azteca Quintanaroo (Note)": [63, 61],
-        "Azteca Quintanaroo (Video)": [59, 62],
-        "Azteca BC (Note)": [60, 62],
-        "Azteca BC (Video)": [71, 66],
-        "Azteca Sinaloa (Note)": [60, 63],
-        "Azteca Sinaloa (Video)": [58, 63],
-        "Azteca CJ (Note)": [63, 62],
-        "Azteca CJ (Video)": [74, 72],
-        "Azteca Aguascalientes (Note)": [64, 64],
-        "Azteca Aguascalientes (Video)": [61, 63],
-        "Azteca Queretaro (Note)": [66, 55],
-        "Azteca Queretaro (Video)": [61, 66],
-        "Azteca Chiapas (Note)": [55, 57],
-        "Azteca Chiapas (Video)": [64, 65],
-        "Azteca Puebla (Note)": [65, 67],
-        "Azteca Puebla (Video)": [66, 67],
-        "Azteca Yucatan (Note)": [59, 59],
-        "Azteca Yucatan (Video)": [68, 63],
-        "Azteca Chihuahua (Note)": [53, 52],
-        "Azteca Chihuahua (Video)": [56, 61],
-        "Azteca Morelos (Note)": [52, 52],
-        "Azteca Morelos (Video)": [62, 62],
-        "Azteca Jalisco (Note)": [58, 59],
-        "Azteca Jalisco (Video)": [64, 60],
-        "Azteca Guerrero (Note)": [62, 60],
-        "Azteca Guerrero (Video)": [61, 61],
-        "Azteca Bajio (Note)": [60, 60],
-        "Azteca Bajio (Video)": [62, 58]
-    }
-df2 = pd.DataFrame(data1)
 
 columns = [
     'TV Azteca Avg', 'Competition Avg',
@@ -196,58 +105,11 @@ def formatToJson(df):
 
 
 def fetch_records():
-    return {
-        'Date': [
-            '2024-06-17',
-            '2024-06-25',
-            # '2024-07-02',
-            # '2024-07-08',
-            # '2024-07-22',
-            # '2024-07-29',
-            # '2024-08-05',
-            # '2024-08-12',
-            # '2024-08-19',
-            # '2024-08-26',
-            # '2024-09-02',
-            # '2024-09-16',
-            # '2024-09-09',
-        ],
-        "Azteca Veracruz (Note)": [58, 60],
-        "Azteca Veracruz (Video)": [60, 61],
-        "Azteca Quintanaroo (Note)": [63, 61],
-        "Azteca Quintanaroo (Video)": [59, 62],
-        "Azteca BC (Note)": [60, 62],
-        "Azteca BC (Video)": [71, 66],
-        "Azteca Sinaloa (Note)": [60, 63],
-        "Azteca Sinaloa (Video)": [58, 63],
-        "Azteca CJ (Note)": [63, 62],
-        "Azteca CJ (Video)": [74, 72],
-        "Azteca Aguascalientes (Note)": [64, 64],
-        "Azteca Aguascalientes (Video)": [61, 63],
-        "Azteca Queretaro (Note)": [66, 55],
-        "Azteca Queretaro (Video)": [61, 66],
-        "Azteca Chiapas (Note)": [55, 57],
-        "Azteca Chiapas (Video)": [64, 65],
-        "Azteca Puebla (Note)": [65, 67],
-        "Azteca Puebla (Video)": [66, 67],
-        "Azteca Yucatan (Note)": [59, 59],
-        "Azteca Yucatan (Video)": [68, 63],
-        "Azteca Chihuahua (Note)": [53, 52],
-        "Azteca Chihuahua (Video)": [56, 61],
-        "Azteca Morelos (Note)": [52, 52],
-        "Azteca Morelos (Video)": [62, 62],
-        "Azteca Jalisco (Note)": [58, 59],
-        "Azteca Jalisco (Video)": [64, 60],
-        "Azteca Guerrero (Note)": [62, 60],
-        "Azteca Guerrero (Video)": [61, 61],
-        "Azteca Bajio (Note)": [60, 60],
-        "Azteca Bajio (Video)": [62, 58]
-    }
     # Initialize a dictionary to store the results
     data = defaultdict(list)
 
     # Fetch all records, you can add filtering if necessary (e.g., for specific date range)
-    records = Record.objects.all().order_by('date')
+    records = LocalRecord.objects.all().order_by('date')
 
     # Group records by date
     grouped_records = defaultdict(list)
@@ -329,6 +191,7 @@ def transform_data(data, include_columns=[], start_date=None, end_date=None):
                     series[key] = []
                 series[key].append({"x": date, "y": value})
 
+
     # Convert series to a list of dictionaries
     result = [{"name": key, "data": value} for key, value in series.items()]
 
@@ -336,7 +199,7 @@ def transform_data(data, include_columns=[], start_date=None, end_date=None):
 
 
 def formatLolData(df, inner_data):
-    data_as_json = formatToJson(df2)
+    data_as_json = formatToJson(df[[col for col in df.columns if not col.startswith('TV') and not col.startswith("Competition")]])
     note = []
     video = []
     video_other = calculate_competition_insights(
@@ -362,6 +225,7 @@ def formatLolData(df, inner_data):
         item["Date"] = inner_data["Date"][index]
 
     transformed_data = transform_data(data_as_json)
+
 
     for item in transformed_data:
         if "Video" in item["name"]:
