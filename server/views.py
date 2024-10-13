@@ -1,13 +1,13 @@
 from django.http import JsonResponse
 from .get_data import get_data, get_averages, get_insights
-from .models import ErrorLog
+from .models import LocalErrorLog
 from server.local_data import local_data,local_quarter,local_insights
 # Create your views here.
 
 
 def handle_request(_request):
     data = get_data()
-    errors = ErrorLog.objects.all().order_by("-created_at")[:5]
+    errors = LocalErrorLog.objects.all().order_by("-created_at")[:5]
     formatted_errors = [{"id": error.id, "message": error.message,
                          "created_at": error.created_at.isoformat()} for error in errors]
 
@@ -40,7 +40,7 @@ def get_insights_api(request):
 
 def get_local_data(request):
     data = local_data.get_data()
-    errors = ErrorLog.objects.all().order_by("-created_at")[:5]
+    errors = LocalErrorLog.objects.all().order_by("-created_at")[:5]
     formatted_errors = [{"id": error.id, "message": error.message,
                          "created_at": error.created_at.isoformat()} for error in errors]
 
