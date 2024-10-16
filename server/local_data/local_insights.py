@@ -3,28 +3,27 @@ from .local_data import (
     competition_columns,
     calculate_competition_insights,
     calculate_relevant_insights,
-    label_mapping
+    azteca_columns
 )
 
 
 def get_insights(date_filter=None):
+    print(date_filter)
     df = init()
     video_other = calculate_competition_insights(
         df, [
             col for col in competition_columns if 'Video' in col], '', date_filter)
     video_self = calculate_relevant_insights(
-        df, [col for col in list(
-            label_mapping.keys()) if 'Video' in col], '', date_filter)
+        df, [col for col in azteca_columns if 'Video' in col], '', date_filter)
     note_other = calculate_competition_insights(
         df, [
             col for col in competition_columns if 'Note' in col], '', date_filter)
     note_self = calculate_relevant_insights(
-        df, [col for col in list(
-            label_mapping.keys()) if 'Note' in col], '', date_filter)
+        df, [col for col in azteca_columns if 'Note' in col], '', date_filter)
     total_self = calculate_relevant_insights(
-        df, list(label_mapping.keys()), '', date_filter)
+        df, azteca_columns, '', date_filter)
     total_competition = calculate_competition_insights(df, [
-        col for col in competition_columns if col not in list(label_mapping.keys())], '', date_filter)
+        col for col in competition_columns], '', date_filter)
     return {
         "videos": {
             "self": video_self,
