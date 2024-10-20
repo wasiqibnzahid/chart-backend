@@ -24,12 +24,13 @@ class ServerConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'server'
 
-    def ready(self):
-        if os.environ.get('RUN_MAIN', None) != 'true':
-            return
-        thread = threading.Thread(target=self.start_scheduler)
-        thread.daemon = True  # Set the thread as a daemon
-        thread.start()
+# Removing auto-run since mac will be handling this now
+    # def ready(self):
+    #     if os.environ.get('RUN_MAIN', None) != 'true':
+    #         return
+        # thread = threading.Thread(target=self.start_scheduler)
+        # thread.daemon = True  # Set the thread as a daemon
+        # thread.start()
 
     def start_scheduler(self):
         scheduler = BackgroundScheduler()
