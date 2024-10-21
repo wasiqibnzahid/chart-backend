@@ -6,76 +6,20 @@ import concurrent.futures
 import json
 import os
 import threading
-from ...models import ErrorLog, Record, Site
-from ...generate_reports import fetch_data, fetch_feed_urls, get_latest_urls, get_sorted_rss_items
-from server.get_data import azteca_columns_raw
+from ...models import LocalErrorLog, LocalRecord, LocalSite
+from server.local_data.local_data import azteca_columns_raw
 
 
-def process_site(site: Site, semaphore):
+def process_site(site: LocalSite, semaphore):
     with semaphore:
         print(f"Init for site {site.name} {site.sitemap_url}, note: {site.note_sitemap_url} video: {site.video_sitemap_url}")
         today = datetime.today()
         monday_of_current_week = today - timedelta(days=today.weekday())
         date = monday_of_current_week.date()
         try:
-            note_sitemap_url = site.sitemap_url
-            video_sitemap_url = site.sitemap_url
-            if site.note_sitemap_url:
-                note_sitemap_url = site.note_sitemap_url
-            if site.video_sitemap_url:
-                video_sitemap_url = site.video_sitemap_url
-            nota_xml = fetch_data(note_sitemap_url)
-            video_xml = fetch_data(video_sitemap_url)
             extracted_video_urls = site.video_urls
             extracted_nota_urls = site.note_urls
-            print("extracted_nota_urls")
-            print(extracted_nota_urls)
-            print(extracted_video_urls)
-            print("extracted_video_urls")
-            if site.name == 'El Heraldo':
-                extracted_video_urls_inner, extracted_nota_urls_inner = get_latest_urls(
-                    site.sitemap_url, is_xml=False)
-            elif site.name == "AS":
-                extracted_nota_urls_inner = get_sorted_rss_items(
-                    site.note_sitemap_url)
-                extracted_video_urls_inner = get_sorted_rss_items(
-                    site.video_sitemap_url)
-            else:
-                extracted_nota_urls_inner = get_latest_urls(
-                    nota_xml, is_xml="html" not in note_sitemap_url)
-                extracted_video_urls_inner = get_latest_urls(
-                    video_xml, is_xml="html" not in video_sitemap_url)
-                if (site.name == "NY Times"):
-                    video_xml = fetch_data(extracted_video_urls_inner[0])
-                    extracted_video_urls_inner = get_latest_urls(
-                        video_xml, is_xml=True)
-            if site.name == "Milenio" or site.name == "El Universal":
-                extracted_nota_urls_inner = [
-                    item for item in extracted_nota_urls_inner if "video" not in item]
-                extracted_video_urls_inner = [
-                    item for item in extracted_video_urls_inner if "video" in item]
-            if site.name == "Infobae" or site.name == "AS":
-                extracted_nota_urls_inner = [
-                    item for item in extracted_nota_urls_inner if "video" not in item]
-            if site.name == "Terra":
-                extracted_nota_urls_inner = [
-                    item for item in extracted_nota_urls_inner if "nacionales" in item]
-                extracted_video_urls_inner = [
-                    item for item in extracted_video_urls_inner if "entretenimiento" in item]
-            extracted_nota_urls.extend(extracted_nota_urls_inner)
-            extracted_video_urls.extend(extracted_video_urls_inner)
 
-            if len(extracted_nota_urls_inner) == 0:
-                log = ErrorLog(message=f"Sitemap returned 0 urls: {note_sitemap_url}")
-                log.save()
-            if len(extracted_video_urls_inner) == 0:
-                log = ErrorLog(message=f"Sitemap returned 0 urls: {video_sitemap_url}")
-                log.save()
-
-            extracted_nota_urls.extend(extracted_nota_urls_inner)
-            extracted_video_urls.extend(extracted_video_urls_inner)
-            print(f"For company {site.name} the note urls are "
-                  f"{len(extracted_nota_urls)} and video are {len(extracted_video_urls_inner)}")
             video_val = 0
             video_count = 0
             note_val = 0
@@ -93,7 +37,7 @@ def process_site(site: Site, semaphore):
                         index += 1
                 except:
                     url = extracted_nota_urls[i]
-                    log = ErrorLog(
+                    log = LocalErrorLog(
                         message=f"Failed for Manual Url {url}"
                     )
                     log.save()
@@ -112,7 +56,7 @@ def process_site(site: Site, semaphore):
                         index += 1
                 except:
                     url = extracted_video_urls[i]
-                    log = ErrorLog(
+                    log = LocalErrorLog(
                         message=f"Failed for Manual Url {url}"
                     )
                     log.save()
@@ -124,7 +68,7 @@ def process_site(site: Site, semaphore):
             video_val = (video_val / video_count) * 100
             note_val = (note_val / note_count) * 100
             print(f"SCORE IS {site.name} {note_val} vid: {video_val}")
-            record = Record(
+            record = LocalRecord(
                 name=site.name,
                 note_value=note_val,
                 video_value=video_val,
@@ -138,7 +82,7 @@ def process_site(site: Site, semaphore):
 
         except Exception as e:
             print(f"Exception for {site.name}: {e}")
-            return Record(name=site.name,
+            return LocalRecord(name=site.name,
                           note_value=0,
                           video_value=0,
                           azteca="Azteca" in site.name,
@@ -149,14 +93,14 @@ def process_site(site: Site, semaphore):
 
 def run_job():
 
-    sites = Site.objects.all()
+    sites = LocalSite.objects.all()
     records = []
     semaphore = threading.Semaphore(1)
     print(f"SIOTES ARE {sites}")
     today = datetime.today()
     monday_of_current_week = today - timedelta(days=today.weekday())
     date = monday_of_current_week.date()
-    Record.objects.filter(date=date).delete()
+    LocalRecord.objects.filter(date=date).delete()
     with concurrent.futures.ThreadPoolExecutor() as executor:
         print(f"STARINT PROCESSING SITE A")
         future_to_site = {executor.submit(
@@ -168,7 +112,7 @@ def run_job():
             print(f"Processed site {site}: Result = {result}")
     print(f"STATUS IS DONE")
     if records:
-        Record.objects.bulk_create(records)
+        LocalRecord.objects.bulk_create(records)
 
 
 def sanitize_filename(url):
