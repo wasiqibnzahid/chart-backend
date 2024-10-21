@@ -4,11 +4,11 @@ from datetime import datetime, timedelta
 
 class Site(models.Model):
     name = models.CharField(max_length=255)
-    sitemap_url = models.URLField(null=True)
-    video_sitemap_url = models.URLField(null=True)
-    note_sitemap_url = models.URLField(null=True)
-    video_urls = models.JSONField(null=True)
-    note_urls = models.JSONField(null=True)
+    sitemap_url = models.URLField(null=True,blank=True)
+    video_sitemap_url = models.URLField(null=True,blank=True)
+    note_sitemap_url = models.URLField(null=True,blank=True)
+    video_urls = models.JSONField(null=True,blank=True)
+    note_urls = models.JSONField(null=True,blank=True)
 
     def __str__(self):
         return self.name
@@ -52,11 +52,11 @@ class ErrorLog(models.Model):
 
 class LocalSite(models.Model):
     name = models.CharField(max_length=255)
-    sitemap_url = models.URLField(null=True)
-    video_sitemap_url = models.URLField(null=True)
-    note_sitemap_url = models.URLField(null=True)
-    video_urls = models.JSONField(null=True)
-    note_urls = models.JSONField(null=True)
+    sitemap_url = models.URLField(null=True,blank=True)
+    video_sitemap_url = models.URLField(null=True,blank=True)
+    note_sitemap_url = models.URLField(null=True,blank=True)
+    video_urls = models.JSONField(null=True,blank=True)
+    note_urls = models.JSONField(null=True,blank=True)
 
     def __str__(self):
         return self.name
