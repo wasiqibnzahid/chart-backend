@@ -106,6 +106,47 @@ def formatToJson(df):
 
 def fetch_records():
     # Initialize a dictionary to store the results
+    return {
+        'Date': [
+            '2024-09-07',
+            '2024-09-16',
+            '2024-09-23',
+            '2024-09-30',
+            '2024-10-07',
+            '2024-10-14'
+        ],
+
+        'Azteca Veracruz (Note)': [58, 60, 62, 60, 63, 64, 66],
+        'Azteca Veracruz (Video)': [60, 61, 63, 60, 67, 67, 67],
+        'Azteca Quintanaroo (Note)': [63, 61, 59, 64, 60, 67, 60],
+        'Azteca Quintanaroo (Video)': [59, 62, 66, 68, 63, 67, 62],
+        'Azteca BC (Note)': [60, 62, 59, 60, 63, 60, 64],
+        'Azteca BC (Video)': [71, 66, 66, 68, 66, 67, 65],
+        'Azteca Sinaloa (Note)': [60, 58, 61, 62, 63, 60, 64],
+        'Azteca Sinaloa (Video)': [63, 63, 61, 62, 67, 65, 62],
+        'Azteca CJ (Note)': [74, 72, 71, 72, 64, 68, 65],
+        'Azteca CJ (Video)': [64, 63, 65, 66, 67, 66, 64],
+        'Azteca Aguascalientes (Note)': [66, 55, 67, 61, 61, 62, 65],
+        'Azteca Aguascalientes (Video)': [61, 66, 66, 64, 64, 64, 64],
+        'Azteca Queretaro (Note)': [55, 57, 63, 65, 61, 64, 66],
+        'Azteca Queretaro (Video)': [64, 65, 61, 64, 63, 62, 62],
+        'Azteca Chiapas (Note)': [59, 59, 60, 59, 60, 63, 63],
+        'Azteca Chiapas (Video)': [68, 63, 64, 63, 67, 65, 66],
+        'Azteca Puebla (Note)': [53, 52, 59, 59, 60, 62, 63],
+        'Azteca Puebla (Video)': [56, 61, 61, 61, 60, 64, 60],
+        'Azteca Yucatan (Note)': [52, 52, 58, 60, 63, 65, 65],
+        'Azteca Yucatan (Video)': [62, 62, 58, 66, 61, 65, 64],
+        'Azteca Chihuahua (Note)': [58, 59, 58, 61, 61, 61, 62],
+        'Azteca Chihuahua (Video)': [64, 60, 60, 66, 61, 64, 66],
+        'Azteca Morelos (Note)': [62, 64, 63, 61, 65, 66, 65],
+        'Azteca Morelos (Video)': [61, 62, 61, 63, 65, 64, 64],
+        'Azteca Jalisco (Note)': [60, 59, 60, 59, 60, 66, 64],
+        'Azteca Jalisco (Video)': [58, 60, 61, 59, 63, 65, 62],
+        'Azteca Guerrero (Note)': [61, 61, 61, 61, 60, 64, 66],
+        'Azteca Guerrero (Video)': [64, 62, 63, 66, 64, 66, 64],
+        'Azteca Bajio (Note)': [60, 58, 63, 61, 61, 66, 66],
+        'Azteca Bajio (Video)': [62, 58, 61, 63, 64, 64, 65]
+    }
     data = defaultdict(list)
 
     # Fetch all records, you can add filtering if necessary (e.g., for specific date range)
@@ -191,7 +232,6 @@ def transform_data(data, include_columns=[], start_date=None, end_date=None):
                     series[key] = []
                 series[key].append({"x": date, "y": value})
 
-
     # Convert series to a list of dictionaries
     result = [{"name": key, "data": value} for key, value in series.items()]
 
@@ -199,7 +239,8 @@ def transform_data(data, include_columns=[], start_date=None, end_date=None):
 
 
 def formatLolData(df, inner_data):
-    data_as_json = formatToJson(df[[col for col in df.columns if not col.startswith('TV') and not col.startswith("Competition")]])
+    data_as_json = formatToJson(df[[col for col in df.columns if not col.startswith(
+        'TV') and not col.startswith("Competition")]])
     note = []
     video = []
     video_other = calculate_competition_insights(
@@ -225,7 +266,6 @@ def formatLolData(df, inner_data):
         item["Date"] = inner_data["Date"][index]
 
     transformed_data = transform_data(data_as_json)
-
 
     for item in transformed_data:
         if "Video" in item["name"]:
@@ -299,7 +339,7 @@ def calculate_competition_insights(filtered_df, companies, is_competition, date_
             filtered_df['Date'], format='%Y-%m-%d')
 
         filtered_df = filtered_df[(filtered_df['Date'] >= start_date) & (
-                filtered_df['Date'] <= end_date)]
+            filtered_df['Date'] <= end_date)]
     significant_changes = []
     for company in companies:
         try:
@@ -307,7 +347,7 @@ def calculate_competition_insights(filtered_df, companies, is_competition, date_
             final_value = filtered_df[company].iloc[-1]
 
             percentage_change = (
-                                        (final_value - initial_value) / initial_value) * 100
+                (final_value - initial_value) / initial_value) * 100
 
             if abs(percentage_change) >= 5:
                 if abs(percentage_change) < 10:
@@ -326,7 +366,8 @@ def calculate_competition_insights(filtered_df, companies, is_competition, date_
 
     if significant_changes:
         most_relevant = max(significant_changes, key=lambda x: abs(x[3]))
-        insight = f"TV Competition {most_relevant[1]} {most_relevant[2]} by {abs(most_relevant[3]):.1f}%, especially in {most_relevant[0]}."
+        insight = f"TV Competition {most_relevant[1]} {most_relevant[2]} by {
+            abs(most_relevant[3]):.1f}%, especially in {most_relevant[0]}."
     else:
         insight = None
 
@@ -345,7 +386,7 @@ def calculate_relevant_insights(filtered_df, companies, title, date_filter=None)
             filtered_df['Date'], format='%Y-%m-%d')
 
         filtered_df = filtered_df[(filtered_df['Date'] >= start_date) & (
-                filtered_df['Date'] <= end_date)]
+            filtered_df['Date'] <= end_date)]
 
     significant_changes = []
 
@@ -355,7 +396,7 @@ def calculate_relevant_insights(filtered_df, companies, title, date_filter=None)
             initial_value = filtered_df[company].iloc[0]
             final_value = filtered_df[company].iloc[-1]
             percentage_change = (
-                                        (final_value - initial_value) / initial_value) * 100
+                (final_value - initial_value) / initial_value) * 100
 
             if abs(percentage_change) >= 5:
                 if abs(percentage_change) < 10:
@@ -371,7 +412,8 @@ def calculate_relevant_insights(filtered_df, companies, title, date_filter=None)
 
     if significant_changes:
         most_relevant = max(significant_changes, key=lambda x: abs(x[3]))
-        insight = f"TV Azteca {most_relevant[1]} {most_relevant[2]} by {abs(most_relevant[3]):.1f}%, especially in {most_relevant[0]}."
+        insight = f"TV Azteca {most_relevant[1]} {most_relevant[2]} by {
+            abs(most_relevant[3]):.1f}%, especially in {most_relevant[0]}."
     else:
         insight = "No significant changes were observed across the Azteca companies."
 
