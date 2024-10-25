@@ -89,6 +89,12 @@ def process_site(site: LocalSite, semaphore):
                           date=date,
                           total_value=0
                           )
+def write_text_to_file(text, filename="/root/log.txt"):
+    # Open the file in append mode; create it if it doesn't exist
+    with open(filename, "a") as file:
+        # Write the text with a newline at the end
+        file.write(text + "\n")
+
 
 
 def run_job():
@@ -112,7 +118,10 @@ def run_job():
             print(f"Processed site {site}: Result = {result}")
     print(f"STATUS IS DONE")
     if records:
-        LocalRecord.objects.bulk_create(records)
+        for record in records:
+            write_text_to_file(f"RECORD IS {record.name} {
+                               record.note_value} {record.video_value}")
+        # LocalRecord.objects.bulk_create(records)
 
 
 def sanitize_filename(url):

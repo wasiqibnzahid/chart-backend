@@ -13,7 +13,8 @@ from server.get_data import azteca_columns_raw
 
 def process_site(site: Site, semaphore):
     with semaphore:
-        print(f"Init for site {site.name} {site.sitemap_url}, note: {site.note_sitemap_url} video: {site.video_sitemap_url}")
+        print(f"Init for site {site.name} {site.sitemap_url}, note: {
+              site.note_sitemap_url} video: {site.video_sitemap_url}")
         today = datetime.today()
         monday_of_current_week = today - timedelta(days=today.weekday())
         date = monday_of_current_week.date()
@@ -66,10 +67,12 @@ def process_site(site: Site, semaphore):
             extracted_video_urls.extend(extracted_video_urls_inner)
 
             if len(extracted_nota_urls_inner) == 0:
-                log = ErrorLog(message=f"Sitemap returned 0 urls: {note_sitemap_url}")
+                log = ErrorLog(message=f"Sitemap returned 0 urls: {
+                               note_sitemap_url}")
                 log.save()
             if len(extracted_video_urls_inner) == 0:
-                log = ErrorLog(message=f"Sitemap returned 0 urls: {video_sitemap_url}")
+                log = ErrorLog(message=f"Sitemap returned 0 urls: {
+                               video_sitemap_url}")
                 log.save()
 
             extracted_nota_urls.extend(extracted_nota_urls_inner)
@@ -86,7 +89,8 @@ def process_site(site: Site, semaphore):
                 try:
                     res = get_lighthouse_mobile_score(
                         extracted_nota_urls[i])
-                    print(f"FOR nota URL {extracted_nota_urls[i]} FOR SITE {site.name} score is {res}")
+                    print(f"FOR nota URL {extracted_nota_urls[i]} FOR SITE {
+                          site.name} score is {res}")
                     if res != 0:
                         note_val += res
                         note_count += 1
@@ -105,7 +109,8 @@ def process_site(site: Site, semaphore):
                 try:
                     res = get_lighthouse_mobile_score(
                         extracted_video_urls[i])
-                    print(f"FOR video URL {extracted_nota_urls[i]} FOR SITE {site.name} score is {res}")
+                    print(f"FOR video URL {extracted_nota_urls[i]} FOR SITE {
+                          site.name} score is {res}")
                     if res != 0:
                         video_val += res
                         video_count += 1
@@ -147,6 +152,13 @@ def process_site(site: Site, semaphore):
                           )
 
 
+def write_text_to_file(text, filename="/root/log.txt"):
+    # Open the file in append mode; create it if it doesn't exist
+    with open(filename, "a") as file:
+        # Write the text with a newline at the end
+        file.write(text + "\n")
+
+
 def run_job():
 
     sites = Site.objects.all()
@@ -168,7 +180,10 @@ def run_job():
             print(f"Processed site {site}: Result = {result}")
     print(f"STATUS IS DONE")
     if records:
-        Record.objects.bulk_create(records)
+        for record in records:
+            write_text_to_file(f"RECORD IS {record.name} {
+                               record.note_value} {record.video_value}")
+        # Record.objects.bulk_create(records)
 
 
 def sanitize_filename(url):
@@ -182,7 +197,8 @@ def get_lighthouse_mobile_score(url):
     report_file_path_rel = sanitize_filename(f"report_{url}.json")
     report_file_path = f'{os.getcwd()}/{report_file_path_rel}'
     try:
-        command = f'lighthouse --no-enable-error-reporting --chrome-flags="--headless --disable-gpu" --output=json --output-path="{report_file_path_rel}" "{url}"'
+        command = f'lighthouse --no-enable-error-reporting --chrome-flags="--headless --disable-gpu" --output=json --output-path="{
+            report_file_path_rel}" "{url}"'
         result = subprocess.run(
             command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
         code = result.check_returncode()
