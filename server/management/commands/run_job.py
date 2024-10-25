@@ -138,7 +138,8 @@ def process_site(site: Site, semaphore):
                 total_value=(note_val + video_val) / 2
                 # Set Azteca flag if applicable
             )
-
+            write_text_to_file(f"LOCAL RECORD IS {record.name} NOTE: {
+                               record.note_value} VIDEO: {record.video_value}")
             return record
 
         except Exception as e:
@@ -179,11 +180,11 @@ def run_job():
             records.append(result)
             print(f"Processed site {site}: Result = {result}")
     print(f"STATUS IS DONE")
-    if records:
-        for record in records:
-            write_text_to_file(f"RECORD IS {record.name} {
-                               record.note_value} {record.video_value}")
-        # Record.objects.bulk_create(records)
+    # if records:
+    #     for record in records:
+    #         write_text_to_file(f"RECORD IS {record.name} {
+    #                            record.note_value} {record.video_value}")
+    # Record.objects.bulk_create(records)
 
 
 def sanitize_filename(url):

@@ -12,7 +12,8 @@ from server.local_data.local_data import azteca_columns_raw
 
 def process_site(site: LocalSite, semaphore):
     with semaphore:
-        print(f"Init for site {site.name} {site.sitemap_url}, note: {site.note_sitemap_url} video: {site.video_sitemap_url}")
+        print(f"Init for site {site.name} {site.sitemap_url}, note: {
+              site.note_sitemap_url} video: {site.video_sitemap_url}")
         today = datetime.today()
         monday_of_current_week = today - timedelta(days=today.weekday())
         date = monday_of_current_week.date()
@@ -30,7 +31,8 @@ def process_site(site: LocalSite, semaphore):
                 try:
                     res = get_lighthouse_mobile_score(
                         extracted_nota_urls[i])
-                    print(f"FOR nota URL {extracted_nota_urls[i]} FOR SITE {site.name} score is {res}")
+                    print(f"FOR nota URL {extracted_nota_urls[i]} FOR SITE {
+                          site.name} score is {res}")
                     if res != 0:
                         note_val += res
                         note_count += 1
@@ -49,7 +51,8 @@ def process_site(site: LocalSite, semaphore):
                 try:
                     res = get_lighthouse_mobile_score(
                         extracted_video_urls[i])
-                    print(f"FOR video URL {extracted_nota_urls[i]} FOR SITE {site.name} score is {res}")
+                    print(f"FOR video URL {extracted_nota_urls[i]} FOR SITE {
+                          site.name} score is {res}")
                     if res != 0:
                         video_val += res
                         video_count += 1
@@ -77,24 +80,25 @@ def process_site(site: LocalSite, semaphore):
                 total_value=(note_val + video_val) / 2
                 # Set Azteca flag if applicable
             )
-
+            write_text_to_file(f"RECORD IS {record.name} NOTE: {record.note_value} VIDEO: {record.video_value}")
             return record
-
+    
         except Exception as e:
             print(f"Exception for {site.name}: {e}")
             return LocalRecord(name=site.name,
-                          note_value=0,
-                          video_value=0,
-                          azteca="Azteca" in site.name,
-                          date=date,
-                          total_value=0
-                          )
+                               note_value=0,
+                               video_value=0,
+                               azteca="Azteca" in site.name,
+                               date=date,
+                               total_value=0
+                               )
+
+
 def write_text_to_file(text, filename="/root/log.txt"):
     # Open the file in append mode; create it if it doesn't exist
     with open(filename, "a") as file:
         # Write the text with a newline at the end
         file.write(text + "\n")
-
 
 
 def run_job():
@@ -117,11 +121,11 @@ def run_job():
             records.append(result)
             print(f"Processed site {site}: Result = {result}")
     print(f"STATUS IS DONE")
-    if records:
-        for record in records:
-            write_text_to_file(f"RECORD IS {record.name} {
-                               record.note_value} {record.video_value}")
-        # LocalRecord.objects.bulk_create(records)
+    # if records:
+    #     for record in records:
+    #         write_text_to_file(f"RECORD IS {record.name} {
+    #                            record.note_value} {record.video_value}")
+    # LocalRecord.objects.bulk_create(records)
 
 
 def sanitize_filename(url):
@@ -135,7 +139,8 @@ def get_lighthouse_mobile_score(url):
     report_file_path_rel = sanitize_filename(f"report_{url}.json")
     report_file_path = f'{os.getcwd()}/{report_file_path_rel}'
     try:
-        command = f'lighthouse --no-enable-error-reporting --chrome-flags="--headless --disable-gpu" --output=json --output-path="{report_file_path_rel}" "{url}"'
+        command = f'lighthouse --no-enable-error-reporting --chrome-flags="--headless --disable-gpu" --output=json --output-path="{
+            report_file_path_rel}" "{url}"'
         result = subprocess.run(
             command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
         code = result.check_returncode()
