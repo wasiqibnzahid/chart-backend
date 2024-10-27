@@ -153,7 +153,7 @@ def process_site(site: Site, semaphore):
                           )
 
 
-def write_text_to_file(text, filename="/ubuntu/log.txt"):
+def write_text_to_file(text, filename="/home/ubuntu/log.txt"):
     # Open the file in append mode; create it if it doesn't exist
     with open(filename, "a") as file:
         # Write the text with a newline at the end
