@@ -106,49 +106,49 @@ def formatToJson(df):
 
 def fetch_records():
     # Initialize a dictionary to store the results
-    return {
-        'Date': [
-            '2024-09-07',
-            '2024-09-16',
-            '2024-09-23',
-            '2024-09-30',
-            '2024-10-07',
-            '2024-10-14',
-            '2024-10-21',
-            '2024-10-28'
-        ],
+    return  {
+    'Date': [
+        '2024-09-07',
+        '2024-09-16',
+        '2024-09-23',
+        '2024-09-30',
+        '2024-10-07',
+        '2024-10-14',
+        '2024-10-21',
+        '2024-10-28'
+    ],
 
-        'Azteca Veracruz (Note)': [58, 60, 62, 60, 63, 64, 64],
-        'Azteca Veracruz (Video)': [60, 61, 63, 60, 67, 67, 64],
-        'Azteca Quintanaroo (Note)': [63, 61, 59, 64, 60, 67, 62],
-        'Azteca Quintanaroo (Video)': [59, 62, 66, 68, 63, 67, 64],
-        'Azteca BC (Note)': [60, 62, 59, 60, 63, 60, 67],
-        'Azteca BC (Video)': [71, 66, 66, 68, 66, 67, 69],
-        'Azteca Sinaloa (Note)': [60, 58, 61, 62, 63, 60, 61],
-        'Azteca Sinaloa (Video)': [63, 63, 61, 62, 67, 65, 60],
-        'Azteca CJ (Note)': [74, 72, 71, 72, 64, 68, 63],
-        'Azteca CJ (Video)': [64, 63, 65, 66, 67, 66, 65],
-        'Azteca Aguascalientes (Note)': [66, 55, 67, 61, 61, 62, 63],
-        'Azteca Aguascalientes (Video)': [61, 66, 66, 64, 64, 64, 67],
-        'Azteca Queretaro (Note)': [55, 57, 63, 65, 61, 64, 63],
-        'Azteca Queretaro (Video)': [64, 65, 61, 64, 63, 62, 67],
-        'Azteca Chiapas (Note)': [59, 59, 60, 59, 60, 63, 65],
-        'Azteca Chiapas (Video)': [68, 63, 64, 63, 67, 65, 68],
-        'Azteca Puebla (Note)': [53, 52, 59, 59, 60, 62, 64],
-        'Azteca Puebla (Video)': [56, 61, 61, 61, 60, 64, 79],
-        'Azteca Yucatan (Note)': [52, 52, 58, 60, 63, 65, 64],
-        'Azteca Yucatan (Video)': [62, 62, 58, 66, 61, 65, 64],
-        'Azteca Chihuahua (Note)': [58, 59, 58, 61, 61, 61, 64],
-        'Azteca Chihuahua (Video)': [64, 60, 60, 66, 61, 64, 62],
-        'Azteca Morelos (Note)': [62, 64, 63, 61, 65, 66, 69],
-        'Azteca Morelos (Video)': [61, 62, 61, 63, 65, 64, 63],
-        'Azteca Jalisco (Note)': [60, 59, 60, 59, 60, 66, 66],
-        'Azteca Jalisco (Video)': [58, 60, 61, 59, 63, 65, 67],
-        'Azteca Guerrero (Note)': [61, 61, 61, 61, 60, 64, 67],
-        'Azteca Guerrero (Video)': [64, 62, 63, 66, 64, 66, 67],
-        'Azteca Bajio (Note)': [60, 58, 63, 61, 61, 66, 65],
-        'Azteca Bajio (Video)': [62, 58, 61, 63, 64, 64, 67]
-    }
+    'Azteca Veracruz (Note)': [58, 60, 62, 60, 63, 64, 66, 64],
+    'Azteca Veracruz (Video)': [60, 61, 63, 60, 67, 67, 67, 64],
+    'Azteca Quintanaroo (Note)': [63, 61, 59, 64, 60, 67, 60, 62],
+    'Azteca Quintanaroo (Video)': [59, 62, 66, 68, 63, 67, 64, 64],
+    'Azteca BC (Note)': [60, 62, 59, 60, 63, 60, 67, 67],
+    'Azteca BC (Video)': [71, 66, 66, 68, 66, 67, 68, 69],
+    'Azteca Sinaloa (Note)': [60, 58, 61, 62, 63, 60, 65, 61],
+    'Azteca Sinaloa (Video)': [63, 63, 61, 62, 67, 65, 65, 60],
+    'Azteca CJ (Note)': [74, 72, 71, 72, 64, 68, 67, 65],
+    'Azteca CJ (Video)': [64, 63, 65, 66, 67, 66, 67, 63],
+    'Azteca Aguascalientes (Note)': [66, 55, 67, 61, 61, 62, 65, 64],
+    'Azteca Aguascalientes (Video)': [61, 66, 66, 64, 64, 64, 66, 64],
+    'Azteca Queretaro (Note)': [55, 57, 63, 65, 61, 64, 66, 66],
+    'Azteca Queretaro (Video)': [64, 65, 61, 64, 63, 62, 65, 67],
+    'Azteca Chiapas (Note)': [59, 59, 60, 59, 60, 63, 62, 67],
+    'Azteca Chiapas (Video)': [68, 63, 64, 63, 67, 65, 69, 67],
+    'Azteca Puebla (Note)': [53, 52, 59, 59, 60, 62, 63, 67],
+    'Azteca Puebla (Video)': [56, 61, 61, 61, 60, 64, 65, 67],
+    'Azteca Yucatan (Note)': [52, 52, 58, 60, 63, 65, 68, 67],
+    'Azteca Yucatan (Video)': [62, 62, 58, 66, 61, 65, 64, 64],
+    'Azteca Chihuahua (Note)': [58, 59, 58, 61, 61, 61, 79, 62],
+    'Azteca Chihuahua (Video)': [64, 60, 60, 66, 61, 64, 64, 63],
+    'Azteca Morelos (Note)': [62, 64, 63, 61, 65, 66, 64, 63],
+    'Azteca Morelos (Video)': [61, 62, 61, 63, 65, 64, 66, 66],
+    'Azteca Jalisco (Note)': [60, 59, 60, 59, 60, 66, 67, 65],
+    'Azteca Jalisco (Video)': [58, 60, 61, 59, 63, 65, 65, 67],
+    'Azteca Guerrero (Note)': [61, 61, 61, 61, 60, 64, 67, 67],
+    'Azteca Guerrero (Video)': [64, 62, 63, 66, 64, 66, 67, 67],
+    'Azteca Bajio (Note)': [60, 58, 63, 61, 61, 66, 67, 67],
+    'Azteca Bajio (Video)': [62, 58, 61, 63, 64, 64, 67, 67]
+}
     data = defaultdict(list)
 
     # Fetch all records, you can add filtering if necessary (e.g., for specific date range)
