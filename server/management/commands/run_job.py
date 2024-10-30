@@ -164,7 +164,7 @@ def run_job():
 
     sites = Site.objects.all()
     records = []
-    semaphore = threading.Semaphore(1)
+    semaphore = threading.Semaphore(4)
     print(f"SIOTES ARE {sites}")
     today = datetime.today()
     monday_of_current_week = today - timedelta(days=today.weekday())
