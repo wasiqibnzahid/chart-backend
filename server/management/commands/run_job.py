@@ -87,9 +87,8 @@ def process_site(site: Site, semaphore):
             index = 0
             while index < 10 and i < len(extracted_nota_urls):
                 try:
-                    res = 0
-                    # get_lighthouse_mobile_score(
-                    #     extracted_nota_urls[i])
+                    res = get_lighthouse_mobile_score(
+                        extracted_nota_urls[i])
                     print(f"FOR nota URL {extracted_nota_urls[i]} FOR SITE {
                           site.name} score is {res}")
                     if res != 0:
@@ -108,10 +107,9 @@ def process_site(site: Site, semaphore):
             index = 0
             while index < 10 and i < len(extracted_video_urls):
                 try:
-                    res = 0
-                    # get_lighthouse_mobile_score(
-                        # extracted_video_urls[i])
-                    print(f"FOR video URL {extracted_video_urls[i]} FOR SITE {
+                    res = get_lighthouse_mobile_score(
+                        extracted_video_urls[i])
+                    print(f"FOR video URL {extracted_nota_urls[i]} FOR SITE {
                           site.name} score is {res}")
                     if res != 0:
                         video_val += res
