@@ -217,7 +217,7 @@ def get_lighthouse_mobile_score(url):
                 performance_score = report['categories']['performance']['score']
 
                 performance_score *= FACTOR
-                write_text_to_file(f"RAW SCORE IS {performance_score} for {url}")
+                write_text_to_file(f"RAW SCORE IS {performance_score} {performance_score >= 95} for {url}")
                 if performance_score >= 95:
                     performance_score = random.uniform(
                         93, 97)
