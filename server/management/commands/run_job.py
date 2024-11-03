@@ -163,7 +163,7 @@ def write_text_to_file(text, filename="/home/ubuntu/log.txt"):
 
 def run_job():
 
-    sites = Site.objects.filter(name="El Heraldo")
+    sites = Site.objects.all()
     records = []
     semaphore = threading.Semaphore(4)
     print(f"SIOTES ARE {sites}")
@@ -217,10 +217,10 @@ def get_lighthouse_mobile_score(url):
                 performance_score = report['categories']['performance']['score']
 
                 performance_score *= FACTOR
-                write_text_to_file(f"RAW SCORE IS {performance_score} {performance_score >= 95} for {url}")
-                if performance_score >= 95:
+                write_text_to_file(f"RAW SCORE IS {performance_score} {performance_score >= 0.95} for {url}")
+                if performance_score >= 0.95:
                     performance_score = random.uniform(
-                        93, 97)
+                        0.93, 0.97)
 
     except Exception as e:
         print(f"Error {e}")
