@@ -105,12 +105,11 @@ def run_job():
 
     sites = LocalSite.objects.all()
     records = []
-    semaphore = threading.Semaphore(1)
+    semaphore = threading.Semaphore(4)
     print(f"SIOTES ARE {sites}")
     today = datetime.today()
     monday_of_current_week = today - timedelta(days=today.weekday())
     date = monday_of_current_week.date()
-    LocalRecord.objects.filter(date=date).delete()
     with concurrent.futures.ThreadPoolExecutor() as executor:
         print(f"STARINT PROCESSING SITE A")
         future_to_site = {executor.submit(
@@ -121,11 +120,12 @@ def run_job():
             records.append(result)
             print(f"Processed site {site}: Result = {result}")
     print(f"STATUS IS DONE")
-    # if records:
-    #     for record in records:
-    #         write_text_to_file(f"RECORD IS {record.name} {
-    #                            record.note_value} {record.video_value}")
-    # LocalRecord.objects.bulk_create(records)
+    LocalRecord.objects.filter(date=date).delete()
+    if records:
+        for record in records:
+            write_text_to_file(f"RECORD IS {record.name} {
+                               record.note_value} {record.video_value}")
+    LocalRecord.objects.bulk_create(records)
 
 
 def sanitize_filename(url):
