@@ -10,11 +10,12 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # remove sql syntax errors
         migrations.RunSQL('''
                           delete from server_localrecord where date = '2024-10-14';
-INSERT INTO server_localrecord (name, note_value, video_value, total_value, azteca, date) VALUES
--- Week of October 14, 2024
-('Azteca Veracruz', 64, 67, 65.5, true, '2024-10-14'),
+                          INSERT INTO server_localrecord (name, note_value, video_value, total_value, azteca, date) VALUES
+                          -- Week of October 14, 2024
+                          ('Azteca Veracruz', 64, 67, 65.5, true, '2024-10-14'),
 ('Azteca Quintanaroo', 67, 67, 67.0, true, '2024-10-14'),
 ('Azteca BajaCalifornia', 60, 67, 63.5, true, '2024-10-14'),
 ('Azteca Sinaloa', 60, 65, 62.5, true, '2024-10-14'),
@@ -30,7 +31,7 @@ INSERT INTO server_localrecord (name, note_value, video_value, total_value, azte
 ('Azteca Guerrero', 64, 66, 65.0, true, '2024-10-14'),
 ('Azteca Bajio', 66, 64, 65.0, true, '2024-10-14');
 
-NSERT INTO server_record (name, note_value, video_value, total_value, azteca, date) VALUES
+INSERT INTO server_record (name, note_value, video_value, total_value, azteca, date) VALUES
 -- Week of October 21, 2024
 ('Azteca UNO', 65, 64, 64.5, true, '2024-10-21'),
 ('Azteca 7', 66, 65, 65.5, true, '2024-10-21'),
