@@ -199,7 +199,7 @@ def get_lighthouse_mobile_score(url):
     report_file_path_rel = sanitize_filename(f"report_{url}.json")
     report_file_path = f'{os.getcwd()}/{report_file_path_rel}'
 
-    FACTOR = 2
+    FACTOR = 1.7
 
     try:
         command = f'lighthouse --no-enable-error-reporting --chrome-flags="--headless" --output=json --output-path="{
