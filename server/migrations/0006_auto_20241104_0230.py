@@ -11,8 +11,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL('''
-                       INSERT INTO server_localsite (name, note_urls, video_urls) VALUES
-('Azteca BajaCalifornia', 
+                     INSERT INTO server_localsite (name, note_urls, video_urls) VALUES
+('Azteca BC', 
     JSON_ARRAY(
         'https://www.tvaztecabajacalifornia.com/espectaculos/mariah-carey-anuncia-el-inicio-la-temporada-navidad-2024-en-halloween',
         'https://www.tvaztecabajacalifornia.com/espectaculos/belinda-invita-a-majo-aguilar-a-su-fiesta-halloween-2024',
@@ -36,7 +36,6 @@ class Migration(migrations.Migration):
         'https://www.aztecayucatan.com/noticias/ministros-en-lo-particular-e-en-general-la-ley-supremacia-constitucional'
     )
 ),
--- Continue for each Azteca station...
 ('Azteca Veracruz',
     JSON_ARRAY(
         'https://www.aztecaveracruz.com/clima/veracruz-podria-tener-lluvias-por-posible-formacion-ciclon-tropical',
@@ -48,6 +47,203 @@ class Migration(migrations.Migration):
         'https://www.aztecaveracruz.com/noticias/que-ocurrio-hoy-31-octubre-en-el-centro-veracruz-que-hay-un-conductor-detenido',
         'https://www.aztecaveracruz.com/noticias/grupo-poder-en-la-suprema-corte-aprobo-la-ley-supremacia-constitucional'
     )
+),
+('Azteca Sinaloa',
+    JSON_ARRAY(
+        'https://www.aztecasinaloa.com/policiacal/localizan-cuerpo-sin-vida-afuera-panteon-salida-culiacana',
+        'https://www.aztecasinaloa.com/noticias/buscan-a-haziel-quiroz-desaparecido-en-culiacan-14-octubre',
+        'https://www.aztecasinaloa.com/policiacal/tras-detencion-de-tres-presuntos-halcones-en-corral-quedo-en-rosario'
+    ),
+    JSON_ARRAY(
+        'https://www.aztecasinaloa.com/noticias/chalco-avance-en-la-limpieza-inundaciones-245-toneladas-desechos-retiradas',
+        'https://www.aztecasinaloa.com/noticias/al-interior-del-pais-se-registran-protestas-en-la-aprobacion-la-reforma-judicial',
+        'https://www.aztecasinaloa.com/noticias/trabajadores-poder-judicial-en-michoacan-exigen-se-pare-reforma'
+    )
+),
+('Azteca Quintanaroo',
+    JSON_ARRAY(
+        'https://www.aztecaquintanaroo.com/noticias/efemerides-del-1-noviembre-esto-paso-un-dia-como-hoy-en-el-mundo',
+        'https://www.aztecaquintanaroo.com/noticias/precio-de-dolar-en-cancun-hoy-tipo-cambio-este-1-noviembre-2024',
+        'https://www.aztecaquintanaroo.com/trafico/auto-impacta-estructura-hotel-en-el-boulevard-kukulkan-en-cancun-hoy-1-noviembre'
+    ),
+    JSON_ARRAY(
+        'https://www.aztecaquintanaroo.com/noticias/video-trabajadores-del-poder-judicial-en-hidalgo-la-intensidad-su-resistencia',
+        'https://www.aztecaquintanaroo.com/noticias/video-menen-y-aliados-no-aceptaran-las-renuncias-los-ministros',
+        'https://www.aztecaquintanaroo.com/noticias/ocho-ministros-la-suprema-corte-anunciaron-que-renunciaran-a-sus-cargos'
+    )
+),
+('Azteca Queretaro',
+    JSON_ARRAY(
+        'https://www.aztecaqueretaro.com/viral/vinotavendedores-pasteles-por-dia-que-cliente-se-lleva-uno-video',
+        'https://www.aztecaqueretaro.com/local/trafico-en-la-carretera-57-frente-marco-queretaro-hoy-1-noviembre',
+        'https://www.aztecaqueretaro.com/local/notas/nueva-ruta-del-transporte-gratuito-los-heroes-la-pradera-en-el-marques'
+    ),
+    JSON_ARRAY(
+        'https://www.aztecaqueretaro.com/noticias/videos/consultar-la-reforma-judicial-publicadas-en-el-portal-la-suprema-corte',
+        'https://www.aztecaqueretaro.com/noticias/videos/congreso-chihuahua-la-reforma-judicial',
+        'https://www.aztecaqueretaro.com/videos/suspension-la-reforma-judicial-pais-legal'
+    )
+),
+('Azteca Puebla',
+    JSON_ARRAY(
+        'https://www.aztecapuebla.com/espectaculos/tv-azteca/tv-azteca-te-regala-pases-para-el-concierto-la-arrolladora-banda-el-limon',
+        'https://www.aztecapuebla.com/espectaculos/totalplay-te-lleva-al-concierto-luis-miguel-en-puebla',
+        'https://www.aztecapuebla.com/noticias/dolar-en-noviembre-2024-en-puebla-cual-es-el-costo-la-multa'
+    ),
+    JSON_ARRAY(
+        'https://www.aztecapuebla.com/noticias/pelea-en-pareja-termina-en-feminicidio-responsable-huyo-su-hi',
+        'https://www.aztecapuebla.com/noticias/en-el-ine-surgio-una-rebelion-la-votacion-judicial',
+        'https://www.aztecapuebla.com/noticias/aprueba-ley-supremacia-constitucional-que-impedira-impugnar-sus-reformas'
+    )
+),
+('Azteca Morelos',
+    JSON_ARRAY(
+        'https://www.aztecamorelos.com/noticias/programa-hoy-no-circula-del-1-noviembre-2024',
+        'https://www.aztecamorelos.com/espectaculos/gana-boletos-dobles-te-azteca-morelos-experiencia-tulimamall-jardines-de-mexico-2024',
+        'https://www.aztecamorelos.com/espectaculos/christian-nodal-recibira-donaciones-arroz-durante-show-aguilar'
+    ),
+    JSON_ARRAY(
+        'https://www.aztecamorelos.com/noticias/hurtan-por-fraudes-y-robos-al-comprar-autos-en-morelos',
+        'https://www.aztecamorelos.com/noticias/trabajadores-del-poder-judicial-se-manifiestan-en-san-lazaro',
+        'https://www.aztecamorelos.com/noticias/reforma-judicial-en-morena-y-aliados-no-aceptaran-renuncias-ministros'
+    )
+),
+('Azteca Jalisco',
+    JSON_ARRAY(
+        'https://www.aztecajalisco.com/local/zapopan-explosion-jardines-valle-alerta-vecinos',
+        'https://www.aztecajalisco.com/local/pasillo-hoy-en-jalisco-cuanto-cuesta-el-premio-dieicl-1-noviembre-2024',
+        'https://www.aztecajalisco.com/local/dolar-hoy-jalisco-precio-tipo-cambio-viernes-1-noviembre-2024'
+    ),
+    JSON_ARRAY(
+        'https://www.aztecajalisco.com/noticias/hechos-jalisco-precio-gasolina-premium-diesel-1-noviembre',
+        'https://www.aztecajalisco.com/noticias/surge-rebelion-el-ine-la-votacion-judicial',
+        'https://www.aztecajalisco.com/noticias/magistrados-federales-aseguran-que-mexico-enfrento-un-golpe-estado-tecnico'
+    )
+),
+('Azteca Guerrero',
+    JSON_ARRAY(
+        'https://www.aztecaguerrero.com/noticias/precio-la-gasolina-en-guerrero-hoy-viernes-1-noviembre-del-2024',
+        'https://www.aztecaguerrero.com/clima/clima-hoy-en-acapulco-y-guerrero-cual-es-el-pronostico-del-tiempo-hoy-viernes-1-octubre',
+        'https://www.aztecaguerrero.com/noticias/claudia-sheinbaum-muestra-la-nueva-imagen-para-su-gobierno'
+    ),
+    JSON_ARRAY(
+        'https://www.aztecaguerrero.com/noticias/siguen-las-protestas-la-reforma-judicial-en-el-palacio-legislativo-san-lazaro',
+        'https://www.aztecaguerrero.com/noticias/peso-mas-debil-bolsa-mexicana-valores-cae-la-preocupacion-por-la-reforma-judicial',
+        'https://www.aztecaguerrero.com/noticias/video-ministros-la-suprema-corte-anuncian-su-renuncia-en-medio-la-crisis-por'
+    )
+),
+('Azteca CJ',
+    JSON_ARRAY(
+        'https://www.aztecaciudadjuarez.com/noticias/marcha-en-la-plaza-armas-festeja-tradiciones-vida-y-muerte',
+        'https://www.aztecaciudadjuarez.com/noticias/precio-dolar-en-ciudad-juarez-viernes-1-noviembre-2024',
+        'https://www.aztecaciudadjuarez.com/clima/en-ciudad-juarez-cual-es-el-pronostico-del-tiempo-viernes-1'
+    ),
+    JSON_ARRAY(
+        'https://www.aztecaciudadjuarez.com/noticias/controversia-en-el-senado-por-reforma-judicial-y-renuncia-ministros-la-scjn',
+        'https://www.aztecaciudadjuarez.com/noticias/ocho-ministros-la-suprema-corte-anuncian-su-renuncia-en-medio-la-crisis-por',
+        'https://www.aztecaciudadjuarez.com/noticias/trabajadores-del-poder-judicial-se-manifiestan-frente-a-la-camara-diputados'
+    )
+),
+('Azteca Chihuahua',
+    JSON_ARRAY(
+        'https://www.aztecachihuahua.com/clima/tormenta-invernal-podria-azotar-chihuahua-este-fin-semana-nieve',
+        'https://www.aztecachihuahua.com/noticias/este-es-el-precio-del-dolar-en-chihuahua-hoy-1-de-noviembre',
+        'https://www.aztecachihuahua.com/noticias/los-veremos-tradicion-en-chihuahua-que-tiene-mas-300-anos-y-solo-se-celebra-en'
+    ),
+    JSON_ARRAY(
+        'https://www.aztecachihuahua.com/noticias/poder-judicial-exige-dulces-para-cobrar-su-carrera-administrativa',
+        'https://www.aztecachihuahua.com/noticias/mas-mil-elementos-seguridad-publico-49-municipios-chihuahua-reciben-uniformes',
+        'https://www.aztecachihuahua.com/noticias/brayan-estrada-y-su-entrenador-patricio-ortiz-representaran-a-chihuahua-en'
+    )
+),
+('Azteca Chiapas',
+    JSON_ARRAY(
+        'https://www.aztecachiapas.com/clima/temperatura-bajas-en-chiapas-clima-hoy-01-noviembre-en-tuxtla-gutierrez-san-cristobal',
+        'https://www.aztecachiapas.com/noticias/trafico-en-tuxtla-gutierrez-hoy-1-noviembre-2024-calles-cerradas-y-bloqueos',
+        'https://www.aztecachiapas.com/noticias/precio-del-dolar-hoy-01-noviembre-2024-cual-es-el-tipo-cambio-en-mexico'
+    ),
+    JSON_ARRAY(
+        'https://www.aztecachiapas.com/noticias/sujetos-armados-abrieron-fuego-trabajadores-de-tuxtla-gutierrez-5-muertos',
+        'https://www.aztecachiapas.com/noticias/da-miedo-caminar-pobladores-copainala-expresan-temor-por-inseguridad-en-el',
+        'https://www.aztecachiapas.com/noticias/controversia-en-el-ine-votacion-judicial-provoca-acala-la-supremacia-si-es'
+    )
+),
+('Azteca Bajio',
+    JSON_ARRAY(
+        'https://www.aztecabajio.com/noticias/precio-la-gasolina-en-guanajuato-hoy-1-noviembre-2024-video',
+        'https://www.aztecabajio.com/noticias/fuga-agua-en-libramiento-jose-maria-morelos-leon-guanajuato-hoy-1-noviembre-2024-video',
+        'https://www.aztecabajio.com/noticias/precio-del-dolar-en-guanajuato-hoy-1-noviembre-2024'
+    ),
+    JSON_ARRAY(
+        'https://www.aztecabajio.com/noticias/barda-calle-enrique-guerra-leon-esta-punto-caer-vecinos-reportan-autoridades',
+        'https://www.aztecabajio.com/noticias/cuanto-costara-la-canasta-basica-en-guanajuato-en-octubre-2024-inegi',
+        'https://www.aztecabajio.com/noticias/ministras-y-ministros-entregaron-su-renuncia-aseguran-que-se-van-por-congruencia'
+    )
+),
+('Azteca Aguascalientes',
+    JSON_ARRAY(
+        'https://www.aztecaaguascalientes.com/noticias/muere-adulto-la-tercera-edad-ser-atropellado-por-un-camion-hoy-1-noviembre',
+        'https://www.aztecaaguascalientes.com/noticias/contratan-a-los-tres-estudiantes-preparatoria-que-hallan-sido-privados-su-libertad-en-fi',
+        'https://www.aztecaaguascalientes.com/noticias/precio-del-dolar-hoy-viernes-1-noviembre-en-zacatecas-se-cono-cera-el-tipo-cambio-banco'
+    ),
+    JSON_ARRAY(
+        'https://www.aztecaaguascalientes.com/noticias/ocho-ministras-y-ministros-entregaron-su-renuncia-reforma-judicial',
+        'https://www.aztecaaguascalientes.com/noticias/surge-rebelion-en-el-ine-la-votacion-judicial',
+        'https://www.aztecaaguascalientes.com/noticias/suprema-corte-no-podra-impedir-ninguna-reformas'
+    )
 );
+
+INSERT INTO server_localrecord (name, note_value, video_value, total_value, azteca, date) VALUES
+-- Week of October 14, 2024
+('Azteca Veracruz', 64, 67, 65.5, true, '2024-10-14'),
+('Azteca Quintanaroo', 67, 67, 67.0, true, '2024-10-14'),
+('Azteca BajaCalifornia', 60, 67, 63.5, true, '2024-10-14'),
+('Azteca Sinaloa', 60, 65, 62.5, true, '2024-10-14'),
+('Azteca Ciudad Juarez', 68, 66, 67.0, true, '2024-10-14'),
+('Azteca Aguascalientes', 62, 64, 63.0, true, '2024-10-14'),
+('Azteca Queretaro', 64, 62, 63.0, true, '2024-10-14'),
+('Azteca Chiapas', 63, 65, 64.0, true, '2024-10-14'),
+('Azteca Puebla', 62, 64, 63.0, true, '2024-10-14'),
+('Azteca Yucatan', 65, 65, 65.0, true, '2024-10-14'),
+('Azteca Chihuahua', 61, 64, 62.5, true, '2024-10-14'),
+('Azteca Morelos', 66, 64, 65.0, true, '2024-10-14'),
+('Azteca Jalisco', 66, 65, 65.5, true, '2024-10-14'),
+('Azteca Guerrero', 64, 66, 65.0, true, '2024-10-14'),
+('Azteca Bajio', 66, 64, 65.0, true, '2024-10-14'),
+
+-- Week of October 21, 2024
+('Azteca Veracruz', 66, 67, 66.5, true, '2024-10-21'),
+('Azteca Quintanaroo', 60, 64, 62.0, true, '2024-10-21'),
+('Azteca BajaCalifornia', 67, 68, 67.5, true, '2024-10-21'),
+('Azteca Sinaloa', 65, 65, 65.0, true, '2024-10-21'),
+('Azteca Ciudad Juarez', 67, 67, 67.0, true, '2024-10-21'),
+('Azteca Aguascalientes', 65, 66, 65.5, true, '2024-10-21'),
+('Azteca Queretaro', 66, 65, 65.5, true, '2024-10-21'),
+('Azteca Chiapas', 62, 69, 65.5, true, '2024-10-21'),
+('Azteca Puebla', 63, 65, 64.0, true, '2024-10-21'),
+('Azteca Yucatan', 68, 64, 66.0, true, '2024-10-21'),
+('Azteca Chihuahua', 79, 64, 71.5, true, '2024-10-21'),
+('Azteca Morelos', 64, 66, 65.0, true, '2024-10-21'),
+('Azteca Jalisco', 67, 65, 66.0, true, '2024-10-21'),
+('Azteca Guerrero', 67, 67, 67.0, true, '2024-10-21'),
+('Azteca Bajio', 67, 67, 67.0, true, '2024-10-21'),
+
+-- Week of October 28, 2024
+('Azteca Veracruz', 64, 64, 64.0, true, '2024-10-28'),
+('Azteca Quintanaroo', 62, 64, 63.0, true, '2024-10-28'),
+('Azteca BajaCalifornia', 67, 69, 68.0, true, '2024-10-28'),
+('Azteca Sinaloa', 61, 60, 60.5, true, '2024-10-28'),
+('Azteca Ciudad Juarez', 65, 63, 64.0, true, '2024-10-28'),
+('Azteca Aguascalientes', 64, 64, 64.0, true, '2024-10-28'),
+('Azteca Queretaro', 66, 67, 66.5, true, '2024-10-28'),
+('Azteca Chiapas', 67, 67, 67.0, true, '2024-10-28'),
+('Azteca Puebla', 67, 67, 67.0, true, '2024-10-28'),
+('Azteca Yucatan', 67, 64, 65.5, true, '2024-10-28'),
+('Azteca Chihuahua', 62, 63, 62.5, true, '2024-10-28'),
+('Azteca Morelos', 63, 66, 64.5, true, '2024-10-28'),
+('Azteca Jalisco', 65, 67, 66.0, true, '2024-10-28'),
+('Azteca Guerrero', 67, 67, 67.0, true, '2024-10-28'),
+('Azteca Bajio', 67, 67, 67.0, true, '2024-10-28'); 
+
                           ''')
     ]
