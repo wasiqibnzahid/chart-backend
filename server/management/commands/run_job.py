@@ -209,6 +209,7 @@ def get_lighthouse_mobile_score(url):
         code = result.check_returncode()
 
         if code != 0:
+            write_text_to_file(f"FOR URL {url} ERROR IS {result.stdout}")
             print(result.stdout)
 
         with open(report_file_path, 'r', encoding='utf-8') as file:
@@ -218,6 +219,8 @@ def get_lighthouse_mobile_score(url):
 
                 performance_score *= FACTOR
                 write_text_to_file(f"RAW SCORE IS {performance_score} {performance_score >= 0.95} for {url}")
+                if(performance_score == 0):
+                    write_text_to_file(f"FOR URL {url} SCORE IS 0")
                 if performance_score >= 0.95:
                     performance_score = random.uniform(
                         0.93, 0.97)
