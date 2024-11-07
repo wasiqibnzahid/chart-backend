@@ -225,42 +225,42 @@ def calculate_relevant_insights(filtered_df, companies, title, date_filter=None)
 
 def calculate_quarterly_averages(df):
 
-    quarters = []
+    months = []
     df['Date'] = pd.to_datetime(df['Date'])
     df['Year'] = df['Date'].dt.year
-    df['Quarter'] = df['Date'].dt.to_period('Q')
+    df['Month'] = df['Date'].dt.to_period('M')
 
-    # Group the data by year and quarter
-    grouped = df.groupby(['Year', 'Quarter'])
+    # Group the data by year and month
+    grouped = df.groupby(['Year', 'Month'])
 
-    for (year, quarter), quarter_df in grouped:
-        tv_azteca_avg = quarter_df[tv_azteca_columns].mean(
+    for (year, month), month_df in grouped:
+        tv_azteca_avg = month_df[tv_azteca_columns].mean(
             axis=1).mean().round(1)
-        competition_avg = quarter_df[competition_columns].mean(
+        competition_avg = month_df[competition_columns].mean(
             axis=1).mean().round(1)
-        tv_azteca_avg_video = quarter_df[[
+        tv_azteca_avg_video = month_df[[
             col for col in tv_azteca_columns if 'Video' in col]].mean(
             axis=1).mean().round(1)
-        competition_avg_video = quarter_df[[
+        competition_avg_video = month_df[[
             col for col in competition_columns if 'Video' in col]].mean(
             axis=1).mean().round(1)
-        tv_azteca_avg_note = quarter_df[[
+        tv_azteca_avg_note = month_df[[
             col for col in tv_azteca_columns if 'Note' in col]].mean(
             axis=1).mean().round(1)
-        competition_avg_note = quarter_df[[
+        competition_avg_note = month_df[[
             col for col in competition_columns if 'Note' in col]].mean(
             axis=1).mean().round(1)
         azteca_map = {}
         competition_map = {}
 
-        if quarters:
-            prev_quarter = quarters[-1]
-            prev_tv_azteca_avg = prev_quarter['TV Azteca Avg']
-            prev_competition_avg = prev_quarter['Competition Avg']
-            prev_tv_azteca_avg_video = prev_quarter['TV Azteca Video Avg']
-            prev_competition_avg_video = prev_quarter['Competition Video Avg']
-            prev_tv_azteca_avg_note = prev_quarter['TV Azteca Note Avg']
-            prev_competition_avg_note = prev_quarter['Competition Note Avg']
+        if months:
+            prev_month = months[-1]
+            prev_tv_azteca_avg = prev_month['TV Azteca Avg']
+            prev_competition_avg = prev_month['Competition Avg']
+            prev_tv_azteca_avg_video = prev_month['TV Azteca Video Avg']
+            prev_competition_avg_video = prev_month['Competition Video Avg']
+            prev_tv_azteca_avg_note = prev_month['TV Azteca Note Avg']
+            prev_competition_avg_note = prev_month['Competition Note Avg']
 
             tv_azteca_change = (
                 tv_azteca_avg - prev_tv_azteca_avg) * 100 / prev_tv_azteca_avg
@@ -282,7 +282,7 @@ def calculate_quarterly_averages(df):
             tv_azteca_change_video = ""
             competition_change_video = ""
         res = {
-            'Date': f"Q{quarter.quarter}-{year}",
+            'Date': f"{month.strftime('%m')}-{year}",
             'TV Azteca Change': tv_azteca_change,
             'Competition Change': competition_change,
             'TV Azteca Video Change': tv_azteca_change_video,
@@ -297,22 +297,20 @@ def calculate_quarterly_averages(df):
             'Competition Note Avg': competition_avg_note,
             "competition": [],
             "azteca": []
-
-
         }
-        for (index, company) in enumerate(azteca_columns_raw):
 
-            company_avg = quarter_df[[
+        for (index, company) in enumerate(azteca_columns_raw):
+            company_avg = month_df[[
                 col for col in tv_azteca_columns if company in col]].mean(
                 axis=1).mean().round(1)
-            company_avg_video = quarter_df[[
+            company_avg_video = month_df[[
                 col for col in tv_azteca_columns if 'Video' in col and company in col]].mean(
                 axis=1).mean().round(1)
-            company_avg_note = quarter_df[[
+            company_avg_note = month_df[[
                 col for col in tv_azteca_columns if 'Note' in col and company in col]].mean(
                 axis=1).mean().round(1)
-            if (len(quarters) > 0):
-                item = prev_quarter.get("azteca")[index]
+            if (len(months) > 0):
+                item = prev_month.get("azteca")[index]
                 prev_company_avg_video = item["video"]
                 prev_company_avg_note = item["note"]
                 prev_company_avg = item["total"]
@@ -322,7 +320,7 @@ def calculate_quarterly_averages(df):
                     company_avg_video - prev_company_avg_video) * 100 / prev_company_avg_video
                 company_change_note = (
                     company_avg_note - prev_company_avg_note) * 100 / prev_company_avg_note
-                prev_quarter = quarters[-1]
+                prev_month = months[-1]
             else:
                 company_change = ''
                 company_change_video = ''
@@ -338,18 +336,17 @@ def calculate_quarterly_averages(df):
             })
 
         for (index, company) in enumerate(competition_columns_raw):
-
-            company_avg = quarter_df[[
+            company_avg = month_df[[
                 col for col in competition_columns if company in col]].mean(
                 axis=1).mean().round(1)
-            company_avg_video = quarter_df[[
+            company_avg_video = month_df[[
                 col for col in competition_columns if "Video" in col and company in col]].mean(
                 axis=1).mean().round(1)
-            company_avg_note = quarter_df[[
+            company_avg_note = month_df[[
                 col for col in competition_columns if "Note" in col and company in col]].mean(
                 axis=1).mean().round(1)
-            if (len(quarters) > 0):
-                item = prev_quarter.get("competition")[index]
+            if (len(months) > 0):
+                item = prev_month.get("competition")[index]
                 prev_company_avg_video = item["video"]
                 prev_company_avg_note = item["note"]
                 prev_company_avg = item["total"]
@@ -359,7 +356,7 @@ def calculate_quarterly_averages(df):
                     company_avg_video - prev_company_avg_video) * 100 / prev_company_avg_video
                 company_change_note = (
                     company_avg_note - prev_company_avg_note) * 100 / prev_company_avg_note
-                prev_quarter = quarters[-1]
+                prev_month = months[-1]
             else:
                 company_change = ''
                 company_change_video = ''
@@ -373,48 +370,9 @@ def calculate_quarterly_averages(df):
                 "video_change": company_change_video,
                 "note_change": company_change_note
             })
+        months.append(res)
 
-        # for company in tv_azteca_columns:
-        #     # Calculate average
-        #     company_avg = quarter_df[company].mean().round(1)
-
-        #     # Store the average in the results dictionary
-        #     res['azteca'][f'{company} Avg'] = company_avg
-
-        #     # Calculate change from the previous quarter if it exists
-        #     if quarters:
-        #         prev_company_avg = quarters[-1].get('azteca')[f'{company} Avg']
-        #         if prev_company_avg is not None and prev_company_avg != 0:
-        #             company_change = (
-        #                 (company_avg - prev_company_avg) / prev_company_avg) * 100
-        #             res['azteca'][f'{company} Change'] = company_change.round(1)
-        #         else:
-        #             res['azteca'][f'{company} Change'] = None
-        #     else:
-        #         res['azteca'][f'{company} Change'] = None
-        # for company in competition_columns:
-        #     # Calculate average
-        #     company_avg = quarter_df[company].mean().round(1)
-
-        #     # Store the average in the results dictionary
-        #     res['competition'][f'{company} Avg'] = company_avg
-
-        #     # Calculate change from the previous quarter if it exists
-        #     if quarters:
-        #         prev_company_avg = quarters[-1].get('competition')[f'{company} Avg']
-        #         if prev_company_avg is not None and prev_company_avg != 0:
-        #             company_change = (
-        #                 (company_avg - prev_company_avg) / prev_company_avg) * 100
-        #             res['competition'][f'{company} Change'] = company_change.round(1)
-        #         else:
-        #             res['competition'][f'{company} Change'] = None
-        #     else:
-        #         res['competition'][f'{company} Change'] = None
-
-        # Append results for the quarter
-        quarters.append(res)
-
-    return pd.DataFrame(quarters)
+    return pd.DataFrame(months)
 
 
 def calculate_changes(df):

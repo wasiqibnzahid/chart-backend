@@ -1,5 +1,7 @@
-from .local_data import init, formatToJson, azteca_columns, competition_columns, azteca_columns_raw,competition_columns_raw
+from .local_data import init, formatToJson, azteca_columns, competition_columns, azteca_columns_raw, competition_columns_raw
 import pandas as pd
+
+
 def get_averages():
     df = init()
     quarter_data = formatToJson(
@@ -11,96 +13,95 @@ def get_averages():
         "week": week_data
     }
 
+
 def calculate_quarterly_averages(df):
 
-    quarters = []
+    months = []
     df['Date'] = pd.to_datetime(df['Date'])
     df['Year'] = df['Date'].dt.year
-    df['Quarter'] = df['Date'].dt.to_period('Q')
+    df['Month'] = df['Date'].dt.to_period('M')
 
-    # Group the data by year and quarter
-    grouped = df.groupby(['Year', 'Quarter'])
+    # Group the data by year and month
+    grouped = df.groupby(['Year', 'Month'])
 
-    for (year, quarter), quarter_df in grouped:
-        azteca_avg = quarter_df[azteca_columns].mean(
+    for (year, month), month_df in grouped:
+        tv_azteca_avg = month_df[tv_azteca_columns].mean(
             axis=1).mean().round(1)
-        competition_avg = quarter_df[competition_columns].mean(
+        competition_avg = month_df[competition_columns].mean(
             axis=1).mean().round(1)
-        azteca_avg_video = quarter_df[[
-            col for col in azteca_columns if 'Video' in col]].mean(
+        tv_azteca_avg_video = month_df[[
+            col for col in tv_azteca_columns if 'Video' in col]].mean(
             axis=1).mean().round(1)
-        competition_avg_video = quarter_df[[
+        competition_avg_video = month_df[[
             col for col in competition_columns if 'Video' in col]].mean(
             axis=1).mean().round(1)
-        azteca_avg_note = quarter_df[[
-            col for col in azteca_columns if 'Note' in col]].mean(
+        tv_azteca_avg_note = month_df[[
+            col for col in tv_azteca_columns if 'Note' in col]].mean(
             axis=1).mean().round(1)
-        competition_avg_note = quarter_df[[
+        competition_avg_note = month_df[[
             col for col in competition_columns if 'Note' in col]].mean(
             axis=1).mean().round(1)
         azteca_map = {}
         competition_map = {}
 
-        if quarters:
-            prev_quarter = quarters[-1]
-            prev_azteca_avg = prev_quarter['TV Azteca Avg']
-            prev_competition_avg = prev_quarter['Competition Avg']
-            prev_azteca_avg_video = prev_quarter['TV Azteca Video Avg']
-            prev_competition_avg_video = prev_quarter['Competition Video Avg']
-            prev_azteca_avg_note = prev_quarter['TV Azteca Note Avg']
-            prev_competition_avg_note = prev_quarter['Competition Note Avg']
+        if months:
+            prev_month = months[-1]
+            prev_tv_azteca_avg = prev_month['TV Azteca Avg']
+            prev_competition_avg = prev_month['Competition Avg']
+            prev_tv_azteca_avg_video = prev_month['TV Azteca Video Avg']
+            prev_competition_avg_video = prev_month['Competition Video Avg']
+            prev_tv_azteca_avg_note = prev_month['TV Azteca Note Avg']
+            prev_competition_avg_note = prev_month['Competition Note Avg']
 
-            azteca_change = (
-                azteca_avg - prev_azteca_avg) * 100 / prev_azteca_avg
+            tv_azteca_change = (
+                tv_azteca_avg - prev_tv_azteca_avg) * 100 / prev_tv_azteca_avg
             competition_change = (
                 competition_avg - prev_competition_avg) * 100 / prev_competition_avg
-            azteca_change_video = (
-                azteca_avg_video - prev_azteca_avg_video) * 100 / prev_azteca_avg_video
+            tv_azteca_change_video = (
+                tv_azteca_avg_video - prev_tv_azteca_avg_video) * 100 / prev_tv_azteca_avg_video
             competition_change_video = (
                 competition_avg_video - prev_competition_avg_video) * 100 / prev_competition_avg_video
-            azteca_change_note = (
-                azteca_avg_note - prev_azteca_avg_note) * 100 / prev_azteca_avg_note
+            tv_azteca_change_note = (
+                tv_azteca_avg_note - prev_tv_azteca_avg_note) * 100 / prev_tv_azteca_avg_note
             competition_change_note = (
                 competition_avg_note - prev_competition_avg_note) * 100 / prev_competition_avg_note
         else:
-            azteca_change = ""
+            tv_azteca_change = ""
             competition_change = ""
-            azteca_change_note = ""
+            tv_azteca_change_note = ""
             competition_change_note = ""
-            azteca_change_video = ""
+            tv_azteca_change_video = ""
             competition_change_video = ""
         res = {
-            'Date': f"Q3-{year}",
-            'TV Azteca Change': azteca_change,
+            'Date': f"{month.strftime('%m')}-{year}",
+            'TV Azteca Change': tv_azteca_change,
             'Competition Change': competition_change,
-            'TV Azteca Video Change': azteca_change_video,
+            'TV Azteca Video Change': tv_azteca_change_video,
             'Competition Video Change': competition_change_video,
-            'TV Azteca Note Change': azteca_change_note,
+            'TV Azteca Note Change': tv_azteca_change_note,
             'Competition Note Change': competition_change_note,
-            'TV Azteca Avg': azteca_avg,
+            'TV Azteca Avg': tv_azteca_avg,
             'Competition Avg': competition_avg,
-            'TV Azteca Video Avg': azteca_avg_video,
+            'TV Azteca Video Avg': tv_azteca_avg_video,
             'Competition Video Avg': competition_avg_video,
-            'TV Azteca Note Avg': azteca_avg_note,
+            'TV Azteca Note Avg': tv_azteca_avg_note,
             'Competition Note Avg': competition_avg_note,
             "competition": [],
             "azteca": []
-
-
         }
-        for (index, company) in enumerate(azteca_columns_raw):
 
-            company_avg = quarter_df[[
-                col for col in azteca_columns if company in col]].mean(
+        for (index, company) in enumerate(azteca_columns_raw):
+            company_avg = month_df[[
+                col for col in tv_azteca_columns if company in col]].mean(
                 axis=1).mean().round(1)
-            company_avg_video = quarter_df[[
-                col for col in azteca_columns if 'Video' in col and company in col]].mean(
+            company_avg_video = month_df[[
+                col for col in tv_azteca_columns if 'Video' in col and company in col]].mean(
                 axis=1).mean().round(1)
-            company_avg_note = quarter_df[[
-                col for col in azteca_columns if 'Note' in col and company in col]].mean(
+            company_avg_note = month_df[[
+                col for col in tv_azteca_columns if 'Note' in col and company in col]].mean(
                 axis=1).mean().round(1)
-            if (len(quarters) > 0):
-                item = prev_quarter.get("azteca")[index]
+            if (len(months) > 0):
+                item = prev_month.get("azteca")[index]
                 prev_company_avg_video = item["video"]
                 prev_company_avg_note = item["note"]
                 prev_company_avg = item["total"]
@@ -110,7 +111,7 @@ def calculate_quarterly_averages(df):
                     company_avg_video - prev_company_avg_video) * 100 / prev_company_avg_video
                 company_change_note = (
                     company_avg_note - prev_company_avg_note) * 100 / prev_company_avg_note
-                prev_quarter = quarters[-1]
+                prev_month = months[-1]
             else:
                 company_change = ''
                 company_change_video = ''
@@ -126,18 +127,17 @@ def calculate_quarterly_averages(df):
             })
 
         for (index, company) in enumerate(competition_columns_raw):
-
-            company_avg = quarter_df[[
+            company_avg = month_df[[
                 col for col in competition_columns if company in col]].mean(
                 axis=1).mean().round(1)
-            company_avg_video = quarter_df[[
+            company_avg_video = month_df[[
                 col for col in competition_columns if "Video" in col and company in col]].mean(
                 axis=1).mean().round(1)
-            company_avg_note = quarter_df[[
+            company_avg_note = month_df[[
                 col for col in competition_columns if "Note" in col and company in col]].mean(
                 axis=1).mean().round(1)
-            if (len(quarters) > 0):
-                item = prev_quarter.get("competition")[index]
+            if (len(months) > 0):
+                item = prev_month.get("competition")[index]
                 prev_company_avg_video = item["video"]
                 prev_company_avg_note = item["note"]
                 prev_company_avg = item["total"]
@@ -147,7 +147,7 @@ def calculate_quarterly_averages(df):
                     company_avg_video - prev_company_avg_video) * 100 / prev_company_avg_video
                 company_change_note = (
                     company_avg_note - prev_company_avg_note) * 100 / prev_company_avg_note
-                prev_quarter = quarters[-1]
+                prev_month = months[-1]
             else:
                 company_change = ''
                 company_change_video = ''
@@ -161,10 +161,10 @@ def calculate_quarterly_averages(df):
                 "video_change": company_change_video,
                 "note_change": company_change_note
             })
+        months.append(res)
 
-        quarters.append(res)
+    return pd.DataFrame(months)
 
-    return pd.DataFrame(quarters)
 
 def calculate_changes(df):
     # Make a copy of the input DataFrame to avoid modifying the original
@@ -212,15 +212,15 @@ def calculate_changes(df):
 
     # Calculate the changes
     azteca_change = (azteca_avg_latest -
-                        azteca_avg_second_last) * 100 / azteca_avg_second_last
+                     azteca_avg_second_last) * 100 / azteca_avg_second_last
     competition_change = (competition_avg_latest -
                           competition_avg_second_last) * 100 / competition_avg_second_last
     azteca_change_video = (azteca_avg_video_latest -
-                              azteca_avg_video_second_last) * 100 / azteca_avg_video_second_last
+                           azteca_avg_video_second_last) * 100 / azteca_avg_video_second_last
     competition_change_video = (competition_avg_video_latest -
                                 competition_avg_video_second_last) * 100 / competition_avg_video_second_last
     azteca_change_note = (azteca_avg_note_latest -
-                             azteca_avg_note_second_last) * 100 / azteca_avg_note_second_last
+                          azteca_avg_note_second_last) * 100 / azteca_avg_note_second_last
     competition_change_note = (competition_avg_note_latest -
                                competition_avg_note_second_last) * 100 / competition_avg_note_second_last
 
