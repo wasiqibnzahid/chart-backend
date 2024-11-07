@@ -30,10 +30,6 @@ def process_site(site: Site, semaphore):
             video_xml = fetch_data(video_sitemap_url)
             extracted_video_urls = site.video_urls
             extracted_nota_urls = site.note_urls
-            print("extracted_nota_urls")
-            print(extracted_nota_urls)
-            print(extracted_video_urls)
-            print("extracted_video_urls")
             if site.name == 'El Heraldo':
                 extracted_video_urls_inner, extracted_nota_urls_inner = get_latest_urls(
                     site.sitemap_url, is_xml=False)
@@ -48,18 +44,13 @@ def process_site(site: Site, semaphore):
                 extracted_video_urls_inner = get_latest_urls(
                     video_xml, is_xml="html" not in video_sitemap_url)
                 if (site.name == "NY Times"):
-                    print(f"I AM HERE")
                     video_xml = fetch_data(extracted_video_urls_inner[0])
-                    print(extracted_video_urls_inner[0], video_xml)
                     extracted_video_urls_inner = get_latest_urls(
                         video_xml, is_xml=True)
-                    print(f"EXTRACTED NOTA URLS BEFORE {
-                          len(extracted_nota_urls_inner)}")
                     nota_xml = fetch_data(extracted_nota_urls_inner[0])
                     extracted_nota_urls_inner = get_latest_urls(
                         nota_xml, is_xml=True)
-                    print(f"EXTRACTED NOTA URLS AFTER {
-                          len(extracted_nota_urls_inner)}")
+                    
                 else:
                     print(f"I AM NOT HERE")
             if site.name == "Milenio" or site.name == "El Universal":
@@ -174,7 +165,7 @@ def write_text_to_file(text, filename="/home/ubuntu/log.txt"):
 
 def run_job():
 
-    sites = Site.objects.filter(name="NY Times")
+    sites = Site.objects.all()
     records = []
     semaphore = threading.Semaphore(4)
     print(f"SIOTES ARE {sites}")
