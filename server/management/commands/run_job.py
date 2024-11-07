@@ -48,12 +48,13 @@ def process_site(site: Site, semaphore):
                 extracted_video_urls_inner = get_latest_urls(
                     video_xml, is_xml="html" not in video_sitemap_url)
                 if (site.name == "NY Times"):
-                    print(f"I AM HERE");
+                    print(f"I AM HERE")
                     video_xml = fetch_data(extracted_video_urls_inner[0])
+                    print(extracted_video_urls_inner[0], video_xml)
                     extracted_video_urls_inner = get_latest_urls(
                         video_xml, is_xml=True)
                 else:
-                    print(f"I AM NOT HERE");
+                    print(f"I AM NOT HERE")
             if site.name == "Milenio" or site.name == "El Universal":
                 extracted_nota_urls_inner = [
                     item for item in extracted_nota_urls_inner if "video" not in item]
@@ -221,8 +222,9 @@ def get_lighthouse_mobile_score(url):
                 performance_score = report['categories']['performance']['score']
 
                 performance_score *= FACTOR
-                write_text_to_file(f"RAW SCORE IS {performance_score} {performance_score >= 0.95} for {url}")
-                if(performance_score == 0):
+                write_text_to_file(f"RAW SCORE IS {performance_score} {
+                                   performance_score >= 0.95} for {url}")
+                if (performance_score == 0):
                     write_text_to_file(f"FOR URL {url} SCORE IS 0")
                 if performance_score >= 0.95:
                     performance_score = random.uniform(
