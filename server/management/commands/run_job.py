@@ -54,12 +54,12 @@ def process_site(site: Site, semaphore):
                     extracted_video_urls_inner = get_latest_urls(
                         video_xml, is_xml=True)
                     print(f"EXTRACTED NOTA URLS BEFORE {
-                          extracted_nota_urls_inner}")
+                          len(extracted_nota_urls_inner)}")
                     nota_xml = fetch_data(extracted_nota_urls_inner[0])
                     extracted_nota_urls_inner = get_latest_urls(
                         nota_xml, is_xml=True, shouldPrint=True)
                     print(f"EXTRACTED NOTA URLS AFTER {
-                          extracted_nota_urls_inner}")
+                          len(extracted_nota_urls_inner)}")
                     print(f"NOTA XML IS {nota_xml}")
                 else:
                     print(f"I AM NOT HERE")
