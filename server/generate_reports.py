@@ -57,7 +57,7 @@ def fetch_data(url):
     return None
 
 
-def get_latest_urls(parsed_data, is_xml=True):
+def get_latest_urls(parsed_data, is_xml=True, shouldPrint=False):
     if (parsed_data is None):
         return []
     if is_xml:
@@ -85,7 +85,8 @@ def get_latest_urls(parsed_data, is_xml=True):
         sorted_urls = [url for url, _ in url_date_pairs]
         # if not sorted_urls:
         #     print("No URLs found in the XML data.")
-
+        if(shouldPrint):
+            print(f"{sorted_urls} SUPA")
         return sorted_urls
 
     elif ("txt" in parsed_data):
