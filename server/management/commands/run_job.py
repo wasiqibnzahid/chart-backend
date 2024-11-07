@@ -53,6 +53,8 @@ def process_site(site: Site, semaphore):
                     print(extracted_video_urls_inner[0], video_xml)
                     extracted_video_urls_inner = get_latest_urls(
                         video_xml, is_xml=True)
+                    print(f"{extracted_video_urls_inner} RARA, {
+                          extracted_nota_urls}")
                 else:
                     print(f"I AM NOT HERE")
             if site.name == "Milenio" or site.name == "El Universal":
