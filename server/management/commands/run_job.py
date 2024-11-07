@@ -59,6 +59,7 @@ def process_site(site: Site, semaphore):
                         nota_xml, is_xml=True)
                     print(f"EXTRACTED NOTA URLS AFTER {
                           extracted_nota_urls_inner}")
+                    print(f"NOTA XML IS {nota_xml}")
                 else:
                     print(f"I AM NOT HERE")
             if site.name == "Milenio" or site.name == "El Universal":
