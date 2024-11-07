@@ -70,7 +70,7 @@ def calculate_quarterly_averages(df):
             azteca_change_video = ""
             competition_change_video = ""
         res = {
-            'Date': f"{int(month.strftime('%m'))}-{year}",
+            'Date': f"Q{int(month.strftime('%m'))}-{year}",
             'TV Azteca Change': azteca_change,
             'Competition Change': competition_change,
             'TV Azteca Video Change': azteca_change_video,
