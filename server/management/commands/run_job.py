@@ -56,7 +56,7 @@ def process_site(site: Site, semaphore):
                     print(f"EXTRACTED NOTA URLS BEFORE {
                           extracted_nota_urls_inner}")
                     extracted_nota_urls_inner = get_latest_urls(
-                        nota_xml, is_xml=True)
+                        nota_xml, is_xml=True, shouldPrint=True)
                     print(f"EXTRACTED NOTA URLS AFTER {
                           extracted_nota_urls_inner}")
                     print(f"NOTA XML IS {nota_xml}")
