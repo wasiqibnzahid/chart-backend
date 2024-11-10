@@ -9,7 +9,7 @@ import os
 import threading
 from ...models import LocalErrorLog, LocalRecord, LocalSite
 from server.local_data.local_data import azteca_columns_raw
-
+from .run_job import fetch_data, get_latest_urls, get_sorted_rss_items
 
 def process_site(site: LocalSite, semaphore):
     with semaphore:
@@ -19,15 +19,43 @@ def process_site(site: LocalSite, semaphore):
         monday_of_current_week = today - timedelta(days=today.weekday())
         date = monday_of_current_week.date()
         try:
+            note_sitemap_url = site.sitemap_url
+            video_sitemap_url = site.sitemap_url
+            if site.note_sitemap_url:
+                note_sitemap_url = site.note_sitemap_url
+            if site.video_sitemap_url:
+                video_sitemap_url = site.video_sitemap_url
+            nota_xml = fetch_data(note_sitemap_url)
+            video_xml = fetch_data(video_sitemap_url)
             extracted_video_urls = site.video_urls
             extracted_nota_urls = site.note_urls
+            extracted_nota_urls_inner = get_latest_urls(
+                nota_xml, is_xml="html" not in note_sitemap_url)
+            extracted_video_urls_inner = get_latest_urls(
+                video_xml, is_xml="html" not in video_sitemap_url)
+            extracted_video_urls.extend(extracted_video_urls_inner)
 
+            if len(extracted_nota_urls_inner) == 0:
+                log = LocalErrorLog(message=f"Sitemap returned 0 urls: {
+                               note_sitemap_url}")
+                log.save()
+            if len(extracted_video_urls_inner) == 0:
+                log = LocalErrorLog(message=f"Sitemap returned 0 urls: {
+                               video_sitemap_url}")
+                log.save()
+
+            extracted_nota_urls.extend(extracted_nota_urls_inner)
+            extracted_video_urls.extend(extracted_video_urls_inner)
+            print(f"For company {site.name} the note urls are "
+                  f"{len(extracted_nota_urls)} and video are {len(extracted_video_urls_inner)}")
+            
             video_val = 0
             video_count = 0
             note_val = 0
             note_count = 0
             i = 0
             index = 0
+            return 0;
             while index < 10 and i < len(extracted_nota_urls):
                 try:
                     res = get_lighthouse_mobile_score(
@@ -122,12 +150,12 @@ def run_job():
             records.append(result)
             print(f"Processed site {site}: Result = {result}")
     print(f"STATUS IS DONE")
-    LocalRecord.objects.filter(date=date).delete()
-    if records:
-        for record in records:
-            write_text_to_file(f"RECORD IS {record.name} {
-                               record.note_value} {record.video_value}")
-    LocalRecord.objects.bulk_create(records)
+    # LocalRecord.objects.filter(date=date).delete()
+    # if records:
+        # for record in records:
+            # write_text_to_file(f"RECORD IS {record.name} {
+            #                    record.note_value} {record.video_value}")
+    # LocalRecord.objects.bulk_create(records)
 
 
 def sanitize_filename(url):
