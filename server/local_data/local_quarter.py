@@ -118,9 +118,9 @@ def calculate_quarterly_averages(df):
                 "total": company_avg,
                 "video": company_avg_video,
                 "note": company_avg_note,
-                "total_change": company_change,
-                "video_change": company_change_video,
-                "note_change": company_change_note
+                "total_change": company_change or 0,
+                "video_change": company_change_video or 0,
+                "note_change": company_change_note or 0
             })
 
         for (index, company) in enumerate(competition_columns_raw):
