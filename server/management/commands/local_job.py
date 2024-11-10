@@ -27,8 +27,8 @@ def process_site(site: LocalSite, semaphore):
                 video_sitemap_url = site.video_sitemap_url
             nota_xml = fetch_data(note_sitemap_url)
             video_xml = fetch_data(video_sitemap_url)
-            extracted_video_urls = site.video_urls
-            extracted_nota_urls = site.note_urls
+            extracted_video_urls = site.video_urls or []
+            extracted_nota_urls = site.note_urls or []
             extracted_nota_urls_inner = get_latest_urls(
                 nota_xml, is_xml="html" not in note_sitemap_url)
             extracted_video_urls_inner = get_latest_urls(
