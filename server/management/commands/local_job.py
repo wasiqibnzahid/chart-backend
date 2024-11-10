@@ -148,7 +148,7 @@ def run_job():
             site = future_to_site[future]
             result = future.result()  # Get the result of the future
             records.append(result)
-            print(f"Processed site {site}: Result = {result}")
+            # print(f"Processed site {site}: Result = {result}")
     print(f"STATUS IS DONE")
     # LocalRecord.objects.filter(date=date).delete()
     # if records:
