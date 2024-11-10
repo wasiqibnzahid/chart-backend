@@ -37,7 +37,7 @@ competition_columns = [
     'Azteca Puebla (Note)', 'Azteca Puebla (Video)', 'Azteca Yucatan (Note)', 'Azteca Yucatan (Video)',
     'Azteca Chihuahua (Note)', 'Azteca Chihuahua (Video)', 'Azteca Morelos (Note)', 'Azteca Morelos (Video)',
     'Azteca Jalisco (Note)', 'Azteca Jalisco (Video)', 'Azteca Guerrero (Note)', 'Azteca Guerrero (Video)',
-    'Azteca Bajio (Note)', 'Azteca Bajio (Video)'
+    'Azteca Bajio (Note)', 'Azteca Bajio (Video)', 'Laguna (Note)', 'Laguna (Video)'
 ]
 
 competition_columns_raw = [
@@ -45,7 +45,7 @@ competition_columns_raw = [
     'Azteca Puebla', 'Azteca Yucatan',
     'Azteca Chihuahua', 'Azteca Morelos',
     'Azteca Jalisco',  'Azteca Guerrero',
-    'Azteca Bajio'
+    'Azteca Bajio', 'Laguna'
 ]
 label_mapping = {
     'Azteca Veracruz (Note)': 'Veracruz',
@@ -62,6 +62,8 @@ label_mapping = {
     "Azteca Aguascalientes (Video)": "Aguascalientes",
     "Azteca Queretaro (Note)": "Queretaro",
     "Azteca Queretaro (Video)": "Queretaro",
+    "Laguna (Note)": "Laguna",
+    "Laguna (Video)": "Laguna",
     "Azteca Chiapas (Note)": "Chiapas",
     "Azteca Chiapas (Video)": "Chiapas",
     "Azteca Puebla (Note)": "Puebla",
