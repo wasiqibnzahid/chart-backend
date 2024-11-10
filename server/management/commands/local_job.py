@@ -132,8 +132,7 @@ def write_text_to_file(text, filename="/home/ubuntu/log.txt"):
 
 def run_job():
 
-    sites = LocalSite.objects.filter(name="Laguna")
-    print(f"sitemap url is {sites[0].sitemap_url} Note: {sites[0].note_sitemap_url} Video: {sites[0].video_sitemap_url}")
+    sites = LocalSite.objects.all()
     records = []
     semaphore = threading.Semaphore(4)
     print(f"SIOTES ARE {sites}")
