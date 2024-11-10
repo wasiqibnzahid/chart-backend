@@ -115,6 +115,7 @@ def process_site(site: LocalSite, semaphore):
 
         except Exception as e:
             print(f"Exception for {site.name}: {e}")
+            raise e
             return LocalRecord(name=site.name,
                                note_value=0,
                                video_value=0,
@@ -133,7 +134,8 @@ def write_text_to_file(text, filename="/home/ubuntu/log.txt"):
 
 def run_job():
 
-    sites = LocalSite.objects.all()
+    sites = LocalSite.objects.filter(name="Laguna")
+    print(f"sitemap url is {sites[0].sitemap_url} Note: {sites[0].note_sitemap_url} Video: {sites[0].video_sitemap_url}")
     records = []
     semaphore = threading.Semaphore(4)
     print(f"SIOTES ARE {sites}")
@@ -198,6 +200,7 @@ def get_lighthouse_mobile_score(url):
 
     except Exception as e:
         print(f"Error {e}")
+        raise e
     finally:
         if os.path.exists(report_file_path):
             os.remove(report_file_path)
