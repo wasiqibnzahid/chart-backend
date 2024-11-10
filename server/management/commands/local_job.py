@@ -55,7 +55,6 @@ def process_site(site: LocalSite, semaphore):
             note_count = 0
             i = 0
             index = 0
-            return 0;
             while index < 10 and i < len(extracted_nota_urls):
                 try:
                     res = get_lighthouse_mobile_score(
@@ -115,7 +114,6 @@ def process_site(site: LocalSite, semaphore):
 
         except Exception as e:
             print(f"Exception for {site.name}: {e}")
-            raise e
             return LocalRecord(name=site.name,
                                note_value=0,
                                video_value=0,
@@ -152,12 +150,12 @@ def run_job():
             records.append(result)
             # print(f"Processed site {site}: Result = {result}")
     print(f"STATUS IS DONE")
-    # LocalRecord.objects.filter(date=date).delete()
-    # if records:
-        # for record in records:
-            # write_text_to_file(f"RECORD IS {record.name} {
-            #                    record.note_value} {record.video_value}")
-    # LocalRecord.objects.bulk_create(records)
+    LocalRecord.objects.filter(date=date).delete()
+    if records:
+        for record in records:
+            write_text_to_file(f"RECORD IS {record.name} {
+                               record.note_value} {record.video_value}")
+    LocalRecord.objects.bulk_create(records)
 
 
 def sanitize_filename(url):
@@ -200,7 +198,6 @@ def get_lighthouse_mobile_score(url):
 
     except Exception as e:
         print(f"Error {e}")
-        raise e
     finally:
         if os.path.exists(report_file_path):
             os.remove(report_file_path)
