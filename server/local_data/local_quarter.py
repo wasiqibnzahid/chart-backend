@@ -1,8 +1,5 @@
-from .local_data import init, formatToJson, azteca_columns, competition_columns, azteca_columns_raw, competition_columns_raw
+from .local_data import init, formatToJson, azteca_columns, competition_columns, azteca_columns_raw,competition_columns_raw
 import pandas as pd
-import numpy as np
-
-
 def get_averages():
     df = init()
     quarter_data = formatToJson(
@@ -13,7 +10,6 @@ def get_averages():
         "quarter": quarter_data,
         "week": week_data
     }
-
 
 def calculate_quarterly_averages(df):
 
@@ -108,10 +104,16 @@ def calculate_quarterly_averages(df):
                 prev_company_avg = item["total"]
                 company_change = (
                     company_avg - prev_company_avg) * 100 / prev_company_avg
+                if(prev_company_avg == 0):
+                    company_change = 0
                 company_change_video = (
                     company_avg_video - prev_company_avg_video) * 100 / prev_company_avg_video
+                if(prev_company_avg_video == 0):
+                    company_change_video = 0
                 company_change_note = (
                     company_avg_note - prev_company_avg_note) * 100 / prev_company_avg_note
+                if(prev_company_avg_note == 0):
+                    company_change_note = 0
                 prev_month = months[-1]
             else:
                 company_change = ''
@@ -122,9 +124,9 @@ def calculate_quarterly_averages(df):
                 "total": company_avg,
                 "video": company_avg_video,
                 "note": company_avg_note,
-                "total_change": 0 if pd.isna(company_change) or np.isinf(company_change) else (company_change or 0),
-                "video_change": 0 if pd.isna(company_change_video) or np.isinf(company_change_video) else (company_change_video or 0),
-                "note_change": 0 if pd.isna(company_change_note) or np.isinf(company_change_note) else (company_change_note or 0)
+                "total_change": 0 if pd.isna(company_change) else (company_change or 0),
+                "video_change": 0 if pd.isna(company_change_video) else (company_change_video or 0),
+                "note_change": 0 if pd.isna(company_change_note) else (company_change_note or 0)
             })
 
         for (index, company) in enumerate(competition_columns_raw):
@@ -144,10 +146,16 @@ def calculate_quarterly_averages(df):
                 prev_company_avg = item["total"]
                 company_change = (
                     company_avg - prev_company_avg) * 100 / prev_company_avg
+                if(prev_company_avg == 0):
+                    company_change = 0
                 company_change_video = (
                     company_avg_video - prev_company_avg_video) * 100 / prev_company_avg_video
+                if(prev_company_avg_video == 0):
+                    company_change_video = 0
                 company_change_note = (
                     company_avg_note - prev_company_avg_note) * 100 / prev_company_avg_note
+                if(prev_company_avg_note == 0):
+                    company_change_note = 0
                 prev_month = months[-1]
             else:
                 company_change = ''
@@ -158,15 +166,14 @@ def calculate_quarterly_averages(df):
                 "total": company_avg,
                 "video": company_avg_video,
                 "note": company_avg_note,
-                "total_change": 0 if pd.isna(company_change) or np.isinf(company_change) else (company_change or 0),
-                "video_change": 0 if pd.isna(company_change_video) or np.isinf(company_change_video) else (company_change_video or 0),
-                "note_change": 0 if pd.isna(company_change_note) or np.isinf(company_change_note) else (company_change_note or 0)
+                "total_change": 0 if pd.isna(company_change) else (company_change or 0),
+                "video_change": 0 if pd.isna(company_change_video) else (company_change_video or 0),
+                "note_change": 0 if pd.isna(company_change_note) else (company_change_note or 0)
             })
 
         months.append(res)
 
     return pd.DataFrame(months)
-
 
 def calculate_changes(df):
     # Make a copy of the input DataFrame to avoid modifying the original
@@ -214,15 +221,15 @@ def calculate_changes(df):
 
     # Calculate the changes
     azteca_change = (azteca_avg_latest -
-                     azteca_avg_second_last) * 100 / azteca_avg_second_last
+                        azteca_avg_second_last) * 100 / azteca_avg_second_last
     competition_change = (competition_avg_latest -
                           competition_avg_second_last) * 100 / competition_avg_second_last
     azteca_change_video = (azteca_avg_video_latest -
-                           azteca_avg_video_second_last) * 100 / azteca_avg_video_second_last
+                              azteca_avg_video_second_last) * 100 / azteca_avg_video_second_last
     competition_change_video = (competition_avg_video_latest -
                                 competition_avg_video_second_last) * 100 / competition_avg_video_second_last
     azteca_change_note = (azteca_avg_note_latest -
-                          azteca_avg_note_second_last) * 100 / azteca_avg_note_second_last
+                             azteca_avg_note_second_last) * 100 / azteca_avg_note_second_last
     competition_change_note = (competition_avg_note_latest -
                                competition_avg_note_second_last) * 100 / competition_avg_note_second_last
 
@@ -263,19 +270,25 @@ def calculate_changes(df):
 
         company_change = (
             company_avg_latest - company_avg_second_last) * 100 / company_avg_second_last
+        if(company_avg_second_last == 0):
+            company_change = 0
         company_change_video = (
             company_avg_video_latest - company_avg_video_second_last) * 100 / company_avg_video_second_last
+        if(company_avg_video_second_last == 0):
+            company_change_video = 0
         company_change_note = (
             company_avg_note_latest - company_avg_note_second_last) * 100 / company_avg_note_second_last
+        if(company_avg_note_second_last == 0):
+            company_change_note = 0
 
         res["azteca"].append({
             "name": company,
             "total": company_avg_latest,
             "video": company_avg_video_latest,
             "note": company_avg_note_latest,
-            "total_change": 0 if pd.isna(company_change) or np.isinf(company_change) else (company_change or 0),
-            "video_change": 0 if pd.isna(company_change_video) or np.isinf(company_change_video) else (company_change_video or 0),
-            "note_change": 0 if pd.isna(company_change_note) or np.isinf(company_change_note) else (company_change_note or 0)
+            "total_change": 0 if pd.isna(company_change) else (company_change or 0),
+            "video_change": 0 if pd.isna(company_change_video) else (company_change_video or 0),
+            "note_change": 0 if pd.isna(company_change_note) else (company_change_note or 0)
         })
 
     # Add company-level data comparison (Competition)
@@ -296,19 +309,26 @@ def calculate_changes(df):
 
         company_change = (
             company_avg_latest - company_avg_second_last) * 100 / company_avg_second_last
+        if(company_avg_second_last == 0):
+            company_change = 0
         company_change_video = (
             company_avg_video_latest - company_avg_video_second_last) * 100 / company_avg_video_second_last
+        if(company_avg_video_second_last == 0):
+            company_change_video = 0
         company_change_note = (
             company_avg_note_latest - company_avg_note_second_last) * 100 / company_avg_note_second_last
+        if(company_avg_note_second_last == 0):
+            company_change_note = 0
+
 
         res["competition"].append({
             "name": company,
             "total": company_avg_latest,
             "video": company_avg_video_latest,
             "note": company_avg_note_latest,
-            "total_change": 0 if pd.isna(company_change) or np.isinf(company_change) else (company_change or 0),
-            "video_change": 0 if pd.isna(company_change_video) or np.isinf(company_change_video) else (company_change_video or 0),
-            "note_change": 0 if pd.isna(company_change_note) or np.isinf(company_change_note) else (company_change_note or 0)
+            "total_change": 0 if pd.isna(company_change) else (company_change or 0),
+            "video_change": 0 if pd.isna(company_change_video) else (company_change_video or 0),
+            "note_change": 0 if pd.isna(company_change_note) else (company_change_note or 0)
         })
 
     return res
