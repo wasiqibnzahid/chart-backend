@@ -165,7 +165,7 @@ def write_text_to_file(text, filename="/home/ubuntu/log.txt"):
 
 def run_job():
 
-    sites = Site.objects.all()
+    sites = Site.objects.filter(name="NY Times")
     records = []
     semaphore = threading.Semaphore(4)
     print(f"SIOTES ARE {sites}")
