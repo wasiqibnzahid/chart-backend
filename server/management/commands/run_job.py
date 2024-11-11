@@ -147,6 +147,7 @@ def process_site(site: Site, semaphore):
 
         except Exception as e:
             print(f"Exception for {site.name}: {e}")
+            raise e
             return Record(name=site.name,
                           note_value=0,
                           video_value=0,
@@ -229,6 +230,7 @@ def get_lighthouse_mobile_score(url):
                         0.93, 0.97)
 
     except Exception as e:
+        raise e
         print(f"Error {e}")
     finally:
         if os.path.exists(report_file_path):
