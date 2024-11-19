@@ -330,9 +330,9 @@ def calculate_quarterly_averages(df):
                 "total": company_avg,
                 "video": company_avg_video,
                 "note": company_avg_note,
-                "total_change": company_change,
-                "video_change": company_change_video,
-                "note_change": company_change_note
+                "total_change": 0 if pd.isna(company_change) else (company_change or 0),
+                "video_change": 0 if pd.isna(company_change_video) else (company_change_video or 0),
+                "note_change": 0 if pd.isna(company_change_note) else (company_change_note or 0)
             })
 
         for (index, company) in enumerate(competition_columns_raw):
@@ -366,9 +366,9 @@ def calculate_quarterly_averages(df):
                 "total": company_avg,
                 "video": company_avg_video,
                 "note": company_avg_note,
-                "total_change": company_change,
-                "video_change": company_change_video,
-                "note_change": company_change_note
+                "total_change": 0 if pd.isna(company_change) else (company_change or 0),
+                "video_change": 0 if pd.isna(company_change_video) else (company_change_video or 0),
+                "note_change": 0 if pd.isna(company_change_note) else (company_change_note or 0)
             })
         months.append(res)
 
@@ -480,9 +480,9 @@ def calculate_changes(df):
             "total": company_avg_latest,
             "video": company_avg_video_latest,
             "note": company_avg_note_latest,
-            "total_change": company_change,
-            "video_change": company_change_video,
-            "note_change": company_change_note
+            "total_change": 0 if pd.isna(company_change) else (company_change or 0),
+            "video_change": 0 if pd.isna(company_change_video) else (company_change_video or 0),
+            "note_change": 0 if pd.isna(company_change_note) else (company_change_note or 0)
         })
 
     # Add company-level data comparison (Competition)
@@ -513,9 +513,9 @@ def calculate_changes(df):
             "total": company_avg_latest,
             "video": company_avg_video_latest,
             "note": company_avg_note_latest,
-            "total_change": company_change,
-            "video_change": company_change_video,
-            "note_change": company_change_note
+            "total_change": 0 if pd.isna(company_change) else (company_change or 0),
+            "video_change": 0 if pd.isna(company_change_video) else (company_change_video or 0),
+            "note_change": 0 if pd.isna(company_change_note) else (company_change_note or 0)
         })
 
     return res
