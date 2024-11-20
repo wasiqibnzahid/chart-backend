@@ -7,14 +7,13 @@ import concurrent.futures
 import json
 import os
 import threading
-from ...models import LocalErrorLog, LocalRecord, LocalSite
+from ...models import LocalErrorLog, LocalRecord, LocalSite, Site
 from server.local_data.local_data import azteca_columns_raw
 from .run_job import fetch_data, get_latest_urls, get_sorted_rss_items
+from server.constants import AmpSites
 
 def process_site(site: LocalSite, semaphore):
     with semaphore:
-        print(f"Init for site {site.name} {site.sitemap_url}, note: {
-              site.note_sitemap_url} video: {site.video_sitemap_url}")
         today = datetime.today()
         monday_of_current_week = today - timedelta(days=today.weekday())
         date = monday_of_current_week.date()
@@ -22,9 +21,9 @@ def process_site(site: LocalSite, semaphore):
             note_sitemap_url = site.sitemap_url
             video_sitemap_url = site.sitemap_url
             if site.note_sitemap_url:
-                note_sitemap_url = site.note_sitemap_url
+                note_sitemap_url = f'{site.note_sitemap_url}?_AMP=TRUE'
             if site.video_sitemap_url:
-                video_sitemap_url = site.video_sitemap_url
+                video_sitemap_url = f'{site.video_sitemap_url}?_AMP=TRUE'
             nota_xml = fetch_data(note_sitemap_url)
             video_xml = fetch_data(video_sitemap_url)
             extracted_video_urls = site.video_urls or []
@@ -36,12 +35,10 @@ def process_site(site: LocalSite, semaphore):
             extracted_video_urls.extend(extracted_video_urls_inner)
 
             if len(extracted_nota_urls_inner) == 0:
-                log = LocalErrorLog(message=f"Sitemap returned 0 urls: {
-                               note_sitemap_url}")
+                log = LocalErrorLog(message=f"Sitemap returned 0 urls: {note_sitemap_url}")
                 log.save()
             if len(extracted_video_urls_inner) == 0:
-                log = LocalErrorLog(message=f"Sitemap returned 0 urls: {
-                               video_sitemap_url}")
+                log = LocalErrorLog(message=f"Sitemap returned 0 urls: {video_sitemap_url}")
                 log.save()
 
             extracted_nota_urls.extend(extracted_nota_urls_inner)
@@ -49,24 +46,24 @@ def process_site(site: LocalSite, semaphore):
             print(f"For company {site.name} the note urls are "
                   f"{len(extracted_nota_urls)} and video are {len(extracted_video_urls_inner)}")
             
-            video_val = 0
+            amp_video_val = 0
             video_count = 0
-            note_val = 0
+            amp_note_val = 0
             note_count = 0
             i = 0
             index = 0
             while index < 10 and i < len(extracted_nota_urls):
+                amp_note_url = f'{extracted_nota_urls[i]}?_AMP=TRUE'
                 try:
                     res = get_lighthouse_mobile_score(
-                        extracted_nota_urls[i])
-                    print(f"FOR nota URL {extracted_nota_urls[i]} FOR SITE {
-                          site.name} score is {res}")
+                        amp_note_url)
+                    print(f"FOR nota URL {amp_note_url} FOR SITE {site.name} score is {res}")
                     if res != 0:
-                        note_val += res
+                        amp_note_val += res
                         note_count += 1
                         index += 1
                 except:
-                    url = extracted_nota_urls[i]
+                    url = amp_note_url
                     log = LocalErrorLog(
                         message=f"Failed for Manual Url {url}"
                     )
@@ -76,17 +73,17 @@ def process_site(site: LocalSite, semaphore):
             i = 0
             index = 0
             while index < 10 and i < len(extracted_video_urls):
+                amp_vedio_url = f'{extracted_video_urls[i]}?_AMP=TRUE'
                 try:
                     res = get_lighthouse_mobile_score(
-                        extracted_video_urls[i])
-                    print(f"FOR video URL {extracted_nota_urls[i]} FOR SITE {
-                          site.name} score is {res}")
+                        amp_vedio_url)
+                    print(f"FOR video URL {amp_vedio_url} FOR SITE {site.name} score is {res}")
                     if res != 0:
-                        video_val += res
+                        amp_video_val += res
                         video_count += 1
                         index += 1
                 except:
-                    url = extracted_video_urls[i]
+                    url = amp_vedio_url
                     log = LocalErrorLog(
                         message=f"Failed for Manual Url {url}"
                     )
@@ -96,30 +93,29 @@ def process_site(site: LocalSite, semaphore):
                 note_count = 1
             if video_count == 0:
                 video_count = 1
-            video_val = (video_val / video_count) * 100
-            note_val = (note_val / note_count) * 100
-            print(f"SCORE IS {site.name} {note_val} vid: {video_val}")
+            amp_video_val = (amp_video_val / video_count) * 100
+            amp_note_val = (amp_note_val / note_count) * 100
+            print(f"SCORE IS {site.name} {amp_note_val} vid: {amp_video_val}")
             record = LocalRecord(
                 name=site.name,
-                note_value=note_val,
-                video_value=video_val,
+                amp_note_value=amp_note_val,
+                amp_video_value=amp_video_val,
                 azteca=site.name in azteca_columns_raw,
                 date=date,
-                total_value=(note_val + video_val) / 2
+                amp_total_value=(amp_note_val + amp_video_val) / 2
                 # Set Azteca flag if applicable
             )
-            write_text_to_file(f"RECORD IS {record.name} NOTE: {
-                               record.note_value} VIDEO: {record.video_value}")
+            write_text_to_file(f"RECORD IS {record.name} NOTE: {record.amp_note_value} VIDEO: {record.amp_video_value}")
             return record
 
         except Exception as e:
             print(f"Exception for {site.name}: {e}")
             return LocalRecord(name=site.name,
-                               note_value=0,
-                               video_value=0,
+                               amp_note_value=0,
+                               amp_video_value=0,
                                azteca="Azteca" in site.name,
                                date=date,
-                               total_value=0
+                               amp_total_value=0
                                )
 
 
@@ -131,8 +127,8 @@ def write_text_to_file(text, filename="/home/jawad/Jawad Ahmad/Projects/report.t
 
 
 def run_job():
-
-    sites = LocalSite.objects.all()
+    sites = LocalSite.objects.filter(name__in=AmpSites)
+    
     records = []
     semaphore = threading.Semaphore(4)
     print(f"SIOTES ARE {sites}")
@@ -152,8 +148,7 @@ def run_job():
     LocalRecord.objects.filter(date=date).delete()
     if records:
         for record in records:
-            write_text_to_file(f"RECORD IS {record.name} {
-                               record.note_value} {record.video_value}")
+            write_text_to_file(f"RECORD IS {record.name} {record.amp_note_value} {record.amp_video_value}")
     LocalRecord.objects.bulk_create(records)
 
 
@@ -187,8 +182,7 @@ def get_lighthouse_mobile_score(url):
                 performance_score = report['categories']['performance']['score']
 
                 performance_score *= FACTOR
-                write_text_to_file(f"RAW SCORE IS {performance_score} {
-                                   performance_score >= 0.95} for {url}")
+                write_text_to_file(f"RAW SCORE IS {performance_score} {performance_score >= 0.95} for {url}")
                 if(performance_score == 0):
                     write_text_to_file(f"FOR URL {url} SCORE IS 0")
                 if performance_score >= 0.95:
@@ -208,7 +202,6 @@ class Command(BaseCommand):
     help = 'Run a long function in a separate thread'
 
     def handle(self, *args, **kwargs):
-        print(f"SSTARTING")
         run_job()
         # threading.Thread(target=run_job, daemon=True).start()
         # self.stdout.write(self.style.SUCCESS(

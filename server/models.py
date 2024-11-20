@@ -17,9 +17,13 @@ class Site(models.Model):
 
 class Record(models.Model):
     name = models.CharField(max_length=255)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True)
     note_value = models.FloatField(null=True, blank=True)
     video_value = models.FloatField(null=True, blank=True)
     total_value = models.FloatField(null=True, blank=True)
+    amp_note_value = models.FloatField(null=True, blank=True)
+    amp_video_value = models.FloatField(null=True, blank=True)
+    amp_total_value = models.FloatField(null=True, blank=True)
     azteca = models.BooleanField(default=False)
     date = models.DateField(null=True)
 
@@ -65,9 +69,13 @@ class LocalSite(models.Model):
 
 class LocalRecord(models.Model):
     name = models.CharField(max_length=255)
+    site = models.ForeignKey(LocalSite, on_delete=models.CASCADE, null=True, blank=True)
     note_value = models.FloatField(null=True, blank=True)
     video_value = models.FloatField(null=True, blank=True)
     total_value = models.FloatField(null=True, blank=True)
+    amp_note_value = models.FloatField(null=True, blank=True)
+    amp_video_value = models.FloatField(null=True, blank=True)
+    amp_total_value = models.FloatField(null=True, blank=True)
     azteca = models.BooleanField(default=False)
     date = models.DateField(null=True)
 
@@ -95,3 +103,26 @@ class LocalErrorLog(models.Model):
 
     def __str__(self):
         return f"{self.message} - {self.created_at}"
+    
+# models.py
+
+from django.db import models
+
+class DataUpload(models.Model):
+    TARGET_MODEL_CHOICES = [
+        ('record', 'Record'),
+        ('localrecord', 'LocalRecord'),
+    ]
+    PROCESS_AMP_CHOICES = [
+        (True, 'Yes'),
+        (False, 'No'),
+    ]
+
+    data = models.TextField(help_text="Paste your data here.")
+    target_model = models.CharField(max_length=20, choices=TARGET_MODEL_CHOICES, default='record')
+    process_amp_values = models.BooleanField(choices=PROCESS_AMP_CHOICES, default=False)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Data upload on {self.uploaded_at}"
+

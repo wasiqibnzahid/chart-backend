@@ -133,7 +133,6 @@ def fetch_records():
 
     # Convert defaultdict to a normal dictionary for output
     final_data = dict(data)
-    print(f"FASDASD {final_data}")
     return final_data
 
 
