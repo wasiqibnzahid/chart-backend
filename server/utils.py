@@ -115,7 +115,7 @@ def process_data_and_create_records(data, target_model_name, process_amp_values)
             site_name_to_localsite = {site.name: site for site in localsite_objects}
 
             # Get all unique site names from both models
-            all_site_names = set(site_name_to_site.keys()).union(site_name_to_localsite.keys())
+            all_site_names = site_name_to_site | site_name_to_localsite
 
             # Iterate through each date
             for i, date_str in enumerate(dates):
