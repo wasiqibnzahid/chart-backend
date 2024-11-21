@@ -103,16 +103,13 @@ def calculate_quarterly_averages(df):
                 prev_company_avg_video = item["video"]
                 prev_company_avg_note = item["note"]
                 prev_company_avg = item["total"]
-                company_change = (
-                    company_avg - prev_company_avg) * 100 / prev_company_avg
+                company_change = safe_division(company_avg, prev_company_avg)
                 if(prev_company_avg == 0):
                     company_change = 0
-                company_change_video = (
-                    company_avg_video - prev_company_avg_video) * 100 / prev_company_avg_video
+                company_change_video = safe_division(company_avg_video, prev_company_avg_video)
                 if(prev_company_avg_video == 0):
                     company_change_video = 0
-                company_change_note = (
-                    company_avg_note - prev_company_avg_note) * 100 / prev_company_avg_note
+                company_change_note = safe_division(company_avg_note, prev_company_avg_note)
                 if(prev_company_avg_note == 0):
                     company_change_note = 0
                 prev_month = months[-1]
@@ -145,16 +142,13 @@ def calculate_quarterly_averages(df):
                 prev_company_avg_video = item["video"]
                 prev_company_avg_note = item["note"]
                 prev_company_avg = item["total"]
-                company_change = (
-                    company_avg - prev_company_avg) * 100 / prev_company_avg
+                company_change = safe_division(company_avg, prev_company_avg)
                 if(prev_company_avg == 0):
                     company_change = 0
-                company_change_video = (
-                    company_avg_video - prev_company_avg_video) * 100 / prev_company_avg_video
+                company_change_video = safe_division(company_avg_video, prev_company_avg_video)
                 if(prev_company_avg_video == 0):
                     company_change_video = 0
-                company_change_note = (
-                    company_avg_note - prev_company_avg_note) * 100 / prev_company_avg_note
+                company_change_note = safe_division(company_avg_note, prev_company_avg_note)
                 if(prev_company_avg_note == 0):
                     company_change_note = 0
                 prev_month = months[-1]
@@ -269,16 +263,13 @@ def calculate_changes(df):
         company_avg_note_second_last = second_last_df[[
             col for col in azteca_columns if 'Note' in col and company in col]].mean(axis=1).mean().round(1)
 
-        company_change = (
-            company_avg_latest - company_avg_second_last) * 100 / company_avg_second_last
+        company_change = safe_division(company_avg_latest, company_avg_second_last)
         if(company_avg_second_last == 0):
             company_change = 0
-        company_change_video = (
-            company_avg_video_latest - company_avg_video_second_last) * 100 / company_avg_video_second_last
+        company_change_video = safe_division(company_avg_video_latest, company_avg_video_second_last)
         if(company_avg_video_second_last == 0):
             company_change_video = 0
-        company_change_note = (
-            company_avg_note_latest - company_avg_note_second_last) * 100 / company_avg_note_second_last
+        company_change_note = safe_division(company_avg_note_latest,company_avg_note_second_last)
         if(company_avg_note_second_last == 0):
             company_change_note = 0
 
