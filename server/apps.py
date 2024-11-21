@@ -18,6 +18,9 @@ def get_next_monday_midnight():
 
 def run_job():
     call_command("run_job")
+    
+def amp_job():
+    call_command("amp_job")
 
 
 class ServerConfig(AppConfig):
@@ -37,9 +40,16 @@ class ServerConfig(AppConfig):
         # Schedule the job to run once on the next Monday at midnight
         scheduler.add_job(run_job, DateTrigger(
             run_date=get_next_monday_midnight()))
+        
+        scheduler.add_job(amp_job, DateTrigger(
+            run_date=get_next_monday_midnight()))
 
         # Schedule the job to run every week on Monday at midnight after the first run
         scheduler.add_job(run_job, IntervalTrigger(
+            # + timedelta(weeks=1)
+            weeks=1, start_date=get_next_monday_midnight() + timedelta(weeks=1)))
+        
+        scheduler.add_job(amp_job, IntervalTrigger(
             # + timedelta(weeks=1)
             weeks=1, start_date=get_next_monday_midnight() + timedelta(weeks=1)))
 
