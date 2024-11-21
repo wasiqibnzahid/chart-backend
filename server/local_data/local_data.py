@@ -128,8 +128,8 @@ def fetch_records():
         for record in records_on_date:
             # Example: Azteca UNO (Note), Azteca UNO (Video)
             name = record.name
-            data[f"{name} (Note)"].append(record.note_value)
-            data[f"{name} (Video)"].append(record.video_value)
+            data[f"{name} (Note)"].append(record.note_value or 0)
+            data[f"{name} (Video)"].append(record.video_value or 0)
 
     # Convert defaultdict to a normal dictionary for output
     final_data = dict(data)
@@ -259,7 +259,7 @@ def formatLolData(df, inner_data):
                 combined_data[name][date] = {'sum': 0, 'count': 0}
 
             # Add value to sum and increment count
-            combined_data[name][date]['sum'] += value
+            combined_data[name][date]['sum'] += value or 0
             combined_data[name][date]['count'] += 1
 
     # Format the averages output

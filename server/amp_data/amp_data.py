@@ -36,6 +36,9 @@ changeKeys = [
 ]
 
 amp_columns = [
+    'Azteca UNO (Note)', 'Azteca UNO (Video)', 'Azteca 7 (Note)', 'Azteca 7 (Video)', 
+    'Deportes (Note)', 'Deportes (Video)', 'ADN40 (Note)', 'ADN40 (Video)', 
+    'Noticias (Note)', 'Noticias (Video)', 
     'Azteca Veracruz (Note)', 'Azteca Veracruz (Video)', 'Azteca Quintanaroo (Note)', 'Azteca Quintanaroo (Video)',
     'Azteca Sinaloa (Note)', 'Azteca Sinaloa (Video)', 'Azteca BC (Note)', 'Azteca BC (Video)',
     'Azteca CJ (Note)', 'Azteca CJ (Video)', 'Azteca Aguascalientes (Note)', 'Azteca Aguascalientes (Video)',
@@ -47,6 +50,9 @@ amp_columns = [
 ]
 
 amp_columns_raw = [
+    'Azteca UNO', 'Azteca 7',
+    'Deportes', 'ADN40',
+    'Noticias',
     'Azteca Veracruz', 'Azteca Quintanaroo',
     'Azteca Sinaloa', 'Azteca BC',
     'Azteca CJ', 'Azteca Aguascalientes',
@@ -294,31 +300,35 @@ def calculate_quarterly_averages(df):
             'AMP Note Avg': amp_avg_note,
             "amp": [] 
         }
-
+        
+        for (index, company) in enumerate(amp_columns_raw):
+            company_avg = round(month_df[[col for col in amp_columns if company in col]].mean(axis=1).mean(), 1)
+            company_avg_video = round(month_df[[col for col in amp_columns if 'Video' in col and company in col]].mean(axis=1).mean(), 1)
+            company_avg_note = round(month_df[[col for col in amp_columns if 'Note' in col and company in col]].mean(axis=1).mean(), 1)
         # Process AMP data
-        if len(months) > 0:
-            prev_month = months[-1]
-            prev_amp_avg = prev_month['AMP Avg']
-            prev_amp_video_avg = prev_month['AMP Video Avg']
-            prev_amp_note_avg = prev_month['AMP Note Avg']
+            if len(months) > 0:
+                prev_month = months[-1]
+                prev_amp_avg = prev_month['AMP Avg']
+                prev_amp_video_avg = prev_month['AMP Video Avg']
+                prev_amp_note_avg = prev_month['AMP Note Avg']
 
-            amp_change = safe_division(amp_avg, prev_amp_avg)
-            amp_video_change = safe_division(amp_avg_video, prev_amp_video_avg)
-            amp_note_change = safe_division(amp_avg_note, prev_amp_note_avg)
-        else:
-            amp_change = ""
-            amp_video_change = ""
-            amp_note_change = ""
+                amp_change = safe_division(amp_avg, prev_amp_avg)
+                amp_video_change = safe_division(amp_avg_video, prev_amp_video_avg)
+                amp_note_change = safe_division(amp_avg_note, prev_amp_note_avg)
+            else:
+                amp_change = ""
+                amp_video_change = ""
+                amp_note_change = ""
 
-        res["amp"].append({
-            "name": "AMP",
-            "total": amp_avg,
-            "video": amp_avg_video,
-            "note": amp_avg_note,
-            "total_change": 0 if pd.isna(amp_change) else (amp_change or 0),
-            "video_change": 0 if pd.isna(amp_video_change) else (amp_video_change or 0),
-            "note_change": 0 if pd.isna(amp_note_change) else (amp_note_change or 0)
-        })
+            res["amp"].append({
+                "name": company,
+                "total": amp_avg,
+                "video": amp_avg_video,
+                "note": amp_avg_note,
+                "total_change": 0 if pd.isna(amp_change) else (amp_change or 0),
+                "video_change": 0 if pd.isna(amp_video_change) else (amp_video_change or 0),
+                "note_change": 0 if pd.isna(amp_note_change) else (amp_note_change or 0)
+            })
 
         months.append(res)
 
@@ -376,21 +386,45 @@ def calculate_changes(df):
         'AMP Note Avg': amp_avg_note_latest,
         "amp": []  # Added AMP section
     }
+    for (index, company) in enumerate(amp_columns_raw):
+        company_avg_latest = round(latest_df[
+            [col for col in amp_columns if company in col]
+        ].mean(axis=1).mean(), 1)
 
-    # Add AMP-level data comparison
-    amp_change = safe_division(amp_avg_latest, amp_avg_second_last)
-    amp_video_change = safe_division(amp_avg_latest, amp_avg_video_second_last)
-    amp_note_change = safe_division(amp_avg_note_latest, amp_avg_note_second_last)
+        company_avg_video_latest = round(latest_df[
+            [col for col in amp_columns if 'Video' in col and company in col]
+        ].mean(axis=1).mean(), 1)
 
-    res["amp"].append({
-        "name": "AMP",
-        "total": amp_avg_latest,
-        "video": amp_avg_video_latest,
-        "note": amp_avg_note_latest,
-        "total_change": 0 if pd.isna(amp_change) else (amp_change or 0),
-        "video_change": 0 if pd.isna(amp_video_change) else (amp_video_change or 0),
-        "note_change": 0 if pd.isna(amp_note_change) else (amp_note_change or 0)
-    })
+        company_avg_note_latest = round(latest_df[
+            [col for col in amp_columns if 'Note' in col and company in col]
+        ].mean(axis=1).mean(), 1)
+
+        company_avg_second_last = round(second_last_df[
+            [col for col in amp_columns if company in col]
+        ].mean(axis=1).mean(), 1)
+
+        company_avg_video_second_last = round(second_last_df[
+            [col for col in amp_columns if 'Video' in col and company in col]
+        ].mean(axis=1).mean(), 1)
+
+        company_avg_note_second_last = round(second_last_df[
+            [col for col in amp_columns if 'Note' in col and company in col]
+        ].mean(axis=1).mean(), 1)
+
+        # Add AMP-level data comparison
+        amp_change = safe_division(company_avg_latest, company_avg_second_last)
+        amp_video_change = safe_division(company_avg_video_latest, company_avg_video_second_last)
+        amp_note_change = safe_division(company_avg_note_latest, company_avg_note_second_last)
+
+        res["amp"].append({
+            "name": company,
+            "total": amp_avg_latest,
+            "video": amp_avg_video_latest,
+            "note": amp_avg_note_latest,
+            "total_change": 0 if pd.isna(amp_change) else (amp_change or 0),
+            "video_change": 0 if pd.isna(amp_video_change) else (amp_video_change or 0),
+            "note_change": 0 if pd.isna(amp_note_change) else (amp_note_change or 0)
+        })
 
     return res
 

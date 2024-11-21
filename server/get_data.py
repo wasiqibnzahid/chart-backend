@@ -89,8 +89,8 @@ def fetch_records():
         for record in records_on_date:
             # Example: Azteca UNO (Note), Azteca UNO (Video)
             name = record.name
-            data[f"{name} (Note)"].append(int(record.note_value))
-            data[f"{name} (Video)"].append(int(record.video_value))
+            data[f"{name} (Note)"].append(int(record.note_value or 0))
+            data[f"{name} (Video)"].append(int(record.video_value or 0))
     # Convert defaultdict to a normal dictionary for output
     return dict(data)
 
@@ -264,18 +264,12 @@ def calculate_quarterly_averages(df):
             prev_tv_azteca_avg_note = prev_month['TV Azteca Note Avg']
             prev_competition_avg_note = prev_month['Competition Note Avg']
 
-            tv_azteca_change = (
-                tv_azteca_avg - prev_tv_azteca_avg) * 100 / prev_tv_azteca_avg
-            competition_change = (
-                competition_avg - prev_competition_avg) * 100 / prev_competition_avg
-            tv_azteca_change_video = (
-                tv_azteca_avg_video - prev_tv_azteca_avg_video) * 100 / prev_tv_azteca_avg_video
-            competition_change_video = (
-                competition_avg_video - prev_competition_avg_video) * 100 / prev_competition_avg_video
-            tv_azteca_change_note = (
-                tv_azteca_avg_note - prev_tv_azteca_avg_note) * 100 / prev_tv_azteca_avg_note
-            competition_change_note = (
-                competition_avg_note - prev_competition_avg_note) * 100 / prev_competition_avg_note
+            tv_azteca_change = safe_division(tv_azteca_avg, prev_tv_azteca_avg)
+            competition_change = safe_division(competition_avg, prev_competition_avg)
+            tv_azteca_change_video = safe_division(tv_azteca_avg_video, prev_tv_azteca_avg_video)
+            competition_change_video = safe_division(competition_avg_video, prev_competition_avg_video)
+            tv_azteca_change_note = safe_division( tv_azteca_avg_note, prev_tv_azteca_avg_note)
+            competition_change_note = safe_division(competition_avg_note, prev_competition_avg_note)
         else:
             tv_azteca_change = ""
             competition_change = ""
@@ -416,18 +410,12 @@ def calculate_changes(df):
         col for col in competition_columns if 'Note' in col]].mean(axis=1).mean().round(1)
 
     # Calculate the changes
-    tv_azteca_change = (tv_azteca_avg_latest -
-                        tv_azteca_avg_second_last) * 100 / tv_azteca_avg_second_last
-    competition_change = (competition_avg_latest -
-                          competition_avg_second_last) * 100 / competition_avg_second_last
-    tv_azteca_change_video = (tv_azteca_avg_video_latest -
-                              tv_azteca_avg_video_second_last) * 100 / tv_azteca_avg_video_second_last
-    competition_change_video = (competition_avg_video_latest -
-                                competition_avg_video_second_last) * 100 / competition_avg_video_second_last
-    tv_azteca_change_note = (tv_azteca_avg_note_latest -
-                             tv_azteca_avg_note_second_last) * 100 / tv_azteca_avg_note_second_last
-    competition_change_note = (competition_avg_note_latest -
-                               competition_avg_note_second_last) * 100 / competition_avg_note_second_last
+    tv_azteca_change = safe_division(tv_azteca_avg_latest, tv_azteca_avg_second_last)
+    competition_change = safe_division(competition_avg_latest,competition_avg_second_last)
+    tv_azteca_change_video = safe_division(tv_azteca_avg_video_latest, tv_azteca_avg_video_second_last)
+    competition_change_video = safe_division(competition_avg_video_latest, competition_avg_video_second_last)
+    tv_azteca_change_note = safe_division(tv_azteca_avg_note_latest, tv_azteca_avg_note_second_last)
+    competition_change_note = safe_division(competition_avg_note_latest, competition_avg_note_second_last)
 
     # Prepare the result dictionary
     res = {
