@@ -308,16 +308,13 @@ def calculate_changes(df):
         company_avg_note_second_last = second_last_df[[
             col for col in competition_columns if 'Note' in col and company in col]].mean(axis=1).mean().round(1)
 
-        company_change = safe_division(
-            (company_avg_latest - company_avg_second_last) * 100 , company_avg_second_last)
+        company_change = safe_division(company_avg_latest, company_avg_second_last)
         if(company_avg_second_last == 0):
             company_change = 0
-        company_change_video = safe_division(
-            (company_avg_video_latest - company_avg_video_second_last) * 100 , company_avg_video_second_last)
+        company_change_video = safe_division(company_avg_video_latest, company_avg_video_second_last)
         if(company_avg_video_second_last == 0):
             company_change_video = 0
-        company_change_note = safe_division(
-            (company_avg_note_latest - company_avg_note_second_last) * 100 , company_avg_note_second_last)
+        company_change_note = safe_division(company_avg_note_latest , company_avg_note_second_last)
         if(company_avg_note_second_last == 0):
             company_change_note = 0
 

@@ -274,11 +274,11 @@ def calculate_quarterly_averages(df):
 
             prev_amp_avg_note = prev_month['AMP Note Avg']
 
-            amp_change = safe_division((amp_avg - prev_amp_avg) * 100 , prev_amp_avg)
+            amp_change = safe_division(amp_avg , prev_amp_avg)
 
-            amp_change_video = safe_division((amp_avg_video - prev_amp_avg_video) * 100 , prev_amp_avg_video)
+            amp_change_video = safe_division(amp_avg_video , prev_amp_avg_video)
 
-            amp_change_note = safe_division((amp_avg_note - prev_amp_avg_note) * 100 , prev_amp_avg_note)
+            amp_change_note = safe_division(amp_avg_note , prev_amp_avg_note)
         else:
             amp_change = ""
             amp_change_video = ""
@@ -302,9 +302,9 @@ def calculate_quarterly_averages(df):
             prev_amp_video_avg = prev_month['AMP Video Avg']
             prev_amp_note_avg = prev_month['AMP Note Avg']
 
-            amp_change = safe_division((amp_avg - prev_amp_avg) * 100, prev_amp_avg)
-            amp_video_change = safe_division((amp_avg_video - prev_amp_video_avg) * 100, prev_amp_video_avg)
-            amp_note_change = safe_division((amp_avg_note - prev_amp_note_avg) * 100, prev_amp_note_avg)
+            amp_change = safe_division(amp_avg, prev_amp_avg)
+            amp_video_change = safe_division(amp_avg_video, prev_amp_video_avg)
+            amp_note_change = safe_division(amp_avg_note, prev_amp_note_avg)
         else:
             amp_change = ""
             amp_video_change = ""
@@ -354,11 +354,11 @@ def calculate_changes(df):
     amp_avg_note_second_last = second_last_df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1)
 
     # Calculate the changes
-    amp_change = safe_division((amp_avg_latest - amp_avg_second_last) * 100 , amp_avg_second_last)
+    amp_change = safe_division(amp_avg_latest , amp_avg_second_last)
 
-    amp_change_video = safe_division((amp_avg_video_latest - amp_avg_video_second_last) * 100 , amp_avg_video_second_last)
+    amp_change_video = safe_division(amp_avg_video_latest , amp_avg_video_second_last)
 
-    amp_change_note = safe_division((amp_avg_note_latest - amp_avg_note_second_last) * 100 , amp_avg_note_second_last)
+    amp_change_note = safe_division(amp_avg_note_latest, amp_avg_note_second_last)
 
     # Prepare the result dictionary
     res = {
@@ -378,9 +378,9 @@ def calculate_changes(df):
     }
 
     # Add AMP-level data comparison
-    amp_change = safe_division((amp_avg_latest - amp_avg_second_last) * 100, amp_avg_second_last)
-    amp_video_change = safe_division((amp_avg_latest - amp_avg_second_last) * 100, amp_avg_video_second_last)
-    amp_note_change = safe_division((amp_avg_note_latest - amp_avg_note_second_last) * 100, amp_avg_note_second_last)
+    amp_change = safe_division(amp_avg_latest, amp_avg_second_last)
+    amp_video_change = safe_division(amp_avg_latest, amp_avg_video_second_last)
+    amp_note_change = safe_division(amp_avg_note_latest, amp_avg_note_second_last)
 
     res["amp"].append({
         "name": "AMP",
