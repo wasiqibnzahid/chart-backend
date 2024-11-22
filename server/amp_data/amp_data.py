@@ -413,9 +413,9 @@ def calculate_changes(df):
 
         res["amp"].append({
             "name": company,
-            "total": amp_avg_latest,
-            "video": amp_avg_video_latest,
-            "note": amp_avg_note_latest,
+            "total": company_avg_latest,
+            "video": company_avg_video_latest,
+            "note": company_avg_note_latest,
             "total_change": 0 if pd.isna(amp_change) else (amp_change or 0),
             "video_change": 0 if pd.isna(amp_video_change) else (amp_video_change or 0),
             "note_change": 0 if pd.isna(amp_note_change) else (amp_note_change or 0)
