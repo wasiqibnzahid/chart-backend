@@ -21,9 +21,6 @@ class Record(models.Model):
     note_value = models.FloatField(null=True, blank=True)
     video_value = models.FloatField(null=True, blank=True)
     total_value = models.FloatField(null=True, blank=True)
-    amp_note_value = models.FloatField(null=True, blank=True)
-    amp_video_value = models.FloatField(null=True, blank=True)
-    amp_total_value = models.FloatField(null=True, blank=True)
     azteca = models.BooleanField(default=False)
     date = models.DateField(null=True)
 
@@ -73,6 +70,11 @@ class LocalRecord(models.Model):
     note_value = models.FloatField(null=True, blank=True)
     video_value = models.FloatField(null=True, blank=True)
     total_value = models.FloatField(null=True, blank=True)
+    azteca = models.BooleanField(default=False)
+    date = models.DateField(null=True)
+    
+class AmpRecord(models.Model):
+    name = models.CharField(max_length=255)
     amp_note_value = models.FloatField(null=True, blank=True)
     amp_video_value = models.FloatField(null=True, blank=True)
     amp_total_value = models.FloatField(null=True, blank=True)
@@ -94,7 +96,7 @@ class LocalRecord(models.Model):
     #     super(Record, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.name} - {self.total_value} - {self.date}"
+        return f"{self.name} - {self.amp_total_value} - {self.date}"
 
 
 class LocalErrorLog(models.Model):

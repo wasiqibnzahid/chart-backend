@@ -1,6 +1,6 @@
 import pandas as pd
 from collections import defaultdict
-from server.models import LocalRecord, Record, Site, LocalSite
+from server.models import AmpRecord
 from datetime import datetime
 import json
 from server.constants import AmpSites 
@@ -113,12 +113,7 @@ def fetch_records():
     # Dictionary to store grouped and structured data
     data = defaultdict(list)
 
-    # Fetch records from both Record and LocalRecord models
-    all_records = (
-        Record.objects.filter(name__in=AmpSites)
-        .union(LocalRecord.objects.filter(name__in=AmpSites))
-        .order_by("date")
-    )
+    all_records = AmpRecord.objects.all().order_by("date")
 
     # Group records by date
     grouped_records = defaultdict(list)
@@ -312,13 +307,13 @@ def calculate_quarterly_averages(df):
                 prev_amp_video_avg = prev_month['AMP Video Avg']
                 prev_amp_note_avg = prev_month['AMP Note Avg']
 
-                amp_change = safe_division(amp_avg, prev_amp_avg)
-                amp_video_change = safe_division(amp_avg_video, prev_amp_video_avg)
-                amp_note_change = safe_division(amp_avg_note, prev_amp_note_avg)
+                amp_change = safe_division(company_avg, prev_amp_avg)
+                amp_video_change = safe_division(company_avg_video, prev_amp_video_avg)
+                amp_note_change = safe_division(company_avg_note, prev_amp_note_avg)
             else:
-                amp_change = ""
-                amp_video_change = ""
-                amp_note_change = ""
+                amp_change = 0
+                amp_video_change = 0
+                amp_note_change = 0
 
             res["amp"].append({
                 "name": company,
@@ -521,11 +516,11 @@ def formatLolData(df, inner_data):
     video = []
     
     video_self = calculate_relevant_insights(
-        df, [col for col in list(label_mapping.keys()) if 'Video' in col], 'AMP')
+        df, [col for col in list(label_mapping.keys()) if 'Video' in col], '')
     note_self = calculate_relevant_insights(
-        df, [col for col in list(label_mapping.keys()) if 'Note' in col], 'AMP')
+        df, [col for col in list(label_mapping.keys()) if 'Note' in col], '')
     total_self = calculate_relevant_insights(
-        df, list(label_mapping.keys()), 'AMP')
+        df, list(label_mapping.keys()), '')
 
     # Dictionaries to store the combined data and totals
     for index, item in enumerate(data_as_json):
@@ -625,11 +620,11 @@ def get_averages():
 def get_insights(date_filter=None):
     df = init()
     video_self = calculate_relevant_insights(
-        df, [col for col in amp_columns if 'Video' in col], 'AMP', date_filter)
+        df, [col for col in amp_columns if 'Video' in col], '', date_filter)
     note_self = calculate_relevant_insights(
-        df, [col for col in amp_columns if 'Note' in col], 'AMP', date_filter)
+        df, [col for col in amp_columns if 'Note' in col], '', date_filter)
     total_self = calculate_relevant_insights(
-        df, amp_columns, 'AMP', date_filter)
+        df, amp_columns, '', date_filter)
     
 
     return {

@@ -4,6 +4,8 @@ from typing import TypedDict, List, Optional, Dict, Any
 import pandas as pd
 import numpy as np
 
+from server.models import AmpRecord
+
 @dataclass
 class AppConfig:
     DEFAULT_START_DATE: str = "01-2024"
@@ -17,13 +19,13 @@ def dummy_reverse(apps, schema_editor):
     pass
 
 def safe_division(
-    numerator: Optional[float], denominator: Optional[float], default: float = 0.0
+    numerator: Optional[float], denominator: Optional[float], default: float = 100.0
 ) -> float:
     try:
         if denominator in [0, None] or pd.isna(denominator) or pd.isna(numerator):
             return default
         result = (numerator - denominator) * 100.0 / denominator
-        return result if not pd.isna(result) else default
+        return round(result) if not pd.isna(result) else default
     except Exception as e:
         return default
 
@@ -158,38 +160,26 @@ def process_data_and_create_records(data, target_model_name, process_amp_values)
 
                     # Process for Site model
                     site_obj = site_name_to_site.get(name)
-                    if site_obj:
-                        # Create or update Record
-                        Record.objects.update_or_create(
-                            name=name,
-                            date=date,
-                            defaults=record_data_amp
-                        )
-
-                    # Process for LocalSite model
-                    localsite_obj = site_name_to_localsite.get(name)
-                    if localsite_obj:
-                        # Create or update LocalRecord
-                        LocalRecord.objects.update_or_create(
-                            name=name,
-                            date=date,
-                            defaults=record_data_amp
-                        )
+                    AmpRecord.objects.update_or_create(
+                        name=name,
+                        date=date,
+                        defaults=record_data_amp
+                    )
 
         else:
             # Not processing AMP values; use target_model_name to determine models
             if target_model_name == 'record':
-                TargetRecordModel = Record
-                TargetSiteModel = Site
+                target_record_model = Record
+                target_site_model = Site
             elif target_model_name == 'localrecord':
-                TargetRecordModel = LocalRecord
-                TargetSiteModel = LocalSite
+                target_record_model = LocalRecord
+                target_site_model = LocalSite
             else:
                 errors.append(f"Invalid target model: {target_model_name}")
                 return errors
 
             # Retrieve site objects from the target model
-            site_objects = TargetSiteModel.objects.filter(name__in=names_in_data)
+            site_objects = target_site_model.objects.filter(name__in=names_in_data)
             site_name_to_obj = {site.name: site for site in site_objects}
 
             # Iterate through each date
@@ -236,7 +226,7 @@ def process_data_and_create_records(data, target_model_name, process_amp_values)
                     }
 
                     # Create or update Record or LocalRecord
-                    TargetRecordModel.objects.update_or_create(
+                    target_record_model.objects.update_or_create(
                         name=name,
                         date=date,
                         defaults=record_data_non_amp

@@ -7,12 +7,12 @@ import concurrent.futures
 import json
 import os
 import threading
-from ...models import ErrorLog, LocalErrorLog, LocalRecord, LocalSite, Record, Site
+from ...models import AmpRecord, LocalErrorLog, LocalSite, Site
 from server.local_data.local_data import azteca_columns_raw
 from .run_job import fetch_data, get_latest_urls, get_sorted_rss_items
-from server.constants import AmpSites
+from server.constants import AMP_PARAMS, AmpSites
 
-def process_site(site: Site, semaphore):
+def process_amp_site(site, semaphore):
     with semaphore:
         today = datetime.today()
         monday_of_current_week = today - timedelta(days=today.weekday())
@@ -21,140 +21,9 @@ def process_site(site: Site, semaphore):
             note_sitemap_url = site.sitemap_url
             video_sitemap_url = site.sitemap_url
             if site.note_sitemap_url:
-                note_sitemap_url = f'{site.note_sitemap_url}?_AMP=TRUE'
+                note_sitemap_url = f'{site.note_sitemap_url}{AMP_PARAMS}'
             if site.video_sitemap_url:
-                video_sitemap_url = f'{site.video_sitemap_url}?_AMP=TRUE'
-            nota_xml = fetch_data(note_sitemap_url)
-            video_xml = fetch_data(video_sitemap_url)
-            extracted_video_urls = site.video_urls or []
-            extracted_nota_urls = site.note_urls or []
-            extracted_nota_urls_inner = get_latest_urls(
-                nota_xml, is_xml="html" not in note_sitemap_url)
-            extracted_video_urls_inner = get_latest_urls(
-                video_xml, is_xml="html" not in video_sitemap_url)
-            extracted_video_urls.extend(extracted_video_urls_inner)
-
-            if len(extracted_nota_urls_inner) == 0:
-                log = ErrorLog(message=f"Sitemap returned 0 urls: {note_sitemap_url}")
-                log.save()
-            if len(extracted_video_urls_inner) == 0:
-                log = ErrorLog(message=f"Sitemap returned 0 urls: {video_sitemap_url}")
-                log.save()
-
-            extracted_nota_urls.extend(extracted_nota_urls_inner)
-            extracted_video_urls.extend(extracted_video_urls_inner)
-            print(f"For company {site.name} the note urls are "
-                  f"{len(extracted_nota_urls)} and video are {len(extracted_video_urls_inner)}")
-            
-            amp_video_val = 0
-            video_count = 0
-            amp_note_val = 0
-            note_count = 0
-            i = 0
-            index = 0
-            while index < 10 and i < len(extracted_nota_urls):
-                amp_note_url = f'{extracted_nota_urls[i]}?_AMP=TRUE'
-                try:
-                    res = get_lighthouse_mobile_score(
-                        amp_note_url)
-                    print(f"FOR nota URL {amp_note_url} FOR SITE {site.name} score is {res}")
-                    if res != 0:
-                        amp_note_val += res
-                        note_count += 1
-                        index += 1
-                except:
-                    url = amp_note_url
-                    log = ErrorLog(
-                        message=f"Failed for Manual Url {url}"
-                    )
-                    log.save()
-                i += 1
-
-            i = 0
-            index = 0
-            while index < 10 and i < len(extracted_video_urls):
-                amp_vedio_url = f'{extracted_video_urls[i]}?_AMP=TRUE'
-                try:
-                    res = get_lighthouse_mobile_score(
-                        amp_vedio_url)
-                    print(f"FOR video URL {amp_vedio_url} FOR SITE {site.name} score is {res}")
-                    if res != 0:
-                        amp_video_val += res
-                        video_count += 1
-                        index += 1
-                except:
-                    url = amp_vedio_url
-                    log = ErrorLog(
-                        message=f"Failed for Manual Url {url}"
-                    )
-                    log.save()
-                i += 1
-            if note_count == 0:
-                note_count = 1
-            if video_count == 0:
-                video_count = 1
-            amp_video_val = (amp_video_val / video_count) * 100
-            amp_note_val = (amp_note_val / note_count) * 100
-            print(f"SCORE IS {site.name} {amp_note_val} vid: {amp_video_val}")
-            record = Record(
-                name=site.name,
-                amp_note_value=amp_note_val,
-                amp_video_value=amp_video_val,
-                azteca=site.name in azteca_columns_raw,
-                date=date,
-                amp_total_value=(amp_note_val + amp_video_val) / 2
-                # Set Azteca flag if applicable
-            )
-            write_text_to_file(f"RECORD IS {record.name} NOTE: {record.amp_note_value} VIDEO: {record.amp_video_value}")
-            return record
-
-        except Exception as e:
-            print(f"Exception for {site.name}: {e}")
-            return Record(name=site.name,
-                               amp_note_value=0,
-                               amp_video_value=0,
-                               azteca="Azteca" in site.name,
-                               date=date,
-                               amp_total_value=0
-                               )
-
-def run_site_job():
-    sites = Site.objects.filter(name__in=AmpSites)
-    
-    records = []
-    semaphore = threading.Semaphore(4)
-    print(f"SIOTES ARE {sites}")
-    today = datetime.today()
-    monday_of_current_week = today - timedelta(days=today.weekday())
-    date = monday_of_current_week.date()
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        print(f"STARINT PROCESSING SITE A")
-        future_to_site = {executor.submit(
-            process_site, site, semaphore): site for site in sites}
-        for future in concurrent.futures.as_completed(future_to_site):
-            site = future_to_site[future]
-            result = future.result()  # Get the result of the future
-            records.append(result)
-            # print(f"Processed site {site}: Result = {result}")
-    print(f"STATUS IS DONE")
-    Record.objects.filter(date=date).delete()
-    if records:
-        for record in records:
-            write_text_to_file(f"RECORD IS {record.name} {record.amp_note_value} {record.amp_video_value}")
-    Record.objects.bulk_create(records)
-
-def process_local_site(site: LocalSite, semaphore):
-    with semaphore:
-        today = datetime.today()
-        monday_of_current_week = today - timedelta(days=today.weekday())
-        date = monday_of_current_week.date()
-        try:
-            note_sitemap_url = site.sitemap_url
-            video_sitemap_url = site.sitemap_url
-            if site.note_sitemap_url:
-                note_sitemap_url = f'{site.note_sitemap_url}?_AMP=TRUE'
-            if site.video_sitemap_url:
-                video_sitemap_url = f'{site.video_sitemap_url}?_AMP=TRUE'
+                video_sitemap_url = f'{site.video_sitemap_url}{AMP_PARAMS}'
             nota_xml = fetch_data(note_sitemap_url)
             video_xml = fetch_data(video_sitemap_url)
             extracted_video_urls = site.video_urls or []
@@ -184,7 +53,7 @@ def process_local_site(site: LocalSite, semaphore):
             i = 0
             index = 0
             while index < 10 and i < len(extracted_nota_urls):
-                amp_note_url = f'{extracted_nota_urls[i]}?_AMP=TRUE'
+                amp_note_url = f'{extracted_nota_urls[i]}{AMP_PARAMS}'
                 try:
                     res = get_lighthouse_mobile_score(
                         amp_note_url)
@@ -204,7 +73,7 @@ def process_local_site(site: LocalSite, semaphore):
             i = 0
             index = 0
             while index < 10 and i < len(extracted_video_urls):
-                amp_vedio_url = f'{extracted_video_urls[i]}?_AMP=TRUE'
+                amp_vedio_url = f'{extracted_video_urls[i]}{AMP_PARAMS}'
                 try:
                     res = get_lighthouse_mobile_score(
                         amp_vedio_url)
@@ -227,27 +96,28 @@ def process_local_site(site: LocalSite, semaphore):
             amp_video_val = (amp_video_val / video_count) * 100
             amp_note_val = (amp_note_val / note_count) * 100
             print(f"SCORE IS {site.name} {amp_note_val} vid: {amp_video_val}")
-            record = LocalRecord(
+            record = AmpRecord(
                 name=site.name,
                 amp_note_value=amp_note_val,
                 amp_video_value=amp_video_val,
+                amp_total_value=(amp_note_val + amp_video_val) / 2,
+                # Set Azteca flag if applicable
                 azteca=site.name in azteca_columns_raw,
                 date=date,
-                amp_total_value=(amp_note_val + amp_video_val) / 2
-                # Set Azteca flag if applicable
             )
             write_text_to_file(f"RECORD IS {record.name} NOTE: {record.amp_note_value} VIDEO: {record.amp_video_value}")
             return record
 
         except Exception as e:
             print(f"Exception for {site.name}: {e}")
-            return LocalRecord(name=site.name,
-                               amp_note_value=0,
-                               amp_video_value=0,
-                               azteca="Azteca" in site.name,
-                               date=date,
-                               amp_total_value=0
-                               )
+            return AmpRecord(
+                name=site.name,
+                amp_note_value=0,
+                amp_video_value=0,
+                amp_total_value=0,
+                azteca="Azteca" in site.name,
+                date=date,
+            )
 
 
 def write_text_to_file(text, filename="/home/ubuntu/log.txt"):
@@ -257,8 +127,10 @@ def write_text_to_file(text, filename="/home/ubuntu/log.txt"):
         file.write(text + "\n")
 
 
-def run_local_site_job():
-    sites = LocalSite.objects.filter(name__in=AmpSites)
+def run_amp_site_job():
+    sites = LocalSite.objects.filter(name__in=AmpSites).union(
+        Site.objects.filter(name__in=AmpSites)
+    )
     
     records = []
     semaphore = threading.Semaphore(4)
@@ -269,18 +141,18 @@ def run_local_site_job():
     with concurrent.futures.ThreadPoolExecutor() as executor:
         print(f"STARINT PROCESSING SITE A")
         future_to_site = {executor.submit(
-            process_site, site, semaphore): site for site in sites}
+            process_amp_site, site, semaphore): site for site in sites}
         for future in concurrent.futures.as_completed(future_to_site):
             site = future_to_site[future]
             result = future.result()  # Get the result of the future
             records.append(result)
             # print(f"Processed site {site}: Result = {result}")
     print(f"STATUS IS DONE")
-    LocalRecord.objects.filter(date=date).delete()
+    AmpRecord.objects.filter(date=date).delete()
     if records:
         for record in records:
             write_text_to_file(f"RECORD IS {record.name} {record.amp_note_value} {record.amp_video_value}")
-    LocalRecord.objects.bulk_create(records)
+    AmpRecord.objects.bulk_create(records)
 
 
 def sanitize_filename(url):
@@ -333,8 +205,4 @@ class Command(BaseCommand):
     help = 'Run a long function in a separate thread'
 
     def handle(self, *args, **kwargs):
-        run_local_site_job()
-        run_site_job()
-        # threading.Thread(target=run_job, daemon=True).start()
-        # self.stdout.write(self.style.SUCCESS(
-        #     'Started long function in background.'))
+        run_amp_site_job()

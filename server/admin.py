@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib import admin
 
 from server.utils import process_data_and_create_records
-from .models import DataUpload, Record,ErrorLog,Site,LocalRecord,LocalErrorLog,LocalSite
+from .models import AmpRecord, DataUpload, Record,ErrorLog,Site,LocalRecord,LocalErrorLog,LocalSite
 # Register your models here.
 
 class DataUploadAdminForm(forms.ModelForm):
@@ -44,6 +44,7 @@ admin.site.register(DataUpload, DataUploadAdmin)
 
 admin.site.register(Site)
 admin.site.register(Record)
+admin.site.register(AmpRecord)
 admin.site.register(ErrorLog)
 
 
