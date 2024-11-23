@@ -8,8 +8,7 @@ import json
 import os
 import threading
 from ...models import AmpRecord, LocalErrorLog, LocalSite, Site
-from server.local_data.local_data import azteca_columns_raw
-from .run_job import fetch_data, get_latest_urls, get_sorted_rss_items
+from .run_job import fetch_data, get_latest_urls
 from server.constants import AMP_PARAMS, AmpSites
 
 def process_amp_site(site, semaphore):
@@ -102,7 +101,7 @@ def process_amp_site(site, semaphore):
                 amp_video_value=amp_video_val,
                 amp_total_value=(amp_note_val + amp_video_val) / 2,
                 # Set Azteca flag if applicable
-                azteca=site.name in azteca_columns_raw,
+                azteca='Azteca' in site.name,
                 date=date,
             )
             write_text_to_file(f"RECORD IS {record.name} NOTE: {record.amp_note_value} VIDEO: {record.amp_video_value}")
@@ -131,7 +130,6 @@ def run_amp_site_job():
     sites = LocalSite.objects.filter(name__in=AmpSites).union(
         Site.objects.filter(name__in=AmpSites)
     )
-    
     records = []
     semaphore = threading.Semaphore(4)
     print(f"SIOTES ARE {sites}")
@@ -152,7 +150,7 @@ def run_amp_site_job():
     if records:
         for record in records:
             write_text_to_file(f"RECORD IS {record.name} {record.amp_note_value} {record.amp_video_value}")
-    AmpRecord.objects.bulk_create(records)
+    AmpRecord.objects.bulk_create(records, batch_size=500)
 
 
 def sanitize_filename(url):
