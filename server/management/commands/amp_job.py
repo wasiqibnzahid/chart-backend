@@ -51,7 +51,7 @@ def process_amp_site(site, semaphore):
             note_count = 0
             i = 0
             index = 0
-            while index < 10 and i < 1:
+            while index < 10 and i < len(extracted_nota_urls):
                 amp_note_url = f'{extracted_nota_urls[i]}{AMP_PARAMS}'
                 try:
                     res = get_lighthouse_mobile_score(
@@ -71,7 +71,7 @@ def process_amp_site(site, semaphore):
 
             i = 0
             index = 0
-            while index < 10 and i < 1:
+            while index < 10 and i < len(extracted_video_urls):
                 amp_vedio_url = f'{extracted_video_urls[i]}{AMP_PARAMS}'
                 try:
                     res = get_lighthouse_mobile_score(
