@@ -51,7 +51,7 @@ def process_amp_site(site, semaphore):
             note_count = 0
             i = 0
             index = 0
-            while index < 10 and i < len(extracted_nota_urls):
+            while index < 10 and i < 1:
                 amp_note_url = f'{extracted_nota_urls[i]}{AMP_PARAMS}'
                 try:
                     res = get_lighthouse_mobile_score(
@@ -71,7 +71,7 @@ def process_amp_site(site, semaphore):
 
             i = 0
             index = 0
-            while index < 10 and i < len(extracted_video_urls):
+            while index < 10 and i < 1:
                 amp_vedio_url = f'{extracted_video_urls[i]}{AMP_PARAMS}'
                 try:
                     res = get_lighthouse_mobile_score(
@@ -123,7 +123,7 @@ def process_amp_site(site, semaphore):
             return amp_record
 
 
-def write_text_to_file(text, filename="/home/ubuntu/log.txt"):
+def write_text_to_file(text, filename="/home/ubuntu/amp_job_log.txt"):
     # Open the file in append mode; create it if it doesn't exist
     with open(filename, "a") as file:
         # Write the text with a newline at the end
