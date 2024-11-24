@@ -95,28 +95,32 @@ def process_amp_site(site, semaphore):
             amp_video_val = (amp_video_val / video_count) * 100
             amp_note_val = (amp_note_val / note_count) * 100
             print(f"SCORE IS {site.name} {amp_note_val} vid: {amp_video_val}")
-            record = AmpRecord(
+            amp_record, created = AmpRecord.objects.update_or_create(
                 name=site.name,
-                amp_note_value=amp_note_val,
-                amp_video_value=amp_video_val,
-                amp_total_value=(amp_note_val + amp_video_val) / 2,
-                # Set Azteca flag if applicable
-                azteca='Azteca' in site.name,
                 date=date,
+                defaults={
+                    "amp_note_value": amp_video_val,
+                    "amp_video_value": amp_note_val,
+                    "amp_total_value": (amp_video_val + amp_note_val) / 2,
+                    "azteca": "Azteca" in site.name,
+                }
             )
-            write_text_to_file(f"RECORD IS {record.name} NOTE: {record.amp_note_value} VIDEO: {record.amp_video_value}")
-            return record
+            write_text_to_file(f"RECORD IS {amp_record.name} NOTE: {amp_record.amp_note_value} VIDEO: {amp_record.amp_video_value}")
+            return amp_record
 
         except Exception as e:
             print(f"Exception for {site.name}: {e}")
-            return AmpRecord(
+            amp_record, created = AmpRecord.objects.update_or_create(
                 name=site.name,
-                amp_note_value=0,
-                amp_video_value=0,
-                amp_total_value=0,
-                azteca="Azteca" in site.name,
                 date=date,
+                defaults={
+                    "amp_note_value": amp_video_val,
+                    "amp_video_value": amp_note_val,
+                    "amp_total_value": (amp_video_val + amp_note_val) / 2,
+                    "azteca": "Azteca" in site.name,
+                }
             )
+            return amp_record
 
 
 def write_text_to_file(text, filename="/home/ubuntu/log.txt"):
@@ -146,11 +150,11 @@ def run_amp_site_job():
             records.append(result)
             # print(f"Processed site {site}: Result = {result}")
     print(f"STATUS IS DONE")
-    AmpRecord.objects.filter(date=date).delete()
+    # AmpRecord.objects.filter(date=date).delete()
     if records:
         for record in records:
-            write_text_to_file(f"RECORD IS {record.name} {record.amp_note_value} {record.amp_video_value}")
-    AmpRecord.objects.bulk_create(records, batch_size=500)
+            write_text_to_file(f"AMP RECORD IS {record.id} {record.name} {record.amp_note_value} {record.amp_video_value}")
+    # AmpRecord.objects.bulk_create(records, batch_size=500)
 
 
 def sanitize_filename(url):
