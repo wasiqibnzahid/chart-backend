@@ -317,9 +317,9 @@ def calculate_quarterly_averages(df):
 
             res["amp"].append({
                 "name": company,
-                "total": amp_avg,
-                "video": amp_avg_video,
-                "note": amp_avg_note,
+                "total": company_avg,
+                "video": company_avg_video,
+                "note": company_avg_note,
                 "total_change": 0 if pd.isna(amp_change) else (amp_change or 0),
                 "video_change": 0 if pd.isna(amp_video_change) else (amp_video_change or 0),
                 "note_change": 0 if pd.isna(amp_note_change) else (amp_note_change or 0)
