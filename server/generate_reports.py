@@ -49,7 +49,6 @@ def fetch_data(url):
             retry += 1
             response = requests.get(url, timeout=10)
             response.raise_for_status()
-            print(f"RESPONSE IS {response.content}")
             parsed_data = ET.fromstring(response.content)
             return parsed_data
         except requests.RequestException as error:
