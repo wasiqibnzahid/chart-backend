@@ -42,9 +42,7 @@ class DataUploadAdmin(admin.ModelAdmin):
             messages.success(request, "Data processed successfully.")
         # Optionally save the DataUpload instance
         super().save_model(request, obj, form, change)
-
-from django.contrib import admin
-from .models import Site, Record, ErrorLog, LocalSite, LocalRecord, AmpRecord, LocalErrorLog, DataUpload
+admin.site.register(DataUpload, DataUploadAdmin)
 
 # Site Admin
 class SiteAdmin(admin.ModelAdmin):
