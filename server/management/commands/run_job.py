@@ -50,9 +50,11 @@ def process_site(site: Site, semaphore):
                     nota_xml = fetch_data(extracted_nota_urls_inner[0])
                     extracted_nota_urls_inner = get_latest_urls(
                         nota_xml, is_xml=True)
-                    
+
                 else:
                     print(f"I AM NOT HERE")
+            print(f"FOR SITE {site.name} THE NOTE URLS ARE {len(extracted_nota_urls_inner)} and first is {
+                  extracted_nota_urls_inner[0] if len(extracted_nota_urls_inner) > 0 else None} and video urls are {len(extracted_video_urls_inner)} and first is {extracted_video_urls_inner[0] if len(extracted_video_urls_inner) > 0 else None}")
             if site.name == "Milenio" or site.name == "El Universal":
                 extracted_nota_urls_inner = [
                     item for item in extracted_nota_urls_inner if "video" not in item]
@@ -165,7 +167,7 @@ def write_text_to_file(text, filename="/home/ubuntu/log.txt"):
 
 def run_job():
 
-    sites = Site.objects.all()
+    sites = Site.objects.filter(name="NY Times")
     records = []
     semaphore = threading.Semaphore(4)
     print(f"SIOTES ARE {sites}")
@@ -173,7 +175,6 @@ def run_job():
     monday_of_current_week = today - timedelta(days=today.weekday())
     date = monday_of_current_week.date()
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        print(f"STARINT PROCESSING SITE A")
         future_to_site = {executor.submit(
             process_site, site, semaphore): site for site in sites}
         for future in concurrent.futures.as_completed(future_to_site):
