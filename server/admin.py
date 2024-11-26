@@ -24,7 +24,6 @@ class DataUploadAdminForm(forms.ModelForm):
         return parsed_data
 
 class DataUploadAdmin(admin.ModelAdmin):
-    list_display = ('data', 'target_model', 'process_amp_values', 'uploaded_at')
     search_fields = ('data', 'target_model')
     list_filter = ('target_model', 'process_amp_values', 'uploaded_at')
     form = DataUploadAdminForm
