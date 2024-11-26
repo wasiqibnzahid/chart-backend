@@ -47,10 +47,6 @@ def process_site(site: Site, semaphore):
                     video_xml = fetch_data(extracted_video_urls_inner[0])
                     extracted_video_urls_inner = get_latest_urls(
                         video_xml, is_xml=True)
-                    nota_xml = fetch_data(extracted_nota_urls_inner[0])
-                    extracted_nota_urls_inner = get_latest_urls(
-                        nota_xml, is_xml=True)
-
                 else:
                     print(f"I AM NOT HERE")
             print(f"FOR SITE {site.name} THE NOTE URLS ARE {len(extracted_nota_urls_inner)} and first is {
