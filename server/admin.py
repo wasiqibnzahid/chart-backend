@@ -24,6 +24,9 @@ class DataUploadAdminForm(forms.ModelForm):
         return parsed_data
 
 class DataUploadAdmin(admin.ModelAdmin):
+    list_display = ('data', 'target_model', 'process_amp_values', 'uploaded_at')
+    search_fields = ('data', 'target_model')
+    list_filter = ('target_model', 'process_amp_values', 'uploaded_at')
     form = DataUploadAdminForm
 
     def save_model(self, request, obj, form, change):
@@ -40,14 +43,62 @@ class DataUploadAdmin(admin.ModelAdmin):
         # Optionally save the DataUpload instance
         super().save_model(request, obj, form, change)
 
-admin.site.register(DataUpload, DataUploadAdmin)
+from django.contrib import admin
+from .models import Site, Record, ErrorLog, LocalSite, LocalRecord, AmpRecord, LocalErrorLog, DataUpload
 
-admin.site.register(Site)
-admin.site.register(Record)
-admin.site.register(AmpRecord)
-admin.site.register(ErrorLog)
+# Site Admin
+class SiteAdmin(admin.ModelAdmin):
+    list_display = ('name', 'sitemap_url', 'video_sitemap_url', 'note_sitemap_url')
+    search_fields = ('name',)
+    list_filter = ('name',)  # Filter by name or other fields you want
 
+admin.site.register(Site, SiteAdmin)
 
-admin.site.register(LocalSite)
-admin.site.register(LocalRecord)
-admin.site.register(LocalErrorLog)
+# Record Admin
+class RecordAdmin(admin.ModelAdmin):
+    list_display = ('name', 'site', 'note_value', 'video_value', 'total_value', 'date', 'azteca')
+    search_fields = ('name', 'site__name')  # Allow search by site name
+    list_filter = ('azteca', 'date', 'site')  # Add filter for azteca, date, and site
+
+admin.site.register(Record, RecordAdmin)
+
+# ErrorLog Admin
+class ErrorLogAdmin(admin.ModelAdmin):
+    list_display = ('message', 'created_at')
+    search_fields = ('message',)
+    list_filter = ('created_at',)  # Filter by the creation date of the log
+
+admin.site.register(ErrorLog, ErrorLogAdmin)
+
+# LocalSite Admin
+class LocalSiteAdmin(admin.ModelAdmin):
+    list_display = ('name', 'sitemap_url', 'video_sitemap_url', 'note_sitemap_url')
+    search_fields = ('name',)
+    list_filter = ('name',)
+
+admin.site.register(LocalSite, LocalSiteAdmin)
+
+# LocalRecord Admin
+class LocalRecordAdmin(admin.ModelAdmin):
+    list_display = ('name', 'site', 'note_value', 'video_value', 'total_value', 'azteca', 'date')
+    search_fields = ('name', 'site__name')  # Allow search by site name
+    list_filter = ('azteca', 'date', 'site')  # Filter by azteca, date, and site
+
+admin.site.register(LocalRecord, LocalRecordAdmin)
+
+# AmpRecord Admin
+class AmpRecordAdmin(admin.ModelAdmin):
+    list_display = ('name', 'amp_note_value', 'amp_video_value', 'amp_total_value', 'azteca', 'date')
+    search_fields = ('name',)
+    list_filter = ('azteca', 'date')  # Filter by azteca and date
+
+admin.site.register(AmpRecord, AmpRecordAdmin)
+
+# LocalErrorLog Admin
+class LocalErrorLogAdmin(admin.ModelAdmin):
+    list_display = ('message', 'created_at')
+    search_fields = ('message',)
+    list_filter = ('created_at',)
+
+admin.site.register(LocalErrorLog, LocalErrorLogAdmin)
+
