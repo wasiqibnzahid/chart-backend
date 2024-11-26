@@ -47,10 +47,7 @@ def process_site(site: Site, semaphore):
                     video_xml = fetch_data(extracted_video_urls_inner[0])
                     extracted_video_urls_inner = get_latest_urls(
                         video_xml, is_xml=True)
-                else:
-                    print(f"I AM NOT HERE")
-            print(f"FOR SITE {site.name} THE NOTE URLS ARE {len(extracted_nota_urls_inner)} and first is {
-                  extracted_nota_urls_inner[0] if len(extracted_nota_urls_inner) > 0 else None} and video urls are {len(extracted_video_urls_inner)} and first is {extracted_video_urls_inner[0] if len(extracted_video_urls_inner) > 0 else None}")
+
             if site.name == "Milenio" or site.name == "El Universal":
                 extracted_nota_urls_inner = [
                     item for item in extracted_nota_urls_inner if "video" not in item]
@@ -145,7 +142,6 @@ def process_site(site: Site, semaphore):
 
         except Exception as e:
             print(f"Exception for {site.name}: {e}")
-            raise e
             return Record(name=site.name,
                           note_value=0,
                           video_value=0,
@@ -164,10 +160,10 @@ def write_text_to_file(text, filename="/home/ubuntu/log.txt"):
 
 def run_job():
 
-    sites = Site.objects.filter(name="NY Times")
+    sites = Site.objects.all()
     records = []
     semaphore = threading.Semaphore(4)
-    print(f"SIOTES ARE {sites}")
+    print(f"SITES ARE {sites}")
     today = datetime.today()
     monday_of_current_week = today - timedelta(days=today.weekday())
     date = monday_of_current_week.date()
@@ -228,7 +224,6 @@ def get_lighthouse_mobile_score(url):
 
     except Exception as e:
         print(f"Error {e}")
-        raise e
     finally:
         if os.path.exists(report_file_path):
             os.remove(report_file_path)
