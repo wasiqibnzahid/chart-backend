@@ -191,15 +191,24 @@ def create_record_if_not_exists(model_class, site, date):
         log.save()
         return None
 
-# def log_if_empty(model_class, extracted_urls, sitemap_url):
-#     """
-#     Logs an error if the extracted URLs list is empty.
-#     """
-#     if len(extracted_urls) == 0:
-#         log_message = f"Sitemap for returned 0 URLs: {sitemap_url}"
-#         log = model_class(message=log_message)
-#         log.save()
+def get_weeks_in_past_six_months():
+    # Get today's date
+    today = datetime.today()
 
+    # Find the most recent Monday
+    days_since_monday = today.weekday()  # Monday is 0, Sunday is 6
+    start_of_week = today - timedelta(days=days_since_monday)
 
+    # Calculate the date 6 months ago
+    six_months_ago = today - timedelta(weeks=4 * 6)  # Approximation of 6 months
 
+    # List to store the weeks
+    weeks = []
 
+    # Loop backwards and collect the Mondays
+    current_week = start_of_week
+    while current_week >= six_months_ago:
+        weeks.append(current_week.date())
+        current_week -= timedelta(weeks=1)
+
+    return weeks
