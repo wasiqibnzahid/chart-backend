@@ -37,20 +37,17 @@ class ServerConfig(AppConfig):
 
     def start_scheduler(self):
         scheduler = BackgroundScheduler()
+        # run command sequentially
+        def run_sequentially():
+            run_job()
+            amp_job()
+            
         # Schedule the job to run once on the next Monday at midnight
-        scheduler.add_job(run_job, DateTrigger(
-            run_date=get_next_monday_midnight()))
-        
-        scheduler.add_job(amp_job, DateTrigger(
+        scheduler.add_job(run_sequentially, DateTrigger(
             run_date=get_next_monday_midnight()))
 
         # Schedule the job to run every week on Monday at midnight after the first run
-        scheduler.add_job(run_job, IntervalTrigger(
-            # + timedelta(weeks=1)
-            weeks=1, start_date=get_next_monday_midnight() + timedelta(weeks=1)))
-        
-        scheduler.add_job(amp_job, IntervalTrigger(
-            # + timedelta(weeks=1)
+        scheduler.add_job(run_sequentially, IntervalTrigger(
             weeks=1, start_date=get_next_monday_midnight() + timedelta(weeks=1)))
 
         # Start the scheduler
