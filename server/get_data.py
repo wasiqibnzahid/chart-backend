@@ -705,3 +705,4 @@ def get_insights(date_filter=None):
             "competition": total_competition
         }
     }
+
