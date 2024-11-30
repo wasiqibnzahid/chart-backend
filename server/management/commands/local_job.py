@@ -210,6 +210,3 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         print(f"SSTARTING")
         run_job()
-        # threading.Thread(target=run_job, daemon=True).start()
-        # self.stdout.write(self.style.SUCCESS(
-        #     'Started long function in background.'))

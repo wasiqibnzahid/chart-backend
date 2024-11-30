@@ -116,18 +116,3 @@ def get_amp_insights_api(request):
         "end": end
     })
     return JsonResponse(data, safe=False)
-
-# def run_job(_request):
-#     threading.Thread(target=run_proj, daemon=True).start()
-#     return JsonResponse({
-#         "status": "success"}, safe=False)
-
-
-# def run_proj():
-#     call_command("run_job")
-
-# run_job(None)
-
-# url= 'https://www.nytimes.com/sitemaps/new/news.xml.gz'
-# data = fetch_data(url)
-# print(get_latest_urls(data))
