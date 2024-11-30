@@ -7,6 +7,9 @@ import concurrent.futures
 import json
 import os
 import threading
+
+from server.constants import OTHER_RECORD_FILEPATH, PERFORMANCE_METRICS
+from server.helpers import create_or_update_record, create_record_if_not_exists, process_urls
 from ...models import LocalErrorLog, LocalRecord, LocalSite
 from server.local_data.local_data import azteca_columns_raw
 from .run_job import fetch_data, get_latest_urls, get_sorted_rss_items
@@ -49,79 +52,49 @@ def process_site(site: LocalSite, semaphore):
             print(f"For company {site.name} the note urls are "
                   f"{len(extracted_nota_urls)} and video are {len(extracted_video_urls_inner)}")
             
-            video_val = 0
-            video_count = 0
-            note_val = 0
-            note_count = 0
-            i = 0
-            index = 0
-            while index < 10 and i < len(extracted_nota_urls):
-                try:
-                    res = get_lighthouse_mobile_score(
-                        extracted_nota_urls[i])
-                    print(f"FOR nota URL {extracted_nota_urls[i]} FOR SITE {
-                          site.name} score is {res}")
-                    if res != 0:
-                        note_val += res
-                        note_count += 1
-                        index += 1
-                except:
-                    url = extracted_nota_urls[i]
-                    log = LocalErrorLog(
-                        message=f"Failed for Manual Url {url}"
-                    )
-                    log.save()
-                i += 1
-
-            i = 0
-            index = 0
-            while index < 10 and i < len(extracted_video_urls):
-                try:
-                    res = get_lighthouse_mobile_score(
-                        extracted_video_urls[i])
-                    print(f"FOR video URL {extracted_nota_urls[i]} FOR SITE {
-                          site.name} score is {res}")
-                    if res != 0:
-                        video_val += res
-                        video_count += 1
-                        index += 1
-                except:
-                    url = extracted_video_urls[i]
-                    log = LocalErrorLog(
-                        message=f"Failed for Manual Url {url}"
-                    )
-                    log.save()
-                i += 1
-            if note_count == 0:
-                note_count = 1
-            if video_count == 0:
-                video_count = 1
-            video_val = (video_val / video_count) * 100
-            note_val = (note_val / note_count) * 100
-            print(f"SCORE IS {site.name} {note_val} vid: {video_val}")
-            record = LocalRecord(
-                name=site.name,
-                note_value=note_val,
-                video_value=video_val,
-                azteca=site.name in azteca_columns_raw,
+            # Process Note Urls
+            note_metrics = process_urls(extracted_nota_urls, PERFORMANCE_METRICS.copy(), site, log_file_name=OTHER_RECORD_FILEPATH)
+            
+            # Process video URLs
+            video_metrics = process_urls(extracted_video_urls, PERFORMANCE_METRICS.copy(), site, url_type="video", log_file_name=OTHER_RECORD_FILEPATH)
+            
+            print(f"SCORE IS {site.name} NOTE: {note_metrics} VIDEO: {video_metrics}")
+            
+            record = create_or_update_record(
+                model_class=LocalRecord, 
+                note_metrics=note_metrics,
+                video_metrics=video_metrics,
+                site=site,
                 date=date,
-                total_value=(note_val + video_val) / 2
-                # Set Azteca flag if applicable
             )
-            write_text_to_file(f"RECORD IS {record.name} NOTE: {
-                               record.note_value} VIDEO: {record.video_value}")
+            
+            write_text_to_file(f"RECORD IS {record.name} NOTE: {record.note_value} VIDEO: {record.video_value}")
             return record
 
         except Exception as e:
-            print(f"Exception for {site.name}: {e}")
-            return LocalRecord(name=site.name,
-                               note_value=0,
-                               video_value=0,
-                               azteca="Azteca" in site.name,
-                               date=date,
-                               total_value=0
-                               )
-
+            # Log the exception with a more detailed message
+            print(f"Exception occurred while processing site '{site.name}' on {date}: {e}")
+            
+            # Attempt to create the record if not already exists
+            record, created = create_record_if_not_exists(
+                model_class=LocalRecord,
+                site=site,
+                date=date,
+            )
+            
+            # Log the outcome of the create operation after an exception
+            if created:
+                write_text_to_file(
+                    f"Exception occurred: New Local Record created for site '{record.name}' with NOTE: {record.note_value} and VIDEO: {record.video_value} due to an error.",
+                    filename=OTHER_RECORD_FILEPATH
+                )
+            else:
+                write_text_to_file(
+                    f"Exception occurred: Existing Local Record found for site '{record.name}' with NOTE: {record.note_value} and VIDEO: {record.video_value}. No changes were made due to an error.",
+                    filename=OTHER_RECORD_FILEPATH
+                )
+                
+            return record
 
 def write_text_to_file(text, filename="/home/ubuntu/log.txt"):
     # Open the file in append mode; create it if it doesn't exist
