@@ -212,3 +212,14 @@ def get_weeks_in_past_six_months():
         current_week -= timedelta(weeks=1)
 
     return weeks
+
+def get_previous_months_of_current_year():
+    current_year = datetime.now().year
+
+    # Get the current month
+    current_month = datetime.now().month
+
+    # Generate a list of previous months (excluding the current month)
+    previous_months = [f"{current_year}-{month:02d}" for month in range(1, current_month)]
+    
+    return previous_months
