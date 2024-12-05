@@ -9,7 +9,7 @@ import os
 import threading
 
 from server.constants import OTHER_RECORD_FILEPATH, PERFORMANCE_METRICS
-from server.helpers import create_or_update_record, create_record_if_not_exists, process_urls
+from server.helpers import create_or_update_record, create_record_if_not_exists, process_urls, write_text_to_file
 from ...models import LocalErrorLog, LocalRecord, LocalSite
 from server.local_data.local_data import azteca_columns_raw
 from .run_job import fetch_data, get_latest_urls, get_sorted_rss_items
@@ -96,12 +96,6 @@ def process_site(site: LocalSite, semaphore):
                 
             return record
 
-def write_text_to_file(text, filename="/home/ubuntu/log.txt"):
-    # Open the file in append mode; create it if it doesn't exist
-    with open(filename, "a") as file:
-        # Write the text with a newline at the end
-        file.write(text + "\n")
-
 
 def run_job():
 
@@ -129,60 +123,9 @@ def run_job():
                                record.note_value} {record.video_value}")
     LocalRecord.objects.bulk_create(records)
 
-
-def sanitize_filename(url):
-    # Replace invalid characters with underscores
-    safe_url = re.sub(r'[\/:*?"<>|]', '_', url)
-    return safe_url
-
-
-def get_lighthouse_mobile_score(url):
-    performance_score = 0
-    report_file_path_rel = sanitize_filename(f"report_{url}.json")
-    report_file_path = f'{os.getcwd()}/{report_file_path_rel}'
-
-    FACTOR = 1.7
-
-    try:
-        command = f'lighthouse --no-enable-error-reporting --chrome-flags="--headless" --output=json --output-path="{
-            report_file_path_rel}" "{url}"'
-        result = subprocess.run(
-            command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
-        code = result.check_returncode()
-
-        if code != 0:
-            write_text_to_file(f"FOR URL {url} ERROR IS {result.stdout}")
-            print(result.stdout)
-
-        with open(report_file_path, 'r', encoding='utf-8') as file:
-            report = json.load(file)
-            if report['categories']['performance']['score'] is not None:
-                performance_score = report['categories']['performance']['score']
-
-                performance_score *= FACTOR
-                write_text_to_file(f"RAW SCORE IS {performance_score} {
-                                   performance_score >= 0.95} for {url}")
-                if(performance_score == 0):
-                    write_text_to_file(f"FOR URL {url} SCORE IS 0")
-                if performance_score >= 0.95:
-                    performance_score = random.uniform(
-                        0.93, 0.97)
-
-    except Exception as e:
-        print(f"Error {e}")
-    finally:
-        if os.path.exists(report_file_path):
-            os.remove(report_file_path)
-
-    return performance_score
-
-
 class Command(BaseCommand):
     help = 'Run a long function in a separate thread'
 
     def handle(self, *args, **kwargs):
         print(f"SSTARTING")
         run_job()
-        # threading.Thread(target=run_job, daemon=True).start()
-        # self.stdout.write(self.style.SUCCESS(
-        #     'Started long function in background.'))

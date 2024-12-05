@@ -1,3 +1,5 @@
+from django.http import JsonResponse
+from django.views import View
 import pandas as pd
 from collections import defaultdict
 
@@ -705,4 +707,17 @@ def get_insights(date_filter=None):
             "competition": total_competition
         }
     }
+    
+class GeneralPerformanceReportView(View):
+
+    def get(self, request):
+        records = Record.objects.values(
+            'id', 'name', 'note_first_contentful_paint', 'note_total_blocking_time',
+            'note_speed_index', 'note_largest_contentful_paint', 'note_cumulative_layout_shift',
+            'video_first_contentful_paint', 'video_total_blocking_time', 'video_speed_index',
+            'video_largest_contentful_paint', 'video_cumulative_layout_shift',
+            'date'
+        )
+
+        return JsonResponse(list(records), safe=False)
 
