@@ -116,12 +116,12 @@ def run_job():
             records.append(result)
             # print(f"Processed site {site}: Result = {result}")
     print(f"STATUS IS DONE")
-    LocalRecord.objects.filter(date=date).delete()
+    # LocalRecord.objects.filter(date=date).delete()
     if records:
         for record in records:
             write_text_to_file(f"RECORD IS {record.name} {
                                record.note_value} {record.video_value}")
-    LocalRecord.objects.bulk_create(records)
+    # LocalRecord.objects.bulk_create(records)
 
 class Command(BaseCommand):
     help = 'Run a long function in a separate thread'

@@ -6,10 +6,10 @@ AmpSites = [
     'Noticias', 'Laguna'
 ]
 AMP_PARAMS = '?_amp=true'
-# AMP_RECORD_FILEPATH = "/home/ubuntu/amp_job_log.txt"
-# OTHER_RECORD_FILEPATH = "/home/ubuntu/log.txt"
-OTHER_RECORD_FILEPATH = "/home/jawad/Jawad Ahmad/Projects/log.txt"
-AMP_RECORD_FILEPATH = OTHER_RECORD_FILEPATH
+AMP_RECORD_FILEPATH = "/home/ubuntu/amp_job_log.txt"
+OTHER_RECORD_FILEPATH = "/home/ubuntu/log.txt"
+# OTHER_RECORD_FILEPATH = "/home/jawad/Jawad Ahmad/Projects/log.txt"
+# AMP_RECORD_FILEPATH = OTHER_RECORD_FILEPATH
 DEFAULT_DECIMAL_PLACES = 2
 DEFAULT_MAX_DIGITS = 5
 FACTOR = 1.7
