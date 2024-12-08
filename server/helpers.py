@@ -103,7 +103,7 @@ def get_lighthouse_mobile_score(url, log_file_name=OTHER_RECORD_FILEPATH):
     
 def process_urls(extracted_urls, metrics, site, url_type="note", log_file_name=OTHER_RECORD_FILEPATH):
     total_values_count = 0
-    for url in extracted_urls:
+    for url in extracted_urls[:4]:
         try:
             res = get_lighthouse_mobile_score(url, log_file_name=log_file_name)
             # print(f"Metrics for {url_type} URL {url} for site {site.name}: {res}")
