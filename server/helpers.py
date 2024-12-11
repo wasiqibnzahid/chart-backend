@@ -21,7 +21,7 @@ def sanitize_filename(url):
     """Sanitize the URL to create a safe filename."""
     return re.sub(r'[\/:*?"<>|]', '_', url)
         
-def get_lighthouse_mobile_score(url, log_file_name=OTHER_RECORD_FILEPATH):
+def get_lighthouse_mobile_score(url, job_type, log_file_name=OTHER_RECORD_FILEPATH):
     """
     Fetch Lighthouse performance metrics for a given URL.
     Divides time-based metrics by 1000 to convert from ms to s.
@@ -40,18 +40,18 @@ def get_lighthouse_mobile_score(url, log_file_name=OTHER_RECORD_FILEPATH):
         command = f'lighthouse --no-enable-error-reporting --chrome-flags="--headless" --output=json --output-path="{report_file_path_rel}" "{url}"'
         result = subprocess.run(
             command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
-        code = result.returncode
+        code = result.check_returncode()
 
         if code != 0:
             write_text_to_file(f"FOR URL {url} ERROR IS {result.stdout.decode('utf-8')}"), log_file_name
-            # print(result.stdout.decode('utf-8'))
+            print(result.stdout.decode('utf-8'))
 
         # Parse the Lighthouse report
         with open(report_file_path, 'r', encoding='utf-8') as file:
             report = json.load(file)
             if report['categories']['performance']['score'] is not None:
                 performance_score = report['categories']['performance']['score'] * FACTOR
-                print("raw scoor: ", performance_score)
+                print(f"raw scoor for job: {job_type} url: {url}: ", performance_score)
                 if(performance_score == 0):
                     write_text_to_file(f"FOR URL {url} SCORE IS 0", filename=OTHER_RECORD_FILEPATH)
                 if performance_score >= 0.95:
@@ -73,20 +73,13 @@ def get_lighthouse_mobile_score(url, log_file_name=OTHER_RECORD_FILEPATH):
                                f"Speed Index: {speed_index} s, "
                                f"Largest Contentful Paint: {largest_contentful_paint} s, "
                                f"Cumulative Layout Shift: {cumulative_layout_shift}", log_file_name)
-            # print(f"METRICS FOR URL {url}: "
-            #       f"Performance Score: {performance_score}, "
-            #       f"First Contentful Paint: {first_contentful_paint} s, "
-            #       f"Total Blocking Time: {total_blocking_time} s, "
-            #       f"Speed Index: {speed_index} s, "
-            #       f"Largest Contentful Paint: {largest_contentful_paint} s, "
-            #       f"Cumulative Layout Shift: {cumulative_layout_shift}")
 
     except subprocess.CalledProcessError as e:
         write_text_to_file(f"FOR URL {url} ERROR: {e.stderr.decode('utf-8')}", log_file_name)
-        # print(f"Error running Lighthouse for {url}: {e.stderr.decode('utf-8')}")
+        print(f"Error running Lighthouse for {url}: {e.stderr.decode('utf-8')}")
     except Exception as e:
         write_text_to_file(f"FOR URL {url} GENERAL ERROR: {e}", log_file_name)
-        # print(f"General error processing {url}: {e}")
+        print(f"General error processing {url}: {e}")
     finally:
         # Clean up the report file
         if os.path.exists(report_file_path):
@@ -101,12 +94,12 @@ def get_lighthouse_mobile_score(url, log_file_name=OTHER_RECORD_FILEPATH):
         "cumulative_layout_shift": cumulative_layout_shift
     }
     
-def process_urls(extracted_urls, metrics, site, url_type="note", log_file_name=OTHER_RECORD_FILEPATH):
+def process_urls(extracted_urls, metrics, site, url_type="note", job_type="Not specify", log_file_name=OTHER_RECORD_FILEPATH):
     total_values_count = 0
-    for url in extracted_urls:
+    for url in extracted_urls[:5]:
         try:
-            res = get_lighthouse_mobile_score(url, log_file_name=log_file_name)
-            # print(f"Metrics for {url_type} URL {url} for site {site.name}: {res}")
+            res = get_lighthouse_mobile_score(url, job_type, log_file_name=log_file_name)
+            print(f"{job_type} Metrics for {url_type} URL {url} for site {site.name}: {res}")
             if res["performance_score"] != 0:
                 for key in metrics:
                     metrics[key] += res[key]

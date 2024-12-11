@@ -16,8 +16,7 @@ from ...generate_reports import fetch_data, get_latest_urls, get_sorted_rss_item
 
 def process_site(site: Site, semaphore):
     with semaphore:
-        print(f"Init for site {site.name} {site.sitemap_url}, note: {
-              site.note_sitemap_url} video: {site.video_sitemap_url}")
+        print(f"Init for site {site.name} {site.sitemap_url}, note: {site.note_sitemap_url} video: {site.video_sitemap_url}")
         today = datetime.today()
         monday_of_current_week = today - timedelta(days=today.weekday())
         date = monday_of_current_week.date()
@@ -67,12 +66,10 @@ def process_site(site: Site, semaphore):
             extracted_video_urls.extend(extracted_video_urls_inner)
             
             if len(extracted_nota_urls_inner) == 0:
-                log = ErrorLog(message=f"Sitemap returned 0 urls: {
-                               note_sitemap_url}")
+                log = ErrorLog(message=f"Sitemap returned 0 urls: { note_sitemap_url}")
                 log.save()
             if len(extracted_video_urls_inner) == 0:
-                log = ErrorLog(message=f"Sitemap returned 0 urls: {
-                               video_sitemap_url}")
+                log = ErrorLog(message=f"Sitemap returned 0 urls: {video_sitemap_url}")
                 log.save()
 
             extracted_nota_urls.extend(extracted_nota_urls_inner)
@@ -81,10 +78,10 @@ def process_site(site: Site, semaphore):
                   f"{len(extracted_nota_urls)} and video are {len(extracted_video_urls_inner)}")
  
             # Process Note Urls
-            note_metrics = process_urls(extracted_nota_urls, PERFORMANCE_METRICS.copy(), site)
+            note_metrics = process_urls(extracted_nota_urls, PERFORMANCE_METRICS.copy(), site, job_type="GENERAL JOB")
             
             # Process video URLs
-            video_metrics = process_urls(extracted_video_urls, PERFORMANCE_METRICS.copy(), site, url_type="video")
+            video_metrics = process_urls(extracted_video_urls, PERFORMANCE_METRICS.copy(), site, url_type="video", job_type="GENERAL JOB")
             
             print(f"SCORE IS {site.name} NOTE: {note_metrics} VIDEO: {video_metrics}")
             

@@ -48,10 +48,10 @@ def process_amp_site(site, semaphore):
                   f"{len(extracted_nota_urls)} and video are {len(extracted_video_urls_inner)}")
 
             # Process Note Urls
-            note_metrics = process_urls(extracted_nota_urls, PERFORMANCE_METRICS.copy(), site, log_file_name=AMP_RECORD_FILEPATH)
+            note_metrics = process_urls(extracted_nota_urls, PERFORMANCE_METRICS.copy(), site, job_type="AMP JOB", log_file_name=AMP_RECORD_FILEPATH)
             
             # Process video URLs
-            video_metrics = process_urls(extracted_video_urls, PERFORMANCE_METRICS.copy(), site, url_type="video", log_file_name=AMP_RECORD_FILEPATH)
+            video_metrics = process_urls(extracted_video_urls, PERFORMANCE_METRICS.copy(), site, url_type="video", job_type="AMP JOB", log_file_name=AMP_RECORD_FILEPATH)
 
             print(f"SCORE IS {site.name} NOTE: {note_metrics} VIDEO: {video_metrics}")
             
