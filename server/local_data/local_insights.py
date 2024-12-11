@@ -1,4 +1,5 @@
 from server.models import LocalRecord
+from django.db.models import Q
 from .local_data import (
     init,
     competition_columns,
@@ -46,7 +47,18 @@ def get_insights(date_filter=None):
 class LocalPerformanceReportView(View):
 
     def get(self, request):
-        records = LocalRecord.objects.values(
+        records = LocalRecord.objects.all().exclude(
+            Q(note_first_contentful_paint=0) &
+            Q(note_total_blocking_time=0) &
+            Q(note_speed_index=0) &
+            Q(note_largest_contentful_paint=0) &
+            Q(note_cumulative_layout_shift=0) &
+            Q(video_first_contentful_paint=0) &
+            Q(video_total_blocking_time=0) &
+            Q(video_speed_index=0) &
+            Q(video_largest_contentful_paint=0) &
+            Q(video_cumulative_layout_shift=0)
+        ).values(
             'id', 'name', 'note_first_contentful_paint', 'note_total_blocking_time',
             'note_speed_index', 'note_largest_contentful_paint', 'note_cumulative_layout_shift',
             'video_first_contentful_paint', 'video_total_blocking_time', 'video_speed_index',

@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.views import View
 import pandas as pd
+from django.db.models import Q
 from collections import defaultdict
 
 from server.utils import safe_division
@@ -709,7 +710,18 @@ def get_insights(date_filter=None):
 class GeneralPerformanceReportView(View):
 
     def get(self, request):
-        records = Record.objects.values(
+        records = Record.objects.all().exclude(
+            Q(note_first_contentful_paint=0) &
+            Q(note_total_blocking_time=0) &
+            Q(note_speed_index=0) &
+            Q(note_largest_contentful_paint=0) &
+            Q(note_cumulative_layout_shift=0) &
+            Q(video_first_contentful_paint=0) &
+            Q(video_total_blocking_time=0) &
+            Q(video_speed_index=0) &
+            Q(video_largest_contentful_paint=0) &
+            Q(video_cumulative_layout_shift=0)
+        ).values(
             'id', 'name', 'note_first_contentful_paint', 'note_total_blocking_time',
             'note_speed_index', 'note_largest_contentful_paint', 'note_cumulative_layout_shift',
             'video_first_contentful_paint', 'video_total_blocking_time', 'video_speed_index',
