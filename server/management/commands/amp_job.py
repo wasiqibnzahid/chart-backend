@@ -33,7 +33,6 @@ def process_amp_site(site, semaphore):
                 nota_xml, is_xml="html" not in note_sitemap_url)
             extracted_video_urls_inner = get_latest_urls(
                 video_xml, is_xml="html" not in video_sitemap_url)
-            extracted_video_urls.extend(extracted_video_urls_inner)
 
             if len(extracted_nota_urls_inner) == 0:
                 log = LocalErrorLog(message=f"Sitemap returned 0 urls: {note_sitemap_url}")

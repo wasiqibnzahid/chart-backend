@@ -96,11 +96,15 @@ def get_lighthouse_mobile_score(url, job_type, log_file_name=OTHER_RECORD_FILEPA
     
 def process_urls(extracted_urls, metrics, site, url_type="note", job_type="Not specify", log_file_name=OTHER_RECORD_FILEPATH):
     total_values_count = 0
+    successful_site_performance = 0
     for url in extracted_urls:
+        if successful_site_performance >= 10:
+            break
         try:
             res = get_lighthouse_mobile_score(url, job_type, log_file_name=log_file_name)
             print(f"{job_type} Metrics for {url_type} URL {url} for site {site.name}: {res}")
             if res["performance_score"] != 0:
+                successful_site_performance +=1
                 for key in metrics:
                     metrics[key] += res[key]
                 total_values_count += 1

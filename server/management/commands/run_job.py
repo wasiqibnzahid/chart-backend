@@ -29,8 +29,8 @@ def process_site(site: Site, semaphore):
                 video_sitemap_url = site.video_sitemap_url
             nota_xml = fetch_data(note_sitemap_url)
             video_xml = fetch_data(video_sitemap_url)
-            extracted_video_urls = site.video_urls
-            extracted_nota_urls = site.note_urls
+            extracted_video_urls = site.video_urls or []
+            extracted_nota_urls = site.note_urls or []
             if site.name == 'El Heraldo':
                 extracted_video_urls_inner, extracted_nota_urls_inner = get_latest_urls(
                     site.sitemap_url, is_xml=False)
@@ -71,9 +71,7 @@ def process_site(site: Site, semaphore):
             if len(extracted_video_urls_inner) == 0:
                 log = ErrorLog(message=f"Sitemap returned 0 urls: {video_sitemap_url}")
                 log.save()
-
-            extracted_nota_urls.extend(extracted_nota_urls_inner)
-            extracted_video_urls.extend(extracted_video_urls_inner)
+                
             print(f"For company {site.name} the note urls are "
                   f"{len(extracted_nota_urls)} and video are {len(extracted_video_urls_inner)}")
  
