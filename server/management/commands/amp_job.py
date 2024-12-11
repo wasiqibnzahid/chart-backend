@@ -8,7 +8,7 @@ import json
 import os
 import threading
 
-from server.helpers import create_or_update_record, create_record_if_not_exists, process_urls, write_text_to_file
+from server.helpers import create_empty_records, create_or_update_record, create_record_if_not_exists, process_urls, write_text_to_file
 from ...models import AmpRecord, LocalErrorLog, LocalSite, Site
 from .run_job import fetch_data, get_latest_urls
 from server.constants import AMP_PARAMS, AMP_RECORD_FILEPATH, PERFORMANCE_METRICS, AmpSites
@@ -94,6 +94,9 @@ def run_amp_site_job():
     sites = LocalSite.objects.filter(name__in=AmpSites).union(
         Site.objects.filter(name__in=AmpSites)
     )
+    
+    create_empty_records(sites, AmpRecord)
+    
     semaphore = threading.Semaphore(4)
     print(f"SIOTES ARE {sites}")
     with concurrent.futures.ThreadPoolExecutor() as executor:

@@ -9,7 +9,7 @@ import os
 import threading
 
 from server.constants import OTHER_RECORD_FILEPATH, PERFORMANCE_METRICS
-from server.helpers import create_or_update_record, create_record_if_not_exists, process_urls, write_text_to_file
+from server.helpers import create_empty_records, create_or_update_record, create_record_if_not_exists, process_urls, write_text_to_file
 from ...models import LocalErrorLog, LocalRecord, LocalSite
 from server.local_data.local_data import azteca_columns_raw
 from .run_job import fetch_data, get_latest_urls, get_sorted_rss_items
@@ -100,6 +100,7 @@ def process_site(site: LocalSite, semaphore):
 def run_job():
 
     sites = LocalSite.objects.all()
+    create_empty_records(sites, LocalRecord)
     records = []
     semaphore = threading.Semaphore(4)
     print(f"SIOTES ARE {sites}")

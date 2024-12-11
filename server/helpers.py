@@ -220,3 +220,23 @@ def get_previous_months_of_current_year():
     previous_months = [f"{current_year}-{month:02d}" for month in range(1, current_month)]
     
     return previous_months
+
+def create_empty_records(sites, model_class):
+    today = datetime.today()
+    monday_of_current_week = today - timedelta(days=today.weekday())
+    date = monday_of_current_week.date()
+    
+    records_to_create = []
+
+    for site in sites:
+        record = model_class(
+            name=site.name,
+            note_value=0.0,
+            video_value=0.0,
+            total_value=0.0,
+            azteca="Azteca" in site.name,
+            date=date
+        )
+        records_to_create.append(record)
+
+    model_class.objects.bulk_create(records_to_create)

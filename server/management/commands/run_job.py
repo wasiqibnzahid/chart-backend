@@ -9,7 +9,7 @@ import os
 import threading
 
 from server.constants import OTHER_RECORD_FILEPATH, PERFORMANCE_METRICS
-from server.helpers import create_or_update_record, create_record_if_not_exists, process_urls, write_text_to_file
+from server.helpers import create_empty_records, create_or_update_record, create_record_if_not_exists, process_urls, write_text_to_file
 from ...models import ErrorLog, Record, Site
 from ...generate_reports import fetch_data, get_latest_urls, get_sorted_rss_items
 
@@ -71,7 +71,7 @@ def process_site(site: Site, semaphore):
             if len(extracted_video_urls_inner) == 0:
                 log = ErrorLog(message=f"Sitemap returned 0 urls: {video_sitemap_url}")
                 log.save()
-                
+
             print(f"For company {site.name} the note urls are "
                   f"{len(extracted_nota_urls)} and video are {len(extracted_video_urls_inner)}")
  
@@ -121,6 +121,7 @@ def process_site(site: Site, semaphore):
 def run_job():
 
     sites = Site.objects.all()
+    create_empty_records(sites, Record)
     semaphore = threading.Semaphore(4)
     print(f"SITES ARE {sites}")
     
