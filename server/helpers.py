@@ -239,6 +239,10 @@ def create_empty_records(sites, model_class):
     records_to_create = []
 
     for site in sites:
+        if model_class.objects.filter(name=site.name, date=date).exists():
+            print(site.name, 'exists')
+            continue
+
         record = model_class(
             name=site.name,
             note_value=0.0,
