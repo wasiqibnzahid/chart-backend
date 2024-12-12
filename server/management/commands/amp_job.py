@@ -1,11 +1,6 @@
-import random
-import subprocess
 from django.core.management.base import BaseCommand
 from datetime import datetime, timedelta
-import re
 import concurrent.futures
-import json
-import os
 import threading
 
 from server.helpers import create_empty_records, create_or_update_record, create_record_if_not_exists, process_urls, write_text_to_file
@@ -19,8 +14,8 @@ def process_amp_site(site, semaphore):
         monday_of_current_week = today - timedelta(days=today.weekday())
         date = monday_of_current_week.date()
         try:
-            note_sitemap_url = site.sitemap_url
-            video_sitemap_url = site.sitemap_url
+            note_sitemap_url = f'{site.sitemap_url}{AMP_PARAMS}'
+            video_sitemap_url = f'{site.sitemap_url}{AMP_PARAMS}'
             if site.note_sitemap_url:
                 note_sitemap_url = f'{site.note_sitemap_url}{AMP_PARAMS}'
             if site.video_sitemap_url:
@@ -47,10 +42,10 @@ def process_amp_site(site, semaphore):
                   f"{len(extracted_nota_urls)} and video are {len(extracted_video_urls_inner)}")
 
             # Process Note Urls
-            note_metrics = process_urls(extracted_nota_urls, PERFORMANCE_METRICS.copy(), site, job_type="AMP JOB", log_file_name=AMP_RECORD_FILEPATH)
+            note_metrics = process_urls(extracted_nota_urls, PERFORMANCE_METRICS.copy(), site, job_type="AMP JOB", log_file_name=AMP_RECORD_FILEPATH, is_amp=True)
             
             # Process video URLs
-            video_metrics = process_urls(extracted_video_urls, PERFORMANCE_METRICS.copy(), site, url_type="video", job_type="AMP JOB", log_file_name=AMP_RECORD_FILEPATH)
+            video_metrics = process_urls(extracted_video_urls, PERFORMANCE_METRICS.copy(), site, url_type="video", job_type="AMP JOB", log_file_name=AMP_RECORD_FILEPATH, is_amp=True)
 
             print(f"SCORE IS {site.name} NOTE: {note_metrics} VIDEO: {video_metrics}")
             

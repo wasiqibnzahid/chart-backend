@@ -8,7 +8,7 @@ import json
 import os
 import threading
 
-from server.constants import FACTOR, OTHER_RECORD_FILEPATH
+from server.constants import AMP_PARAMS, FACTOR, OTHER_RECORD_FILEPATH
 from server.models import ErrorLog
 
 def write_text_to_file(text, filename=OTHER_RECORD_FILEPATH):
@@ -37,7 +37,13 @@ def get_lighthouse_mobile_score(url, job_type, log_file_name=OTHER_RECORD_FILEPA
 
     try:
         # Run Lighthouse and generate a JSON report
-        command = f'lighthouse --no-enable-error-reporting --chrome-flags="--headless" --output=json --output-path="{report_file_path_rel}" "{url}"'
+        # command = f'lighthouse --no-enable-error-reporting --chrome-flags="--headless" --output=json --output-path="{report_file_path_rel}" "{url}"'
+        command = (
+            f'lighthouse --no-enable-error-reporting '
+            f'--chrome-flags="--headless --disable-gpu --no-sandbox" '
+            f'--throttling-method=provided '
+            f'--output=json --output-path="{report_file_path_rel}" "{url}"'
+        )
         result = subprocess.run(
             command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
         code = result.check_returncode()
@@ -94,10 +100,14 @@ def get_lighthouse_mobile_score(url, job_type, log_file_name=OTHER_RECORD_FILEPA
         "cumulative_layout_shift": cumulative_layout_shift
     }
     
-def process_urls(extracted_urls, metrics, site, url_type="note", job_type="Not specify", log_file_name=OTHER_RECORD_FILEPATH):
+def process_urls(extracted_urls, metrics, site, url_type="note", job_type="Not specify", log_file_name=OTHER_RECORD_FILEPATH, **kwargs):
+    is_amp = kwargs.get("is_amp", False)
     total_values_count = 0
     successful_site_performance = 0
     for url in extracted_urls:
+        if is_amp:
+            url = f"{url}{AMP_PARAMS}"
+
         if successful_site_performance >= 10:
             break
         try:
