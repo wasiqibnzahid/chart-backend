@@ -134,8 +134,8 @@ def fetch_records():
 
         # Update temporary data with the actual values from records
         for record in records_on_date:
-            temp_data[f"{record.name} (Note)"] += int(record.amp_note_value or 0)
-            temp_data[f"{record.name} (Video)"] += int(record.amp_video_value or 0)
+            temp_data[f"{record.name} (Note)"] += int(record.note_value or 0)
+            temp_data[f"{record.name} (Video)"] += int(record.video_value or 0)
 
         # Append the values from temp_data to the main data dictionary
         for key in temp_data:

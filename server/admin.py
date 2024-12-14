@@ -85,7 +85,7 @@ admin.site.register(LocalRecord, LocalRecordAdmin)
 
 # AmpRecord Admin
 class AmpRecordAdmin(admin.ModelAdmin):
-    list_display = ('name', 'amp_note_value', 'amp_video_value', 'amp_total_value', 'azteca', 'date')
+    list_display = ('name', 'note_value', 'video_value', 'total_value', 'azteca', 'date')
     search_fields = ('name',)
     list_filter = ('azteca', 'date')  # Filter by azteca and date
 

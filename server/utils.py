@@ -151,9 +151,9 @@ def process_data_and_create_records(data, target_model_name, process_amp_values)
 
                     # Prepare record data for AMP values
                     record_data_amp = {
-                        'amp_note_value': note_value,
-                        'amp_video_value': video_value,
-                        'amp_total_value': total_value,
+                        'note_value': note_value,
+                        'video_value': video_value,
+                        'total_value': total_value,
                         'azteca': azteca,
                         'date': date,
                     }

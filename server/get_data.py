@@ -1,4 +1,7 @@
+from django.http import JsonResponse
+from django.views import View
 import pandas as pd
+from django.db.models import Q
 from collections import defaultdict
 
 from server.utils import safe_division
@@ -217,8 +220,7 @@ def calculate_relevant_insights(filtered_df, companies, title, date_filter=None)
 
     if significant_changes:
         most_relevant = max(significant_changes, key=lambda x: abs(x[3]))
-        insight = f"TV Azteca {most_relevant[1]} {most_relevant[2]} by {
-            abs(most_relevant[3]):.1f}%, especially in {most_relevant[0]}."
+        insight = f"TV Azteca {most_relevant[1]} {most_relevant[2]} by {abs(most_relevant[3]):.1f}%, especially in {most_relevant[0]}."
     else:
         insight = "No significant changes were observed across the TV Azteca companies."
 
@@ -550,8 +552,7 @@ def calculate_competition_insights(filtered_df, companies, is_competition, date_
 
     if significant_changes:
         most_relevant = max(significant_changes, key=lambda x: abs(x[3]))
-        insight = f"Competition {most_relevant[1]} {most_relevant[2]} by {
-            abs(most_relevant[3]):.1f}%, especially in {most_relevant[0]}."
+        insight = f"Competition {most_relevant[1]} {most_relevant[2]} by {abs(most_relevant[3]):.1f}%, especially in {most_relevant[0]}."
     else:
         insight = None
 
@@ -705,3 +706,28 @@ def get_insights(date_filter=None):
             "competition": total_competition
         }
     }
+    
+class GeneralPerformanceReportView(View):
+
+    def get(self, request):
+        records = Record.objects.all().exclude(
+            Q(note_first_contentful_paint=0) &
+            Q(note_total_blocking_time=0) &
+            Q(note_speed_index=0) &
+            Q(note_largest_contentful_paint=0) &
+            Q(note_cumulative_layout_shift=0) &
+            Q(video_first_contentful_paint=0) &
+            Q(video_total_blocking_time=0) &
+            Q(video_speed_index=0) &
+            Q(video_largest_contentful_paint=0) &
+            Q(video_cumulative_layout_shift=0)
+        ).values(
+            'id', 'name', 'note_first_contentful_paint', 'note_total_blocking_time',
+            'note_speed_index', 'note_largest_contentful_paint', 'note_cumulative_layout_shift',
+            'video_first_contentful_paint', 'video_total_blocking_time', 'video_speed_index',
+            'video_largest_contentful_paint', 'video_cumulative_layout_shift',
+            'date'
+        )
+
+        return JsonResponse(list(records), safe=False)
+
