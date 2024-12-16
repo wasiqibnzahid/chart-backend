@@ -60,9 +60,8 @@ def get_lighthouse_mobile_score(url, job_type, log_file_name=OTHER_RECORD_FILEPA
                 print(f"raw scoor for job: {job_type} url: {url}: ", performance_score)
                 if(performance_score == 0):
                     write_text_to_file(f"FOR URL {url} SCORE IS 0", filename=OTHER_RECORD_FILEPATH)
-                if performance_score >= 0.95:
-                    performance_score = random.uniform(
-                        0.93, 0.97)
+                if performance_score >= 100:
+                    performance_score = 100
 
             audits = report.get('audits', {})
             # Divide time-based metrics by 1000 to convert from ms to s
