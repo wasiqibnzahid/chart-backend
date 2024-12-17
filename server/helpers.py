@@ -56,7 +56,7 @@ def get_lighthouse_mobile_score(url, job_type, log_file_name=OTHER_RECORD_FILEPA
         with open(report_file_path, 'r', encoding='utf-8') as file:
             report = json.load(file)
             if report['categories']['performance']['score'] is not None:
-                performance_score = report['categories']['performance']['score'] * FACTOR
+                performance_score = report['categories']['performance']['score']
                 print(f"raw scoor for job: {job_type} url: {url}: ", performance_score)
                 if(performance_score == 0):
                     write_text_to_file(f"FOR URL {url} SCORE IS 0", filename=OTHER_RECORD_FILEPATH)
