@@ -1,4 +1,6 @@
 from django.http import JsonResponse
+
+from server.general_sites.helpers import custom_function
 from .get_data import get_data, get_averages, get_insights
 from .models import LocalErrorLog
 from server.local_data import local_data,local_quarter,local_insights
@@ -30,8 +32,9 @@ def handle_request(_request):
 
 
 def get_quarterly(_request):
+    custom_data = custom_function()
     data = get_averages()
-    return JsonResponse(data, safe=False)
+    return JsonResponse({'data':data, 'custom_data':custom_data}, safe=False)
 
 
 def get_insights_api(request):
