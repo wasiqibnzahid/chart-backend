@@ -3,6 +3,7 @@ from collections import defaultdict
 from server.models import AmpRecord
 from datetime import datetime
 import json
+from django.utils import timezone
 from server.constants import AmpSites 
 from typing import Optional
 from server.utils import safe_division, validate_dataframe_input
@@ -248,6 +249,85 @@ def calculate_relevant_insights(filtered_df, companies, title, date_filter=None)
         insight = f"No significant changes were observed across the {title} companies."
 
     return insight
+def calculate_weekly_averages(df):
+    months = []
+    df['Date'] = pd.to_datetime(df['Date'])
+    df['Year'] = df['Date'].dt.year
+    df['Month'] = df['Date'].dt.to_period('M')
+
+    # Group the data by year and month
+    grouped = df.groupby(['Date'])
+
+    for (date, ), month_df in grouped:
+        amp_avg = month_df[amp_columns].mean(axis=1).mean().round(1)
+
+        amp_avg_video = month_df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).mean().round(1)
+
+        amp_avg_note = month_df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1)
+
+        amp_map = {}
+
+        if months:
+            prev_month = months[-1]
+            prev_amp_avg = prev_month['AMP Avg']
+
+            prev_amp_avg_video = prev_month['AMP Video Avg']
+
+            prev_amp_avg_note = prev_month['AMP Note Avg']
+
+            amp_change = safe_division(amp_avg , prev_amp_avg)
+
+            amp_change_video = safe_division(amp_avg_video , prev_amp_avg_video)
+
+            amp_change_note = safe_division(amp_avg_note , prev_amp_avg_note)
+        else:
+            amp_change = 100
+            amp_change_video = 100
+            amp_change_note = 100
+
+        res = {
+            'Date': f"{date.date()}",
+            'AMP Change': amp_change,
+            'AMP Video Change': amp_change_video,
+            'AMP Note Change': amp_change_note,
+            'AMP Avg': amp_avg,
+            'AMP Video Avg': amp_avg_video,
+            'AMP Note Avg': amp_avg_note,
+            "amp": [] 
+        }
+        
+        for (index, company) in enumerate(amp_columns_raw):
+            company_avg = round(month_df[[col for col in amp_columns if company in col]].mean(axis=1).mean(), 1)
+            company_avg_video = round(month_df[[col for col in amp_columns if 'Video' in col and company in col]].mean(axis=1).mean(), 1)
+            company_avg_note = round(month_df[[col for col in amp_columns if 'Note' in col and company in col]].mean(axis=1).mean(), 1)
+        # Process AMP data
+            if len(months) > 0:
+                prev_month = months[-1]
+                prev_amp_avg = prev_month['AMP Avg']
+                prev_amp_video_avg = prev_month['AMP Video Avg']
+                prev_amp_note_avg = prev_month['AMP Note Avg']
+
+                amp_change = safe_division(company_avg, prev_amp_avg)
+                amp_video_change = safe_division(company_avg_video, prev_amp_video_avg)
+                amp_note_change = safe_division(company_avg_note, prev_amp_note_avg)
+            else:
+                amp_change = 100
+                amp_video_change = 100
+                amp_note_change = 100
+
+            res["amp"].append({
+                "name": company,
+                "total": company_avg,
+                "video": company_avg_video,
+                "note": company_avg_note,
+                "total_change": 0 if pd.isna(amp_change) else (amp_change or 0),
+                "video_change": 0 if pd.isna(amp_video_change) else (amp_video_change or 0),
+                "note_change": 0 if pd.isna(amp_note_change) else (amp_note_change or 0)
+            })
+
+        months.append(res)
+
+    return pd.DataFrame(months)
 
 def calculate_quarterly_averages(df):
     months = []
@@ -281,9 +361,9 @@ def calculate_quarterly_averages(df):
 
             amp_change_note = safe_division(amp_avg_note , prev_amp_avg_note)
         else:
-            amp_change = ""
-            amp_change_video = ""
-            amp_change_note = ""
+            amp_change = 100
+            amp_change_video = 100
+            amp_change_note = 100
 
         res = {
             'Date': f"Q{int(month.strftime('%m'))}-{year}",
@@ -311,9 +391,9 @@ def calculate_quarterly_averages(df):
                 amp_video_change = safe_division(company_avg_video, prev_amp_video_avg)
                 amp_note_change = safe_division(company_avg_note, prev_amp_note_avg)
             else:
-                amp_change = 0
-                amp_video_change = 0
-                amp_note_change = 0
+                amp_change = 100
+                amp_video_change = 100
+                amp_note_change = 100
 
             res["amp"].append({
                 "name": company,
@@ -328,6 +408,124 @@ def calculate_quarterly_averages(df):
         months.append(res)
 
     return pd.DataFrame(months)
+
+def calculate_yearly_averages(df):
+    months = []
+    df['Date'] = pd.to_datetime(df['Date'])
+    df['Year'] = df['Date'].dt.year
+    df['Month'] = df['Date'].dt.to_period('M')
+
+    # Group the data by year and month
+    grouped = df.groupby(['Year'])
+
+    for (year,), month_df in grouped:
+        amp_avg = month_df[amp_columns].mean(axis=1).mean().round(1)
+
+        amp_avg_video = month_df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).mean().round(1)
+
+        amp_avg_note = month_df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1)
+
+        amp_map = {}
+
+        if months:
+            prev_month = months[-1]
+            prev_amp_avg = prev_month['AMP Avg']
+
+            prev_amp_avg_video = prev_month['AMP Video Avg']
+
+            prev_amp_avg_note = prev_month['AMP Note Avg']
+
+            amp_change = safe_division(amp_avg , prev_amp_avg)
+
+            amp_change_video = safe_division(amp_avg_video , prev_amp_avg_video)
+
+            amp_change_note = safe_division(amp_avg_note , prev_amp_avg_note)
+        else:
+            amp_change = 100
+            amp_change_video = 100
+            amp_change_note = 100
+
+        res = {
+            'Date': f"Q{int(1)}-{year}",
+            'AMP Change': amp_change,
+            'AMP Video Change': amp_change_video,
+            'AMP Note Change': amp_change_note,
+            'AMP Avg': amp_avg,
+            'AMP Video Avg': amp_avg_video,
+            'AMP Note Avg': amp_avg_note,
+            "amp": [] 
+        }
+        
+        for (index, company) in enumerate(amp_columns_raw):
+            company_avg = round(month_df[[col for col in amp_columns if company in col]].mean(axis=1).mean(), 1)
+            company_avg_video = round(month_df[[col for col in amp_columns if 'Video' in col and company in col]].mean(axis=1).mean(), 1)
+            company_avg_note = round(month_df[[col for col in amp_columns if 'Note' in col and company in col]].mean(axis=1).mean(), 1)
+        # Process AMP data
+            if len(months) > 0:
+                prev_month = months[-1]
+                prev_amp_avg = prev_month['AMP Avg']
+                prev_amp_video_avg = prev_month['AMP Video Avg']
+                prev_amp_note_avg = prev_month['AMP Note Avg']
+
+                amp_change = safe_division(company_avg, prev_amp_avg)
+                amp_video_change = safe_division(company_avg_video, prev_amp_video_avg)
+                amp_note_change = safe_division(company_avg_note, prev_amp_note_avg)
+            else:
+                amp_change = 100
+                amp_video_change = 100
+                amp_note_change = 100
+
+            res["amp"].append({
+                "name": company,
+                "total": company_avg,
+                "video": company_avg_video,
+                "note": company_avg_note,
+                "total_change": 0 if pd.isna(amp_change) else (amp_change or 0),
+                "video_change": 0 if pd.isna(amp_video_change) else (amp_video_change or 0),
+                "note_change": 0 if pd.isna(amp_note_change) else (amp_note_change or 0)
+            })
+
+        months.append(res)
+
+    return pd.DataFrame(months)
+
+def calculate_all_time_averages(df):
+    date = timezone.now()
+
+    amp_avg = df[amp_columns].mean(axis=1).mean().round(1)
+
+    amp_avg_video = df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).mean().round(1)
+
+    amp_avg_note = df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1)
+
+    res = {
+        'Date': f"{date.date()}",
+        'AMP Change': 100,
+        'AMP Video Change': 100,
+        'AMP Note Change': 100,
+        'AMP Avg': amp_avg,
+        'AMP Video Avg': amp_avg_video,
+        'AMP Note Avg': amp_avg_note,
+        "amp": [] 
+    }
+        
+    for (index, company) in enumerate(amp_columns_raw):
+        company_avg = round(df[[col for col in amp_columns if company in col]].mean(axis=1).mean(), 1)
+        company_avg_video = round(df[[col for col in amp_columns if 'Video' in col and company in col]].mean(axis=1).mean(), 1)
+        company_avg_note = round(df[[col for col in amp_columns if 'Note' in col and company in col]].mean(axis=1).mean(), 1)
+    
+        res["amp"].append({
+            "name": company,
+            "total": company_avg,
+            "video": company_avg_video,
+            "note": company_avg_note,
+            "total_change": 100,
+            "video_change": 100,
+            "note_change": 100
+        })
+
+
+    return res
 
 def calculate_changes(df):
     # Make a copy of the input DataFrame to avoid modifying the original
@@ -610,11 +808,18 @@ def get_averages():
     df = init()
     quarter_data = formatToJson(
         calculate_quarterly_averages(df))
-    week_data = calculate_changes(df)
+    week_data = formatToJson(
+        calculate_weekly_averages(df))
+    year_data = formatToJson(
+        calculate_yearly_averages(df))
+    all_time_data = (
+        calculate_all_time_averages(df))
 
     return {
         "quarter": quarter_data,
-        "week": week_data
+        "week": week_data,
+        "year": year_data,
+        "all_time": all_time_data,
     }
 
 def get_insights(date_filter=None):

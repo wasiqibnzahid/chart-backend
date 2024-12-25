@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.views import View
+from django.utils import timezone
 import pandas as pd
 from django.db.models import Q
 from collections import defaultdict
@@ -227,6 +228,145 @@ def calculate_relevant_insights(filtered_df, companies, title, date_filter=None)
     return insight
 
 
+def calculate_weekly_averages(df):
+
+    months = []
+    df['Date'] = pd.to_datetime(df['Date'])
+    df['Year'] = df['Date'].dt.year
+    df['Month'] = df['Date'].dt.to_period('M')
+
+    # Group the data by year and month
+    grouped = df.groupby(['Date'])
+
+    for (date,), month_df in grouped:
+        tv_azteca_avg = month_df[tv_azteca_columns].mean(
+            axis=1).mean().round(1)
+        competition_avg = month_df[competition_columns].mean(
+            axis=1).mean().round(1)
+        tv_azteca_avg_video = month_df[[
+            col for col in tv_azteca_columns if 'Video' in col]].mean(
+            axis=1).mean().round(1)
+        competition_avg_video = month_df[[
+            col for col in competition_columns if 'Video' in col]].mean(
+            axis=1).mean().round(1)
+        tv_azteca_avg_note = month_df[[
+            col for col in tv_azteca_columns if 'Note' in col]].mean(
+            axis=1).mean().round(1)
+        competition_avg_note = month_df[[
+            col for col in competition_columns if 'Note' in col]].mean(
+            axis=1).mean().round(1)
+        azteca_map = {}
+        competition_map = {}
+
+        if months:
+            prev_month = months[-1]
+            prev_tv_azteca_avg = prev_month['TV Azteca Avg']
+            prev_competition_avg = prev_month['Competition Avg']
+            prev_tv_azteca_avg_video = prev_month['TV Azteca Video Avg']
+            prev_competition_avg_video = prev_month['Competition Video Avg']
+            prev_tv_azteca_avg_note = prev_month['TV Azteca Note Avg']
+            prev_competition_avg_note = prev_month['Competition Note Avg']
+
+            tv_azteca_change = safe_division(tv_azteca_avg, prev_tv_azteca_avg)
+            competition_change = safe_division(competition_avg, prev_competition_avg)
+            tv_azteca_change_video = safe_division(tv_azteca_avg_video, prev_tv_azteca_avg_video)
+            competition_change_video = safe_division(competition_avg_video, prev_competition_avg_video)
+            tv_azteca_change_note = safe_division( tv_azteca_avg_note, prev_tv_azteca_avg_note)
+            competition_change_note = safe_division(competition_avg_note, prev_competition_avg_note)
+        else:
+            tv_azteca_change = ""
+            competition_change = ""
+            tv_azteca_change_note = ""
+            competition_change_note = ""
+            tv_azteca_change_video = ""
+            competition_change_video = ""
+        res = {
+            'Date': f"{date.date()}",
+            'TV Azteca Change': tv_azteca_change,
+            'Competition Change': competition_change,
+            'TV Azteca Video Change': tv_azteca_change_video,
+            'Competition Video Change': competition_change_video,
+            'TV Azteca Note Change': tv_azteca_change_note,
+            'Competition Note Change': competition_change_note,
+            'TV Azteca Avg': tv_azteca_avg,
+            'Competition Avg': competition_avg,
+            'TV Azteca Video Avg': tv_azteca_avg_video,
+            'Competition Video Avg': competition_avg_video,
+            'TV Azteca Note Avg': tv_azteca_avg_note,
+            'Competition Note Avg': competition_avg_note,
+            "competition": [],
+            "azteca": []
+        }
+
+        for (index, company) in enumerate(azteca_columns_raw):
+            company_avg = month_df[[
+                col for col in tv_azteca_columns if company in col]].mean(
+                axis=1).mean().round(1)
+            company_avg_video = month_df[[
+                col for col in tv_azteca_columns if 'Video' in col and company in col]].mean(
+                axis=1).mean().round(1)
+            company_avg_note = month_df[[
+                col for col in tv_azteca_columns if 'Note' in col and company in col]].mean(
+                axis=1).mean().round(1)
+            if (len(months) > 0):
+                item = prev_month.get("azteca")[index]
+                prev_company_avg_video = item["video"]
+                prev_company_avg_note = item["note"]
+                prev_company_avg = item["total"]
+                company_change = safe_division(company_avg, prev_company_avg)
+                company_change_video = safe_division(company_avg_video ,prev_company_avg_video)
+                company_change_note = safe_division(company_avg_note, prev_company_avg_note)
+                prev_month = months[-1]
+            else:
+                company_change = 100
+                company_change_video = 100
+                company_change_note = 100
+            res["azteca"].append({
+                "name": company,
+                "total": company_avg,
+                "video": company_avg_video,
+                "note": company_avg_note,
+                "total_change": 0 if pd.isna(company_change) else (company_change or 0),
+                "video_change": 0 if pd.isna(company_change_video) else (company_change_video or 0),
+                "note_change": 0 if pd.isna(company_change_note) else (company_change_note or 0)
+            })
+
+        for (index, company) in enumerate(competition_columns_raw):
+            company_avg = month_df[[
+                col for col in competition_columns if company in col]].mean(
+                axis=1).mean().round(1)
+            company_avg_video = month_df[[
+                col for col in competition_columns if "Video" in col and company in col]].mean(
+                axis=1).mean().round(1)
+            company_avg_note = month_df[[
+                col for col in competition_columns if "Note" in col and company in col]].mean(
+                axis=1).mean().round(1)
+            if (len(months) > 0):
+                item = prev_month.get("competition")[index]
+                prev_company_avg_video = item["video"]
+                prev_company_avg_note = item["note"]
+                prev_company_avg = item["total"]
+                company_change = safe_division(company_avg, prev_company_avg)
+                company_change_video = safe_division(company_avg_video, prev_company_avg_video)
+                company_change_note = safe_division(company_avg_note, prev_company_avg_note)
+                prev_month = months[-1]
+            else:
+                company_change = 100
+                company_change_video = 100
+                company_change_note = 100
+            res["competition"].append({
+                "name": company,
+                "total": company_avg,
+                "video": company_avg_video,
+                "note": company_avg_note,
+                "total_change": 0 if pd.isna(company_change) else (company_change or 0),
+                "video_change": 0 if pd.isna(company_change_video) else (company_change_video or 0),
+                "note_change": 0 if pd.isna(company_change_note) else (company_change_note or 0)
+            })
+        months.append(res)
+
+    return pd.DataFrame(months)
+
 def calculate_quarterly_averages(df):
 
     months = []
@@ -365,6 +505,229 @@ def calculate_quarterly_averages(df):
         months.append(res)
 
     return pd.DataFrame(months)
+
+def calculate_yearly_averages(df):
+
+    months = []
+    df['Date'] = pd.to_datetime(df['Date'])
+    df['Year'] = df['Date'].dt.year
+    df['Month'] = df['Date'].dt.to_period('M')
+
+    # Group the data by year and month
+    grouped = df.groupby(['Year'])
+
+    for (year,), month_df in grouped:
+        print(year)
+        tv_azteca_avg = month_df[tv_azteca_columns].mean(
+            axis=1).mean().round(1)
+        competition_avg = month_df[competition_columns].mean(
+            axis=1).mean().round(1)
+        tv_azteca_avg_video = month_df[[
+            col for col in tv_azteca_columns if 'Video' in col]].mean(
+            axis=1).mean().round(1)
+        competition_avg_video = month_df[[
+            col for col in competition_columns if 'Video' in col]].mean(
+            axis=1).mean().round(1)
+        tv_azteca_avg_note = month_df[[
+            col for col in tv_azteca_columns if 'Note' in col]].mean(
+            axis=1).mean().round(1)
+        competition_avg_note = month_df[[
+            col for col in competition_columns if 'Note' in col]].mean(
+            axis=1).mean().round(1)
+        azteca_map = {}
+        competition_map = {}
+
+        if months:
+            prev_month = months[-1]
+            prev_tv_azteca_avg = prev_month['TV Azteca Avg']
+            prev_competition_avg = prev_month['Competition Avg']
+            prev_tv_azteca_avg_video = prev_month['TV Azteca Video Avg']
+            prev_competition_avg_video = prev_month['Competition Video Avg']
+            prev_tv_azteca_avg_note = prev_month['TV Azteca Note Avg']
+            prev_competition_avg_note = prev_month['Competition Note Avg']
+
+            tv_azteca_change = safe_division(tv_azteca_avg, prev_tv_azteca_avg)
+            competition_change = safe_division(competition_avg, prev_competition_avg)
+            tv_azteca_change_video = safe_division(tv_azteca_avg_video, prev_tv_azteca_avg_video)
+            competition_change_video = safe_division(competition_avg_video, prev_competition_avg_video)
+            tv_azteca_change_note = safe_division( tv_azteca_avg_note, prev_tv_azteca_avg_note)
+            competition_change_note = safe_division(competition_avg_note, prev_competition_avg_note)
+        else:
+            tv_azteca_change = 100
+            competition_change = 100
+            tv_azteca_change_note = 100
+            competition_change_note = 100
+            tv_azteca_change_video = 100
+            competition_change_video = 100
+        res = {
+            'Date': f"Q{int(1)}-{year}",
+            'TV Azteca Change': tv_azteca_change,
+            'Competition Change': competition_change,
+            'TV Azteca Video Change': tv_azteca_change_video,
+            'Competition Video Change': competition_change_video,
+            'TV Azteca Note Change': tv_azteca_change_note,
+            'Competition Note Change': competition_change_note,
+            'TV Azteca Avg': tv_azteca_avg,
+            'Competition Avg': competition_avg,
+            'TV Azteca Video Avg': tv_azteca_avg_video,
+            'Competition Video Avg': competition_avg_video,
+            'TV Azteca Note Avg': tv_azteca_avg_note,
+            'Competition Note Avg': competition_avg_note,
+            "competition": [],
+            "azteca": []
+        }
+
+        for (index, company) in enumerate(azteca_columns_raw):
+            company_avg = month_df[[
+                col for col in tv_azteca_columns if company in col]].mean(
+                axis=1).mean().round(1)
+            company_avg_video = month_df[[
+                col for col in tv_azteca_columns if 'Video' in col and company in col]].mean(
+                axis=1).mean().round(1)
+            company_avg_note = month_df[[
+                col for col in tv_azteca_columns if 'Note' in col and company in col]].mean(
+                axis=1).mean().round(1)
+            if (len(months) > 0):
+                item = prev_month.get("azteca")[index]
+                prev_company_avg_video = item["video"]
+                prev_company_avg_note = item["note"]
+                prev_company_avg = item["total"]
+                company_change = safe_division(company_avg, prev_company_avg)
+                company_change_video = safe_division(company_avg_video ,prev_company_avg_video)
+                company_change_note = safe_division(company_avg_note, prev_company_avg_note)
+                prev_month = months[-1]
+            else:
+                company_change = 100
+                company_change_video = 100
+                company_change_note = 100
+            res["azteca"].append({
+                "name": company,
+                "total": company_avg,
+                "video": company_avg_video,
+                "note": company_avg_note,
+                "total_change": 0 if pd.isna(company_change) else (company_change or 0),
+                "video_change": 0 if pd.isna(company_change_video) else (company_change_video or 0),
+                "note_change": 0 if pd.isna(company_change_note) else (company_change_note or 0)
+            })
+
+        for (index, company) in enumerate(competition_columns_raw):
+            company_avg = month_df[[
+                col for col in competition_columns if company in col]].mean(
+                axis=1).mean().round(1)
+            company_avg_video = month_df[[
+                col for col in competition_columns if "Video" in col and company in col]].mean(
+                axis=1).mean().round(1)
+            company_avg_note = month_df[[
+                col for col in competition_columns if "Note" in col and company in col]].mean(
+                axis=1).mean().round(1)
+            if (len(months) > 0):
+                item = prev_month.get("competition")[index]
+                prev_company_avg_video = item["video"]
+                prev_company_avg_note = item["note"]
+                prev_company_avg = item["total"]
+                company_change = safe_division(company_avg, prev_company_avg)
+                company_change_video = safe_division(company_avg_video, prev_company_avg_video)
+                company_change_note = safe_division(company_avg_note, prev_company_avg_note)
+                prev_month = months[-1]
+            else:
+                company_change = 100
+                company_change_video = 100
+                company_change_note = 100
+            res["competition"].append({
+                "name": company,
+                "total": company_avg,
+                "video": company_avg_video,
+                "note": company_avg_note,
+                "total_change": 0 if pd.isna(company_change) else (company_change or 0),
+                "video_change": 0 if pd.isna(company_change_video) else (company_change_video or 0),
+                "note_change": 0 if pd.isna(company_change_note) else (company_change_note or 0)
+            })
+        months.append(res)
+
+    return pd.DataFrame(months)
+
+def calculate_all_time_averages(df):
+    date = timezone.now()
+
+    tv_azteca_avg = df[tv_azteca_columns].mean(
+        axis=1).mean().round(1)
+    competition_avg = df[competition_columns].mean(
+        axis=1).mean().round(1)
+    tv_azteca_avg_video = df[[
+        col for col in tv_azteca_columns if 'Video' in col]].mean(
+        axis=1).mean().round(1)
+    competition_avg_video = df[[
+        col for col in competition_columns if 'Video' in col]].mean(
+        axis=1).mean().round(1)
+    tv_azteca_avg_note = df[[
+        col for col in tv_azteca_columns if 'Note' in col]].mean(
+        axis=1).mean().round(1)
+    competition_avg_note = df[[
+        col for col in competition_columns if 'Note' in col]].mean(
+        axis=1).mean().round(1)
+
+        
+    res = {
+        'Date': f"{date.date()}",
+        'TV Azteca Change': 100,
+        'Competition Change': 100,
+        'TV Azteca Video Change': 100,
+        'Competition Video Change': 100,
+        'TV Azteca Note Change': 100,
+        'Competition Note Change': 100,
+        'TV Azteca Avg': tv_azteca_avg,
+        'Competition Avg': competition_avg,
+        'TV Azteca Video Avg': tv_azteca_avg_video,
+        'Competition Video Avg': competition_avg_video,
+        'TV Azteca Note Avg': tv_azteca_avg_note,
+        'Competition Note Avg': competition_avg_note,
+        "competition": [],
+        "azteca": []
+    }
+
+    for (index, company) in enumerate(azteca_columns_raw):
+        company_avg = df[[
+            col for col in tv_azteca_columns if company in col]].mean(
+            axis=1).mean().round(1)
+        company_avg_video = df[[
+            col for col in tv_azteca_columns if 'Video' in col and company in col]].mean(
+            axis=1).mean().round(1)
+        company_avg_note = df[[
+            col for col in tv_azteca_columns if 'Note' in col and company in col]].mean(
+            axis=1).mean().round(1)
+
+        res["azteca"].append({
+            "name": company,
+            "total": company_avg,
+            "video": company_avg_video,
+            "note": company_avg_note,
+            "total_change": 100,
+            "video_change": 100,
+            "note_change": 100
+        })
+
+    for (index, company) in enumerate(competition_columns_raw):
+        company_avg = df[[
+            col for col in competition_columns if company in col]].mean(
+            axis=1).mean().round(1)
+        company_avg_video = df[[
+            col for col in competition_columns if "Video" in col and company in col]].mean(
+            axis=1).mean().round(1)
+        company_avg_note = df[[
+            col for col in competition_columns if "Note" in col and company in col]].mean(
+            axis=1).mean().round(1)
+
+        res["competition"].append({
+            "name": company,
+            "total": company_avg,
+            "video": company_avg_video,
+            "note": company_avg_note,
+            "total_change": 100,
+            "video_change": 100,
+            "note_change": 100
+        })
+
+    return res
 
 
 def calculate_changes(df):
@@ -668,11 +1031,18 @@ def get_averages():
     df = init()
     quarter_data = formatToJson(
         calculate_quarterly_averages(df))
-    week_data = calculate_changes(df)
+    week_data = formatToJson(
+        calculate_weekly_averages(df))
+    yearly_data = formatToJson(
+        calculate_yearly_averages(df)
+    )
+    all_time_data = calculate_all_time_averages(df)
 
     return {
         "quarter": quarter_data,
-        "week": week_data
+        "yearly": yearly_data,
+        "week": week_data,
+        "all_time": all_time_data
     }
 
 
