@@ -56,9 +56,10 @@ class Command(BaseCommand):
 
                 try:
                     waiting_check.status = 'pending'
+                    print(f"CHECK IS {waiting_check}")
                     waiting_check.save()
                     # Update all the performance metrics
-                    print(f" CHECK IS {waiting_check} and metrics are {url_metrics}")
+                    print(f" metrics are {url_metrics}")
                     waiting_check.note_first_contentful_paint = url_metrics.get(
                         'first-contentful-paint', 0)
                     waiting_check.note_total_blocking_time = url_metrics.get(
