@@ -58,6 +58,7 @@ class Command(BaseCommand):
                     waiting_check.status = 'pending'
                     waiting_check.save()
                     # Update all the performance metrics
+                    print(f" CHECK IS {waiting_check} and metrics are {url_metrics}")
                     waiting_check.note_first_contentful_paint = url_metrics.get(
                         'first-contentful-paint', 0)
                     waiting_check.note_total_blocking_time = url_metrics.get(
@@ -75,7 +76,6 @@ class Command(BaseCommand):
                     waiting_check.score = sum(url_metrics.values()) / \
                         len(url_metrics) if url_metrics else 0
                     waiting_check.status = 'done'
-                    print(f" NEW CHECK IS {waiting_check}")
                     waiting_check.save()
 
                     print(f"Processed {waiting_check.url} with score {
