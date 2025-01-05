@@ -3,14 +3,24 @@ import time
 import threading
 from django.db import connection
 from ...models import WebsiteCheck
+import requests
+
+LAMBDA_URL = "https://hpuyeonhb3mctgalziaie3py7m0vnqfk.lambda-url.us-east-1.on.aws/"
 
 def notify_waiting_items():
-    """Function to check for waiting items and notify"""
+    """Function to check for waiting items and notify Lambda"""
     try:
         waiting_count = WebsiteCheck.objects.filter(status='waiting').count()
         if waiting_count > 0:
             print(f"Found {waiting_count} items waiting to be processed")
-            return True
+            try:
+                # Make request to Lambda
+                response = requests.get(LAMBDA_URL)
+                print(f"Lambda notification response: {response.text}")
+                return True
+            except Exception as e:
+                print(f"Error notifying Lambda: {e}")
+                return False
         return False
     except Exception as e:
         print(f"Error checking waiting items: {e}")
@@ -26,7 +36,7 @@ class Command(BaseCommand):
                     # Close any stale database connections
                     connection.close()
                     
-                    # Just check for waiting items
+                    # Check for waiting items and notify Lambda if found
                     notify_waiting_items()
                     
                     # Wait for 5 minutes
