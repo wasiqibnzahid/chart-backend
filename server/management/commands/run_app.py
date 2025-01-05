@@ -43,16 +43,13 @@ class Command(BaseCommand):
 
             # Process URLs in batch
             # urls_to_process = [waiting_check.url]
-            urls_to_process = [
-                'https://www.aztecayucatan.com/clima/atencion-toda-de-baja-presion-aumenta-su-probabilidad-de-formar-el-ciclon-patty-frente-a-yucatan']
+            urls_to_process = 'https://www.aztecayucatan.com/clima/atencion-toda-de-baja-presion-aumenta-su-probabilidad-de-formar-el-ciclon-patty-frente-a-yucatan'
 
             try:
                 # Process URLs and get metrics
                 print(f"Processing URLs: {urls_to_process}")
                 url_metrics = get_lighthouse_mobile_score(
                     urls_to_process,
-                    PERFORMANCE_METRICS.copy(),
-                    None,  # No site object needed for this case
                     job_type="WEBSITE_CHECK"
                 )
 
