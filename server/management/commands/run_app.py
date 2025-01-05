@@ -33,19 +33,19 @@ class Command(BaseCommand):
             # filter(
             #     status='waiting'
             # )
-            waiting_checks = WebsiteCheck.objects.all()[:1]
-            print(f"Waiting checks: {waiting_checks}")
+            waiting_check = WebsiteCheck.objects.first()
+            print(f"Waiting checks: {waiting_check}")
 
-            if not waiting_checks:
+            if not waiting_check:
                 print("No pending website checks, shutting down...")
                 break
 
             # Process URLs in batch
-            urls_to_process = [check.url for check in waiting_checks]
+            urls_to_process = [waiting_check.url]
             try:
                 # Process URLs and get metrics
                 print(f"Processing URLs: {urls_to_process}")
-                metrics = process_urls(
+                url_metrics = process_urls(
                     urls_to_process,
                     PERFORMANCE_METRICS.copy(),
                     None,  # No site object needed for this case
@@ -53,43 +53,44 @@ class Command(BaseCommand):
                 )
 
                 # Update each check with its corresponding metrics
-                for check, url_metrics in zip(waiting_checks, metrics):
-                    try:
-                        check.status = 'pending'
-                        check.save()
-                        # Update all the performance metrics
-                        check.note_first_contentful_paint = url_metrics.get(
-                            'first-contentful-paint', 0)
-                        check.note_total_blocking_time = url_metrics.get(
-                            'total-blocking-time', 0)
-                        check.note_speed_index = url_metrics.get(
-                            'speed-index', 0)
-                        check.note_largest_contentful_paint = url_metrics.get(
-                            'largest-contentful-paint', 0)
-                        check.note_cumulative_layout_shift = url_metrics.get(
-                            'cumulative-layout-shift', 0)
-                        check.json_data = url_metrics.get('json_response', {})
 
-                        # Calculate overall score (average of all metrics)
-                        check.score = sum(url_metrics.values()) / \
-                            len(url_metrics) if url_metrics else 0
-                        check.status = 'done'
-                        check.save()
+                try:
+                    waiting_check.status = 'pending'
+                    waiting_check.save()
+                    # Update all the performance metrics
+                    waiting_check.note_first_contentful_paint = url_metrics.get(
+                        'first-contentful-paint', 0)
+                    waiting_check.note_total_blocking_time = url_metrics.get(
+                        'total-blocking-time', 0)
+                    waiting_check.note_speed_index = url_metrics.get(
+                        'speed-index', 0)
+                    waiting_check.note_largest_contentful_paint = url_metrics.get(
+                        'largest-contentful-paint', 0)
+                    waiting_check.note_cumulative_layout_shift = url_metrics.get(
+                        'cumulative-layout-shift', 0)
+                    waiting_check.json_data = url_metrics.get(
+                        'json_response', {})
 
-                        print(f"Processed {check.url} with score {
-                              check.score}")
+                    # Calculate overall score (average of all metrics)
+                    waiting_check.score = sum(url_metrics.values()) / \
+                        len(url_metrics) if url_metrics else 0
+                    waiting_check.status = 'done'
+                    waiting_check.save()
 
-                    except Exception as e:
-                        print(f"Error updating check {check.url}: {e}")
-                        check.status = 'failed'
-                        check.save()
+                    print(f"Processed {waiting_check.url} with score {
+                        waiting_check.score}")
+
+                except Exception as e:
+                    print(f"Error updating check {waiting_check.url}: {e}")
+                    waiting_check.status = 'failed'
+                    waiting_check.save()
 
             except Exception as e:
                 print(f"Error processing batch: {e}")
                 # Mark all checks in batch as pending
-                for check in waiting_checks:
-                    check.status = 'pending'
-                    check.save()
+                for waiting_check in waiting_check:
+                    waiting_check.status = 'pending'
+                    waiting_check.save()
 
             # Small delay between batches
             time.sleep(1)
