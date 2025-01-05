@@ -59,7 +59,8 @@ class Command(BaseCommand):
                         check.note_speed_index = url_metrics.get('speed-index', 0)
                         check.note_largest_contentful_paint = url_metrics.get('largest-contentful-paint', 0)
                         check.note_cumulative_layout_shift = url_metrics.get('cumulative-layout-shift', 0)
-                        
+                        check.json_data = url_metrics.get('json_response', {})
+
                         # Calculate overall score (average of all metrics)
                         check.score = sum(url_metrics.values()) / len(url_metrics) if url_metrics else 0
                         check.status = 'done'
