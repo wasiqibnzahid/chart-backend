@@ -137,11 +137,13 @@ def add_website_check(request):
             return JsonResponse({
                 'error': 'URL is required'
             }, status=400)
-            
-        website_check = WebsiteCheck.objects.create(
-            url=url,
-            status='waiting'
-        )
+        
+        website_check = WebsiteCheck.objects.filter(url=url, status='waiting').first()
+        if not website_check:
+            website_check = WebsiteCheck.objects.create(
+                url=url,
+                status='waiting'
+            )
         
         # Notify Lambda about new check
         try:

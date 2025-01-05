@@ -88,9 +88,8 @@ class Command(BaseCommand):
             except Exception as e:
                 print(f"Error processing batch: {e}")
                 # Mark all checks in batch as pending
-                for waiting_check in waiting_check:
-                    waiting_check.status = 'pending'
-                    waiting_check.save()
+                waiting_check.status = 'failed'
+                waiting_check.save()
 
             # Small delay between batches
             time.sleep(1)

@@ -131,7 +131,8 @@ def process_urls(extracted_urls, metrics, site, url_type="note", job_type="Not s
             
     # Calculate averages
     for key in metrics:
-        metrics[key] = metrics[key] / (total_values_count or 1)      
+        if(key != "json_response"):
+            metrics[key] = metrics[key] / (total_values_count or 1)      
 
     # Multiply performance scores by 100 to convert to percentage
     metrics["performance_score"] *= 100
