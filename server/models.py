@@ -1,9 +1,11 @@
 from django.db import models
+from django.utils import timezone
 from datetime import datetime, timedelta
 
 from django.db import models
 
 from server.constants import DEFAULT_DECIMAL_PLACES, DEFAULT_MAX_DIGITS
+
 
 class RecordCommonFields(models.Model):
     note_first_contentful_paint = models.DecimalField(
@@ -79,22 +81,23 @@ class RecordCommonFields(models.Model):
     class Meta:
         abstract = True
 
+
 class Site(models.Model):
     name = models.CharField(max_length=255)
-    sitemap_url = models.URLField(null=True,blank=True)
-    video_sitemap_url = models.URLField(null=True,blank=True)
-    note_sitemap_url = models.URLField(null=True,blank=True)
-    video_urls = models.JSONField(null=True,blank=True)
-    note_urls = models.JSONField(null=True,blank=True)
+    sitemap_url = models.URLField(null=True, blank=True)
+    video_sitemap_url = models.URLField(null=True, blank=True)
+    note_sitemap_url = models.URLField(null=True, blank=True)
+    video_urls = models.JSONField(null=True, blank=True)
+    note_urls = models.JSONField(null=True, blank=True)
 
     def __str__(self):
         return self.name
 
 
-
 class Record(RecordCommonFields):
     name = models.CharField(max_length=255)
-    site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True)
+    site = models.ForeignKey(
+        Site, on_delete=models.CASCADE, null=True, blank=True)
     note_value = models.FloatField(null=True, blank=True)
     video_value = models.FloatField(null=True, blank=True)
     total_value = models.FloatField(null=True, blank=True)
@@ -113,32 +116,32 @@ class ErrorLog(models.Model):
         return f"{self.message} - {self.created_at}"
 
 
-
 class LocalSite(models.Model):
     name = models.CharField(max_length=255)
-    sitemap_url = models.URLField(null=True,blank=True)
-    video_sitemap_url = models.URLField(null=True,blank=True)
-    note_sitemap_url = models.URLField(null=True,blank=True)
-    video_urls = models.JSONField(null=True,blank=True)
-    note_urls = models.JSONField(null=True,blank=True)
+    sitemap_url = models.URLField(null=True, blank=True)
+    video_sitemap_url = models.URLField(null=True, blank=True)
+    note_sitemap_url = models.URLField(null=True, blank=True)
+    video_urls = models.JSONField(null=True, blank=True)
+    note_urls = models.JSONField(null=True, blank=True)
 
     def __str__(self):
         return self.name
 
 
-
 class LocalRecord(RecordCommonFields):
     name = models.CharField(max_length=255)
-    site = models.ForeignKey(LocalSite, on_delete=models.CASCADE, null=True, blank=True)
+    site = models.ForeignKey(
+        LocalSite, on_delete=models.CASCADE, null=True, blank=True)
     note_value = models.FloatField(null=True, blank=True)
     video_value = models.FloatField(null=True, blank=True)
     total_value = models.FloatField(null=True, blank=True)
     azteca = models.BooleanField(default=False)
     date = models.DateField(null=True)
-    
+
     def __str__(self):
         return f"{self.name} - {self.total_value} - {self.date}"
-    
+
+
 class AmpRecord(RecordCommonFields):
     name = models.CharField(max_length=255)
     note_value = models.FloatField(null=True, blank=True)
@@ -157,10 +160,9 @@ class LocalErrorLog(models.Model):
 
     def __str__(self):
         return f"{self.message} - {self.created_at}"
-    
+
 # models.py
 
-from django.db import models
 
 class DataUpload(models.Model):
     TARGET_MODEL_CHOICES = [
@@ -173,10 +175,72 @@ class DataUpload(models.Model):
     ]
 
     data = models.TextField(help_text="Paste your data here.")
-    target_model = models.CharField(max_length=20, choices=TARGET_MODEL_CHOICES, default='record')
-    process_amp_values = models.BooleanField(choices=PROCESS_AMP_CHOICES, default=False)
+    target_model = models.CharField(
+        max_length=20, choices=TARGET_MODEL_CHOICES, default='record')
+    process_amp_values = models.BooleanField(
+        choices=PROCESS_AMP_CHOICES, default=False)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Data upload on {self.uploaded_at}"
 
+
+class WebsiteCheck(RecordCommonFields):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('waiting', 'Waiting'),
+        ('done', 'Done')
+    ]
+
+    url = models.URLField()
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='pending',
+        db_index=True  # Create index on status field
+    )
+    score = models.FloatField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.url} - {self.status}"
+
+
+class LastJobRun(models.Model):
+    last_run = models.DateTimeField()
+
+    class Meta:
+        # Ensure only one record exists
+        constraints = [
+            models.CheckConstraint(check=models.Q(
+                id=1), name='singleton_last_job_run')
+        ]
+
+    def save(self, *args, **kwargs):
+        self.id = 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def update_last_run(cls):
+        obj, _ = cls.objects.get_or_create(id=1)
+        obj.last_run = timezone.now()
+        obj.save()
+
+    @classmethod
+    def should_run(cls):
+        obj, _ = cls.objects.get_or_create(
+            id=1,
+            defaults={'last_run': timezone.now() - timedelta(days=1)}
+        )
+
+        now = timezone.now()
+
+        # Check if it's Monday between 4-6 AM
+        is_monday = now.weekday() == 0
+        is_time_window = 4 <= now.hour < 6
+
+        # Check if last run was not today
+        last_run_not_today = obj.last_run.date() != now.date()
+
+        return is_monday and is_time_window and last_run_not_today
