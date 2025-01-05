@@ -18,6 +18,8 @@ urlpatterns = [
     path('amp/quarter/', views.get_amp_quarterly, name='amp-quarter'),
     path('amp/insights/', views.get_amp_insights_api, name='amp-insights'),
     path('amp/performance/', AmpPerformanceReportView.as_view(), name='amp-performance'),
+    path('api/website-checks/', views.list_website_checks, name='list_website_checks'),
+    path('api/website-checks/add/', views.add_website_check, name='add_website_check'),
 
     # path('run_job', views.run_job, name='run_job'),
 ]

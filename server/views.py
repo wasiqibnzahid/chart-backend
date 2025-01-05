@@ -1,8 +1,11 @@
 from django.http import JsonResponse
 from .get_data import get_data, get_averages, get_insights
-from .models import LocalErrorLog
+from .models import LocalErrorLog, WebsiteCheck
 from server.local_data import local_data,local_quarter,local_insights
 from server.amp_data import amp_data
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+import json
 # Create your views here.
 
 
@@ -116,3 +119,60 @@ def get_amp_insights_api(request):
         "end": end
     })
     return JsonResponse(data, safe=False)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def add_website_check(request):
+    try:
+        data = json.loads(request.body)
+        url = data.get('url')
+        
+        if not url:
+            return JsonResponse({
+                'error': 'URL is required'
+            }, status=400)
+            
+        website_check = WebsiteCheck.objects.create(
+            url=url,
+            status='waiting'
+        )
+        
+        return JsonResponse({
+            'id': website_check.id,
+            'url': website_check.url,
+            'status': website_check.status,
+            'created_at': website_check.created_at.isoformat()
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'error': str(e)
+        }, status=500)
+
+@require_http_methods(["GET"])
+def list_website_checks(request):
+    try:
+        status = request.GET.get('status')
+        
+        checks = WebsiteCheck.objects.all()
+        if status:
+            checks = checks.filter(status=status)
+            
+        checks = checks.order_by('-created_at')
+        
+        return JsonResponse({
+            'checks': [{
+                'id': check.id,
+                'url': check.url,
+                'status': check.status,
+                'score': check.score,
+                'created_at': check.created_at.isoformat(),
+                'updated_at': check.updated_at.isoformat()
+            } for check in checks]
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'error': str(e)
+        }, status=500)
+
