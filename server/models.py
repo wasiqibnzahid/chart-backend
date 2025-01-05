@@ -206,7 +206,7 @@ class WebsiteCheck(models.Model):
     metrics = models.JSONField(default=dict)
 
     def __str__(self):
-        return f"{self.url} - {self.status}"
+        return f"{self.url} - {self.status} - {self.metrics}"
 
 
 class LastJobRun(models.Model):
