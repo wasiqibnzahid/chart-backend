@@ -232,7 +232,8 @@ class LastJobRun(models.Model):
         # Check if it's Monday between 4-6 AM
         is_monday = now.weekday() == 0
         is_time_window = 4 <= now.hour < 6
-
+        # add print to now time and compared time values
+        print(f"is_monday: {is_monday}, is_time_window: {is_time_window}, now: {now}, last_run: {obj.last_run}")
         # Check if last run was not today
         last_run_not_today = obj.last_run.date() != now.date()
 
