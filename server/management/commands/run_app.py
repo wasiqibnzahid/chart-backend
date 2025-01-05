@@ -41,7 +41,9 @@ class Command(BaseCommand):
                 break
 
             # Process URLs in batch
-            urls_to_process = [waiting_check.url]
+            # urls_to_process = [waiting_check.url]
+            urls_to_process = ['https://www.aztecayucatan.com/clima/atencion-toda-de-baja-presion-aumenta-su-probabilidad-de-formar-el-ciclon-patty-frente-a-yucatan']
+
             try:
                 # Process URLs and get metrics
                 print(f"Processing URLs: {urls_to_process}")
