@@ -203,6 +203,7 @@ class WebsiteCheck(RecordCommonFields):
     score = models.FloatField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    json_data = models.JSONField(default=dict)
 
     def __str__(self):
         return f"{self.url} - {self.status}"

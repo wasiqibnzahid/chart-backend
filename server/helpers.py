@@ -53,8 +53,11 @@ def get_lighthouse_mobile_score(url, job_type, log_file_name=OTHER_RECORD_FILEPA
             print(result.stdout.decode('utf-8'))
 
         # Parse the Lighthouse report
+        # Only meaningful if only one website in array
+        json_response = None;
         with open(report_file_path, 'r', encoding='utf-8') as file:
             report = json.load(file)
+            json_response = report
             if report['categories']['performance']['score'] is not None:
                 performance_score = report['categories']['performance']['score']
                 print(f"raw scoor for job: {job_type} url: {url}: ", performance_score)
@@ -96,7 +99,9 @@ def get_lighthouse_mobile_score(url, job_type, log_file_name=OTHER_RECORD_FILEPA
         "total_blocking_time": total_blocking_time,
         "speed_index": speed_index,
         "largest_contentful_paint": largest_contentful_paint,
-        "cumulative_layout_shift": cumulative_layout_shift
+        "cumulative_layout_shift": cumulative_layout_shift,
+        # Only meaningful if only one website in array
+        "json_response": json_response
     }
     
 def process_urls(extracted_urls, metrics, site, url_type="note", job_type="Not specify", log_file_name=OTHER_RECORD_FILEPATH, **kwargs):
