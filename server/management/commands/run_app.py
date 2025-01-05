@@ -51,6 +51,8 @@ class Command(BaseCommand):
                 # Update each check with its corresponding metrics
                 for check, url_metrics in zip(waiting_checks, metrics):
                     try:
+                        check.status = 'pending'
+                        check.save()
                         # Update all the performance metrics
                         check.note_first_contentful_paint = url_metrics.get('first-contentful-paint', 0)
                         check.note_total_blocking_time = url_metrics.get('total-blocking-time', 0)
@@ -67,7 +69,7 @@ class Command(BaseCommand):
                         
                     except Exception as e:
                         print(f"Error updating check {check.url}: {e}")
-                        check.status = 'pending'
+                        check.status = 'failed'
                         check.save()
                     
             except Exception as e:

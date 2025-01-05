@@ -189,6 +189,7 @@ class WebsiteCheck(RecordCommonFields):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('waiting', 'Waiting'),
+        ('failed', 'Failed'),
         ('done', 'Done')
     ]
 
