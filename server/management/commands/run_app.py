@@ -48,6 +48,8 @@ class Command(BaseCommand):
             try:
                 # Process URLs and get metrics
                 print(f"Processing URLs: {urls_to_process}")
+                waiting_check.status = 'pending'
+                waiting_check.save()
                 url_metrics = get_lighthouse_mobile_score(
                     urls_to_process,
                     job_type="WEBSITE_CHECK"
@@ -56,9 +58,8 @@ class Command(BaseCommand):
                 # Update each check with its corresponding metrics
 
                 try:
-                    waiting_check.status = 'pending'
+                    
                     print(f"CHECK IS {waiting_check}")
-                    waiting_check.save()
                     # Update all the performance metrics
                     print(f" metrics are {url_metrics}")
                     if url_metrics.get(

@@ -35,6 +35,7 @@ def get_lighthouse_mobile_score(url, job_type, log_file_name=OTHER_RECORD_FILEPA
     report_file_path_rel = sanitize_filename(f"report_{url}.json")
     report_file_path = f'{os.getcwd()}/{report_file_path_rel}'
 
+    json_response = None;
     try:
         # Run Lighthouse and generate a JSON report
         # command = f'lighthouse --no-enable-error-reporting --chrome-flags="--headless" --output=json --output-path="{report_file_path_rel}" "{url}"'
@@ -54,7 +55,6 @@ def get_lighthouse_mobile_score(url, job_type, log_file_name=OTHER_RECORD_FILEPA
 
         # Parse the Lighthouse report
         # Only meaningful if only one website in array
-        json_response = None;
         with open(report_file_path, 'r', encoding='utf-8') as file:
             report = json.load(file)
             json_response = report
