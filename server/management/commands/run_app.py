@@ -75,6 +75,7 @@ class Command(BaseCommand):
                     waiting_check.score = sum(url_metrics.values()) / \
                         len(url_metrics) if url_metrics else 0
                     waiting_check.status = 'done'
+                    print(f" NEW CHECK IS {waiting_check}")
                     waiting_check.save()
 
                     print(f"Processed {waiting_check.url} with score {
