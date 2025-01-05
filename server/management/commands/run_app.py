@@ -34,7 +34,7 @@ class Command(BaseCommand):
                 status__in=['waiting', 'failed']
             ).order_by('created_at')[:1]
             print(f"Waiting checks: {waiting_checks}")
-            
+            print(f" ALL ITEMS ARE {WebsiteCheck.objects.all()}")
             if not waiting_checks:
                 print("No pending website checks, shutting down...")
                 break
