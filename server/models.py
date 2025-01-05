@@ -210,13 +210,6 @@ class WebsiteCheck(RecordCommonFields):
 class LastJobRun(models.Model):
     last_run = models.DateTimeField()
 
-    class Meta:
-        # Ensure only one record exists
-        constraints = [
-            models.CheckConstraint(check=models.Q(
-                id=1), name='singleton_last_job_run')
-        ]
-
     def save(self, *args, **kwargs):
         self.id = 1
         super().save(*args, **kwargs)
