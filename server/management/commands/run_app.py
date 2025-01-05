@@ -43,7 +43,7 @@ class Command(BaseCommand):
 
             # Process URLs in batch
             # urls_to_process = [waiting_check.url]
-            urls_to_process = 'https://www.aztecayucatan.com/clima/atencion-toda-de-baja-presion-aumenta-su-probabilidad-de-formar-el-ciclon-patty-frente-a-yucatan'
+            urls_to_process = 'https://www.tvazteca.com/aztecauno/lo-que-callamos-las-mujeres/rocio-un-llanto-en-silencio'
 
             try:
                 # Process URLs and get metrics
