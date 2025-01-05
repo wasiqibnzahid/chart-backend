@@ -120,7 +120,10 @@ def process_urls(extracted_urls, metrics, site, url_type="note", job_type="Not s
             if res["performance_score"] != 0:
                 successful_site_performance +=1
                 for key in metrics:
-                    metrics[key] += res[key]
+                    if(key != "json_response"):
+                        metrics[key] += res[key]
+                    else:
+                        metrics[key] = res[key]
                 total_values_count += 1
         except Exception as e:
             log = ErrorLog(message=f"Failed for {url_type} URL {url}: {e}")

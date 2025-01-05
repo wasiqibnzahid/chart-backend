@@ -31,7 +31,8 @@ class Command(BaseCommand):
             # Get waiting items in batches of 10
             waiting_checks = WebsiteCheck.objects.filter(
                 status='waiting'
-            ).order_by('created_at')[:10]
+            ).order_by('created_at')[:1]
+            print(f"Waiting checks: {waiting_checks}")
             
             if not waiting_checks:
                 print("No pending website checks, shutting down...")
@@ -41,6 +42,7 @@ class Command(BaseCommand):
             urls_to_process = [check.url for check in waiting_checks]
             try:
                 # Process URLs and get metrics
+                print(f"Processing URLs: {urls_to_process}")
                 metrics = process_urls(
                     urls_to_process, 
                     PERFORMANCE_METRICS.copy(),
