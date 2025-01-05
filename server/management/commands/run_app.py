@@ -4,6 +4,7 @@ from datetime import datetime
 from django.core.management import call_command
 from ...models import LastJobRun, WebsiteCheck
 from .run_job import process_urls
+from ...helpers import get_lighthouse_mobile_score
 from server.constants import PERFORMANCE_METRICS
 import time
 
@@ -47,7 +48,7 @@ class Command(BaseCommand):
             try:
                 # Process URLs and get metrics
                 print(f"Processing URLs: {urls_to_process}")
-                url_metrics = process_urls(
+                url_metrics = get_lighthouse_mobile_score(
                     urls_to_process,
                     PERFORMANCE_METRICS.copy(),
                     None,  # No site object needed for this case
