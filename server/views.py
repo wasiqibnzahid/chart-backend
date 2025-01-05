@@ -6,6 +6,12 @@ from server.amp_data import amp_data
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 import json
+import requests
+from django.conf import settings
+
+# Add constant for Lambda URL
+LAMBDA_URL = "https://hpuyeonhb3mctgalziaie3py7m0vnqfk.lambda-url.us-east-1.on.aws/"
+
 # Create your views here.
 
 
@@ -137,6 +143,13 @@ def add_website_check(request):
             status='waiting'
         )
         
+        # Notify Lambda about new check
+        try:
+            response = requests.get(LAMBDA_URL)
+            print(f"Lambda notification response for new check: {response.text}")
+        except Exception as e:
+            print(f"Error notifying Lambda about new check: {e}")
+        
         return JsonResponse({
             'id': website_check.id,
             'url': website_check.url,
@@ -152,11 +165,10 @@ def add_website_check(request):
 @require_http_methods(["GET"])
 def list_website_checks(request):
     try:
-        status = request.GET.get('status')
-        
-        checks = WebsiteCheck.objects.all()
-        if status:
-            checks = checks.filter(status=status)
+        site = request.GET.get('site')
+        checks = WebsiteCheck.objects.filter(url=site)
+        if site:
+            checks = checks.filter(url=site)
             
         checks = checks.order_by('-created_at')
         
@@ -167,7 +179,20 @@ def list_website_checks(request):
                 'status': check.status,
                 'score': check.score,
                 'created_at': check.created_at.isoformat(),
-                'updated_at': check.updated_at.isoformat()
+                'updated_at': check.updated_at.isoformat(),
+                # Add all performance metrics
+                'metrics': {
+                    'first_contentful_paint': check.note_first_contentful_paint,
+                    'total_blocking_time': check.note_total_blocking_time,
+                    'speed_index': check.note_speed_index,
+                    'largest_contentful_paint': check.note_largest_contentful_paint,
+                    'cumulative_layout_shift': check.note_cumulative_layout_shift,
+                    'video_first_contentful_paint': check.video_first_contentful_paint,
+                    'video_total_blocking_time': check.video_total_blocking_time,
+                    'video_speed_index': check.video_speed_index,
+                    'video_largest_contentful_paint': check.video_largest_contentful_paint,
+                    'video_cumulative_layout_shift': check.video_cumulative_layout_shift,
+                }
             } for check in checks]
         })
         
