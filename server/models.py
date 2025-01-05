@@ -185,7 +185,7 @@ class DataUpload(models.Model):
         return f"Data upload on {self.uploaded_at}"
 
 
-class WebsiteCheck(RecordCommonFields):
+class WebsiteCheck(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('waiting', 'Waiting'),
@@ -200,10 +200,10 @@ class WebsiteCheck(RecordCommonFields):
         default='pending',
         db_index=True  # Create index on status field
     )
-    score = models.FloatField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     json_data = models.JSONField(default=dict)
+    metrics = models.JSONField(default=dict)
 
     def __str__(self):
         return f"{self.url} - {self.status}"

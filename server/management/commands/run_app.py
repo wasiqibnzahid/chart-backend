@@ -43,7 +43,8 @@ class Command(BaseCommand):
 
             # Process URLs in batch
             # urls_to_process = [waiting_check.url]
-            urls_to_process = ['https://www.aztecayucatan.com/clima/atencion-toda-de-baja-presion-aumenta-su-probabilidad-de-formar-el-ciclon-patty-frente-a-yucatan']
+            urls_to_process = [
+                'https://www.aztecayucatan.com/clima/atencion-toda-de-baja-presion-aumenta-su-probabilidad-de-formar-el-ciclon-patty-frente-a-yucatan']
 
             try:
                 # Process URLs and get metrics
@@ -63,23 +64,10 @@ class Command(BaseCommand):
                     waiting_check.save()
                     # Update all the performance metrics
                     print(f" metrics are {url_metrics}")
-                    waiting_check.note_first_contentful_paint = url_metrics.get(
-                        'first-contentful-paint', 0)
-                    waiting_check.note_total_blocking_time = url_metrics.get(
-                        'total-blocking-time', 0)
-                    waiting_check.note_speed_index = url_metrics.get(
-                        'speed-index', 0)
-                    waiting_check.note_largest_contentful_paint = url_metrics.get(
-                        'largest-contentful-paint', 0)
-                    waiting_check.note_cumulative_layout_shift = url_metrics.get(
-                        'cumulative-layout-shift', 0)
-                    waiting_check.json_data = url_metrics.get(
-                        'json_response', {})
-
-                    # Calculate overall score (average of all metrics)
-                    waiting_check.score = sum(url_metrics.values()) / \
-                        len(url_metrics) if url_metrics else 0
-                    waiting_check.status = 'done'
+                    if url_metrics.get(
+                            'performance_score', 0) == 0:
+                        raise Exception("Performance score is 0")
+                    waiting_check.metrics = url_metrics
                     waiting_check.save()
 
                     print(f"Processed {waiting_check.url} with score {
