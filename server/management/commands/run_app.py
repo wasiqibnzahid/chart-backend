@@ -33,7 +33,7 @@ class Command(BaseCommand):
         while True:
             # Get waiting items in batches of 10
             waiting_check = WebsiteCheck.objects.filter(
-                status='waiting'
+                status__in=['waiting', 'pending']
             ).first()
             print(f"Waiting checks: {waiting_check}")
 
