@@ -182,7 +182,8 @@ def list_website_checks(request):
                 'json': check.json_data,
                 'created_at': check.created_at.isoformat(),
                 'updated_at': check.updated_at.isoformat(),
-                'metrics': check.metrics
+                'metrics': check.metrics,
+                "json_url": check.json_url
             } for check in checks]
         })
         
