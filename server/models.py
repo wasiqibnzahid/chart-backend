@@ -202,7 +202,7 @@ class WebsiteCheck(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    json_data = models.JSONField(default=dict)
+    json_url = models.URLField(null=True, blank=True)
     metrics = models.JSONField(default=dict)
 
     def __str__(self):
@@ -235,7 +235,8 @@ class LastJobRun(models.Model):
         is_monday = now.weekday() == 0
         is_time_window = 0 <= now.hour < 12
         # add print to now time and compared time values
-        print(f"is_monday: {is_monday}, is_time_window: {is_time_window}, now: {now}, last_run: {obj.last_run}")
+        print(f"is_monday: {is_monday}, is_time_window: {
+              is_time_window}, now: {now}, last_run: {obj.last_run}")
         # Check if last run was not today
         last_run_not_today = obj.last_run.date() != now.date()
 

@@ -3,6 +3,11 @@ from datetime import datetime
 from typing import TypedDict, List, Optional, Dict, Any
 import pandas as pd
 import numpy as np
+import boto3
+from django.conf import settings
+import os
+from botocore.exceptions import ClientError
+import json
 
 from server.models import AmpRecord
 
@@ -233,3 +238,32 @@ def process_data_and_create_records(data, target_model_name, process_amp_values)
         errors.append(str(e))
 
     return errors
+
+def upload_to_s3(json_data, file_name):
+    """
+    Upload JSON data to S3 bucket
+    Returns the URL of the uploaded file or None if failed
+    """
+    try:
+        # Use instance profile credentials
+        s3_client = boto3.client('s3')
+        
+        # Convert JSON to string if it's a dict
+        if isinstance(json_data, dict):
+            json_data = json.dumps(json_data)
+            
+        # Upload the file
+        s3_client.put_object(
+            Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+            Key=file_name,
+            Body=json_data,
+            ContentType='application/json'
+        )
+        
+        # Generate the URL
+        url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.{settings.AWS_REGION}.amazonaws.com/{file_name}"
+        return url
+        
+    except ClientError as e:
+        print(f"Error uploading to S3: {e}")
+        return None

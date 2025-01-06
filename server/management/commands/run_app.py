@@ -5,8 +5,10 @@ from django.core.management import call_command
 from ...models import LastJobRun, WebsiteCheck
 from .run_job import process_urls
 from ...helpers import get_lighthouse_mobile_score
+from ...utils import upload_to_s3
 from server.constants import PERFORMANCE_METRICS
 import time
+import uuid
 
 
 class Command(BaseCommand):
@@ -20,10 +22,9 @@ class Command(BaseCommand):
             print("Running main jobs...")
 
             # Run all three jobs
-            # TODO: Uncomment this
-            # call_command('run_job')
-            # call_command('local_job')
-            # call_command('amp_job')
+            call_command('run_job')
+            call_command('local_job')
+            call_command('amp_job')
 
             # Update last run time
             LastJobRun.update_last_run()
@@ -41,28 +42,34 @@ class Command(BaseCommand):
                 print("No pending website checks, shutting down...")
                 break
 
-            # Process URLs in batch
-            # urls_to_process = [waiting_check.url]
-            urls_to_process = 'https://www.tvazteca.com/aztecauno/lo-que-callamos-las-mujeres/rocio-un-llanto-en-silencio'
-
             try:
                 # Process URLs and get metrics
-                print(f"Processing URLs: {urls_to_process}")
+                print(f"Processing URL: {waiting_check.url}")
                 waiting_check.status = 'pending'
                 waiting_check.save()
+
+                # Generate unique filename for S3
+                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                unique_id = str(uuid.uuid4())[:8]
+                filename = f"lighthouse/{timestamp}_{unique_id}.json"
+
                 url_metrics = get_lighthouse_mobile_score(
-                    urls_to_process,
-                    job_type="WEBSITE_CHECK"
+                    waiting_check.url,
+                    job_type="WEBSITE_CHECK",
+                    should_save_json=True
                 )
 
-                # Update each check with its corresponding metrics
-
                 try:
-
-                    # Update all the performance metrics
-                    if url_metrics.get(
-                            'performance_score', 0) == 0:
+                    if url_metrics.get('performance_score', 0) == 0:
                         raise Exception("Performance score is 0")
+
+                    # Upload JSON to S3
+                    if 'json_response' in url_metrics:
+                        s3_url = upload_to_s3(url_metrics['json_response'], filename)
+                        if s3_url:
+                            waiting_check.json_url = s3_url
+
+                    # Update metrics
                     waiting_check.metrics = {
                         "performance_score": url_metrics["performance_score"],
                         "first_contentful_paint": url_metrics["first_contentful_paint"],
@@ -71,14 +78,10 @@ class Command(BaseCommand):
                         "largest_contentful_paint": url_metrics["largest_contentful_paint"],
                         "cumulative_layout_shift": url_metrics["cumulative_layout_shift"],
                     }
-                    waiting_check.json_data = url_metrics["json_response"]
-                    # set all items where url is same their json_data to {}
-                    WebsiteCheck.objects.filter(
-                        url=waiting_check.url).update(json_data={})
                     waiting_check.status = 'done'
                     waiting_check.save()
 
-                    print(f"Processed {waiting_check} with score")
+                    print(f"Processed {waiting_check.url} successfully")
 
                 except Exception as e:
                     print(f"Error updating check {waiting_check.url}: {e}")
@@ -86,10 +89,9 @@ class Command(BaseCommand):
                     waiting_check.save()
 
             except Exception as e:
-                print(f"Error processing batch: {e}")
-                # Mark all checks in batch as pending
+                print(f"Error processing URL: {e}")
                 waiting_check.status = 'failed'
                 waiting_check.save()
 
-            # Small delay between batches
+            # Small delay between checks
             time.sleep(1)

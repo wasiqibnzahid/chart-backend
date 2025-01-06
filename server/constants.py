@@ -21,5 +21,4 @@ PERFORMANCE_METRICS = {
     "speed_index": 0,
     "largest_contentful_paint": 0,
     "cumulative_layout_shift": 0,
-    "json_response": {}
 }

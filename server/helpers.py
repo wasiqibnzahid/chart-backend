@@ -11,17 +11,20 @@ import threading
 from server.constants import AMP_PARAMS, FACTOR, OTHER_RECORD_FILEPATH
 from server.models import ErrorLog
 
+
 def write_text_to_file(text, filename=OTHER_RECORD_FILEPATH):
     # Open the file in append mode; create it if it doesn't exist
     with open(filename, "a") as file:
         # Write the text with a newline at the end
         file.write(text + "\n")
-        
+
+
 def sanitize_filename(url):
     """Sanitize the URL to create a safe filename."""
     return re.sub(r'[\/:*?"<>|]', '_', url)
-        
-def get_lighthouse_mobile_score(url, job_type, log_file_name=OTHER_RECORD_FILEPATH):
+
+
+def get_lighthouse_mobile_score(url, job_type, log_file_name=OTHER_RECORD_FILEPATH, should_save_json=False):
     """
     Fetch Lighthouse performance metrics for a given URL.
     Divides time-based metrics by 1000 to convert from ms to s.
@@ -35,7 +38,7 @@ def get_lighthouse_mobile_score(url, job_type, log_file_name=OTHER_RECORD_FILEPA
     report_file_path_rel = sanitize_filename(f"report_{url}.json")
     report_file_path = f'{os.getcwd()}/{report_file_path_rel}'
 
-    json_response = None;
+    json_response = None
     try:
         # Run Lighthouse and generate a JSON report
         # command = f'lighthouse --no-enable-error-reporting --chrome-flags="--headless" --output=json --output-path="{report_file_path_rel}" "{url}"'
@@ -50,41 +53,55 @@ def get_lighthouse_mobile_score(url, job_type, log_file_name=OTHER_RECORD_FILEPA
         code = result.check_returncode()
 
         if code != 0:
-            write_text_to_file(f"FOR URL {url} ERROR IS {result.stdout.decode('utf-8')}"), log_file_name
+            write_text_to_file(f"FOR URL {url} ERROR IS {
+                               result.stdout.decode('utf-8')}"), log_file_name
             print(result.stdout.decode('utf-8'))
 
         # Parse the Lighthouse report
         # Only meaningful if only one website in array
         with open(report_file_path, 'r', encoding='utf-8') as file:
             report = json.load(file)
-            json_response = report
+            if should_save_json:
+                json_response = report
             if report['categories']['performance']['score'] is not None:
                 performance_score = report['categories']['performance']['score']
-                print(f"raw scoor for job: {job_type} url: {url}: ", performance_score)
-                if(performance_score == 0):
-                    write_text_to_file(f"FOR URL {url} SCORE IS 0", filename=OTHER_RECORD_FILEPATH)
+                print(f"raw scoor for job: {job_type} url: {
+                      url}: ", performance_score)
+                if (performance_score == 0):
+                    write_text_to_file(
+                        f"FOR URL {url} SCORE IS 0", filename=OTHER_RECORD_FILEPATH)
                 if performance_score >= 100:
                     performance_score = 100
 
             audits = report.get('audits', {})
             # Divide time-based metrics by 1000 to convert from ms to s
-            first_contentful_paint = audits.get('first-contentful-paint', {}).get('numericValue', 0) / 1000
-            total_blocking_time = audits.get('total-blocking-time', {}).get('numericValue', 0) / 1000
-            speed_index = audits.get('speed-index', {}).get('numericValue', 0) / 1000
-            largest_contentful_paint = audits.get('largest-contentful-paint', {}).get('numericValue', 0) / 1000
-            cumulative_layout_shift = audits.get('cumulative-layout-shift', {}).get('numericValue', 0)
+            first_contentful_paint = audits.get(
+                'first-contentful-paint', {}).get('numericValue', 0) / 1000
+            total_blocking_time = audits.get(
+                'total-blocking-time', {}).get('numericValue', 0) / 1000
+            speed_index = audits.get(
+                'speed-index', {}).get('numericValue', 0) / 1000
+            largest_contentful_paint = audits.get(
+                'largest-contentful-paint', {}).get('numericValue', 0) / 1000
+            cumulative_layout_shift = audits.get(
+                'cumulative-layout-shift', {}).get('numericValue', 0)
 
             write_text_to_file(f"METRICS FOR URL {url}: "
                                f"Performance Score: {performance_score}, "
-                               f"First Contentful Paint: {first_contentful_paint} s, "
-                               f"Total Blocking Time: {total_blocking_time} s, "
+                               f"First Contentful Paint: {
+                                   first_contentful_paint} s, "
+                               f"Total Blocking Time: {
+                                   total_blocking_time} s, "
                                f"Speed Index: {speed_index} s, "
-                               f"Largest Contentful Paint: {largest_contentful_paint} s, "
+                               f"Largest Contentful Paint: {
+                                   largest_contentful_paint} s, "
                                f"Cumulative Layout Shift: {cumulative_layout_shift}", log_file_name)
 
     except subprocess.CalledProcessError as e:
-        write_text_to_file(f"FOR URL {url} ERROR: {e.stderr.decode('utf-8')}", log_file_name)
-        print(f"Error running Lighthouse for {url}: {e.stderr.decode('utf-8')}")
+        write_text_to_file(f"FOR URL {url} ERROR: {
+                           e.stderr.decode('utf-8')}", log_file_name)
+        print(f"Error running Lighthouse for {
+              url}: {e.stderr.decode('utf-8')}")
     except Exception as e:
         write_text_to_file(f"FOR URL {url} GENERAL ERROR: {e}", log_file_name)
         print(f"General error processing {url}: {e}")
@@ -92,18 +109,20 @@ def get_lighthouse_mobile_score(url, job_type, log_file_name=OTHER_RECORD_FILEPA
         # Clean up the report file
         if os.path.exists(report_file_path):
             os.remove(report_file_path)
-
-    return {
+    res = {
         "performance_score": performance_score,
         "first_contentful_paint": first_contentful_paint,
         "total_blocking_time": total_blocking_time,
         "speed_index": speed_index,
         "largest_contentful_paint": largest_contentful_paint,
         "cumulative_layout_shift": cumulative_layout_shift,
-        # Only meaningful if only one website in array
-        "json_response": json_response
+
     }
-    
+    if should_save_json:
+        res["json_response"] = json_response
+    return res
+
+
 def process_urls(extracted_urls, metrics, site, url_type="note", job_type="Not specify", log_file_name=OTHER_RECORD_FILEPATH, **kwargs):
     is_amp = kwargs.get("is_amp", False)
     total_values_count = 0
@@ -115,29 +134,28 @@ def process_urls(extracted_urls, metrics, site, url_type="note", job_type="Not s
         if successful_site_performance >= 10:
             break
         try:
-            res = get_lighthouse_mobile_score(url, job_type, log_file_name=log_file_name)
-            print(f"{job_type} Metrics for {url_type} URL {url} for site {site.name}: {res}")
+            res = get_lighthouse_mobile_score(
+                url, job_type, log_file_name=log_file_name)
+            print(f"{job_type} Metrics for {url_type} URL {
+                  url} for site {site.name}: {res}")
             if res["performance_score"] != 0:
-                successful_site_performance +=1
+                successful_site_performance += 1
                 for key in metrics:
-                    if(key != "json_response"):
-                        metrics[key] += res[key]
-                    else:
-                        metrics[key] = res[key]
+                    metrics[key] += res[key]
                 total_values_count += 1
         except Exception as e:
             log = ErrorLog(message=f"Failed for {url_type} URL {url}: {e}")
             log.save()
-            
+
     # Calculate averages
     for key in metrics:
-        if(key != "json_response"):
-            metrics[key] = metrics[key] / (total_values_count or 1)      
+        metrics[key] = metrics[key] / (total_values_count or 1)
 
     # Multiply performance scores by 100 to convert to percentage
     metrics["performance_score"] *= 100
-    
+
     return metrics
+
 
 def create_or_update_record(model_class, note_metrics, video_metrics, site, date):
     """
@@ -145,11 +163,12 @@ def create_or_update_record(model_class, note_metrics, video_metrics, site, date
     """
     try:
         # Calculate total value (example: average of note and video performance scores)
-        total_value = (note_metrics["performance_score"] + video_metrics["performance_score"]) / 2
-        
+        total_value = (note_metrics["performance_score"] +
+                       video_metrics["performance_score"]) / 2
+
         # Create the record using the provided model class
         record, created = model_class.objects.update_or_create(
-            name=site.name, 
+            name=site.name,
             date=date,
             defaults={
                 'note_value': note_metrics.get("performance_score", 0),
@@ -172,13 +191,14 @@ def create_or_update_record(model_class, note_metrics, video_metrics, site, date
         )
 
         return record
-    
+
     except Exception as e:
         # print(f"Error creating record for site {site.name}: {e}")
         # Optionally log the error to a database or a file
         log = ErrorLog(message=f"Error creating record for {site.name}: {e}")
         log.save()
         return None
+
 
 def create_record_if_not_exists(model_class, site, date):
     """
@@ -187,7 +207,7 @@ def create_record_if_not_exists(model_class, site, date):
     try:
         # Attempt to get an existing record. If it doesn't exist, create a new one.
         record, created = model_class.objects.get_or_create(
-            name=site.name, 
+            name=site.name,
             date=date,
             defaults={
                 'note_value': 0,
@@ -198,13 +218,15 @@ def create_record_if_not_exists(model_class, site, date):
         )
 
         return record, created
-    
+
     except Exception as e:
         # print(f"Error creating default record for site {site.name}: {e}")
         # Optionally log the error to a database or a file
-        log = ErrorLog(message=f"Error creating default record for {site.name}: {e}")
+        log = ErrorLog(message=f"Error creating default record for {
+                       site.name}: {e}")
         log.save()
         return None
+
 
 def get_weeks_in_past_six_months():
     # Get today's date
@@ -215,7 +237,8 @@ def get_weeks_in_past_six_months():
     start_of_week = today - timedelta(days=days_since_monday)
 
     # Calculate the date 6 months ago
-    six_months_ago = today - timedelta(weeks=4 * 6)  # Approximation of 6 months
+    # Approximation of 6 months
+    six_months_ago = today - timedelta(weeks=4 * 6)
 
     # List to store the weeks
     weeks = []
@@ -228,6 +251,7 @@ def get_weeks_in_past_six_months():
 
     return weeks
 
+
 def get_previous_months_of_current_year():
     current_year = datetime.now().year
 
@@ -235,15 +259,17 @@ def get_previous_months_of_current_year():
     current_month = datetime.now().month
 
     # Generate a list of previous months (excluding the current month)
-    previous_months = [f"{current_year}-{month:02d}" for month in range(1, current_month)]
-    
+    previous_months = [
+        f"{current_year}-{month:02d}" for month in range(1, current_month)]
+
     return previous_months
+
 
 def create_empty_records(sites, model_class):
     today = datetime.today()
     monday_of_current_week = today - timedelta(days=today.weekday())
     date = monday_of_current_week.date()
-    
+
     records_to_create = []
 
     for site in sites:
