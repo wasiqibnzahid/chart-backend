@@ -59,7 +59,6 @@ class Command(BaseCommand):
 
                 try:
 
-                    print(f"CHECK IS {waiting_check}")
                     # Update all the performance metrics
                     if url_metrics.get(
                             'performance_score', 0) == 0:
