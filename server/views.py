@@ -179,22 +179,10 @@ def list_website_checks(request):
                 'id': check.id,
                 'url': check.url,
                 'status': check.status,
-                'score': check.score,
+                'json': check.json_data,
                 'created_at': check.created_at.isoformat(),
                 'updated_at': check.updated_at.isoformat(),
-                # Add all performance metrics
-                'metrics': {
-                    'first_contentful_paint': check.note_first_contentful_paint,
-                    'total_blocking_time': check.note_total_blocking_time,
-                    'speed_index': check.note_speed_index,
-                    'largest_contentful_paint': check.note_largest_contentful_paint,
-                    'cumulative_layout_shift': check.note_cumulative_layout_shift,
-                    'video_first_contentful_paint': check.video_first_contentful_paint,
-                    'video_total_blocking_time': check.video_total_blocking_time,
-                    'video_speed_index': check.video_speed_index,
-                    'video_largest_contentful_paint': check.video_largest_contentful_paint,
-                    'video_cumulative_layout_shift': check.video_cumulative_layout_shift,
-                }
+                'metrics': check.metrics
             } for check in checks]
         })
         
