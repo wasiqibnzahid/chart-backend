@@ -179,7 +179,6 @@ def list_website_checks(request):
                 'id': check.id,
                 'url': check.url,
                 'status': check.status,
-                'json': check.json_data,
                 'created_at': check.created_at.isoformat(),
                 'updated_at': check.updated_at.isoformat(),
                 'metrics': check.metrics,
