@@ -80,7 +80,7 @@ class Command(BaseCommand):
                     waiting_check.save()
 
                     print(f"Processed {waiting_check.url} with score {
-                        waiting_check.score}")
+                        waiting_check.metrics}")
 
                 except Exception as e:
                     print(f"Error updating check {waiting_check.url}: {e}")
