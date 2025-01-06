@@ -168,12 +168,10 @@ def add_website_check(request):
 def list_website_checks(request):
     try:
         site = request.GET.get('site')
-        checks = WebsiteCheck.objects.filter(url=site)
+        checks = [];
         if site:
-            checks = checks.filter(url=site)
+            checks = WebsiteCheck.objects.filter(url=site)
             
-        checks = checks.order_by('-created_at')
-        
         return JsonResponse({
             'checks': [{
                 'id': check.id,
