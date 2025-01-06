@@ -20,9 +20,10 @@ class Command(BaseCommand):
             print("Running main jobs...")
 
             # Run all three jobs
-            call_command('run_job')
-            call_command('local_job')
-            call_command('amp_job')
+            # TODO: Uncomment this
+            # call_command('run_job')
+            # call_command('local_job')
+            # call_command('amp_job')
 
             # Update last run time
             LastJobRun.update_last_run()
