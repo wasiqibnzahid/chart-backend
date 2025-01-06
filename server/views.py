@@ -137,9 +137,10 @@ def add_website_check(request):
             return JsonResponse({
                 'error': 'URL is required'
             }, status=400)
-        
+        is_found = True
         website_check = WebsiteCheck.objects.filter(url=url, status__in=['waiting', 'pending']).first()
         if not website_check:
+            is_found = False
             website_check = WebsiteCheck.objects.create(
                 url=url,
                 status='waiting'
@@ -156,6 +157,7 @@ def add_website_check(request):
             'id': website_check.id,
             'url': website_check.url,
             'status': website_check.status,
+            'is_found': is_found,
             'created_at': website_check.created_at.isoformat()
         })
         
