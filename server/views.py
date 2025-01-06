@@ -126,12 +126,9 @@ def get_amp_insights_api(request):
     })
     return JsonResponse(data, safe=False)
 
-@csrf_exempt
-@require_http_methods(["POST"])
 def add_website_check(request):
     try:
-        data = json.loads(request.body)
-        url = data.get('url')
+        url = request.GET.get('url')
         
         if not url:
             return JsonResponse({
