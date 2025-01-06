@@ -35,7 +35,7 @@ class Command(BaseCommand):
             waiting_check = WebsiteCheck.objects.filter(
                 status__in=['waiting', 'pending']
             ).first()
-            print(f"Waiting checks: {waiting_check.url}")
+            print(f"Waiting checks: {waiting_check}")
 
             if not waiting_check:
                 print("No pending website checks, shutting down...")
@@ -78,8 +78,7 @@ class Command(BaseCommand):
                     waiting_check.status = 'done'
                     waiting_check.save()
 
-                    print(f"Processed {waiting_check.url} with score {
-                        waiting_check.metrics}")
+                    print(f"Processed {waiting_check} with score")
 
                 except Exception as e:
                     print(f"Error updating check {waiting_check.url}: {e}")
