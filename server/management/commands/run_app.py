@@ -35,7 +35,7 @@ class Command(BaseCommand):
             waiting_check = WebsiteCheck.objects.filter(
                 status__in=['waiting', 'pending']
             ).first()
-            print(f"Waiting checks: {waiting_check}")
+            print(f"Waiting checks: {waiting_check.url}")
 
             if not waiting_check:
                 print("No pending website checks, shutting down...")
