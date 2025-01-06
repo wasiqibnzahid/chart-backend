@@ -21,7 +21,9 @@ def notify_waiting_items():
             except Exception as e:
                 print(f"Error notifying Lambda: {e}")
                 return False
-        return False
+        else:
+            print("No waiting items found")
+            return False
     except Exception as e:
         print(f"Error checking waiting items: {e}")
         return False
