@@ -58,14 +58,23 @@ class Command(BaseCommand):
                 # Update each check with its corresponding metrics
 
                 try:
-                    
+
                     print(f"CHECK IS {waiting_check}")
                     # Update all the performance metrics
-                    print(f" metrics are {url_metrics}")
                     if url_metrics.get(
                             'performance_score', 0) == 0:
                         raise Exception("Performance score is 0")
-                    waiting_check.metrics = url_metrics
+                    waiting_check.metrics = {
+                        "performance_score": url_metrics["performance_score"],
+                        "first_contentful_paint": url_metrics["first_contentful_paint"],
+                        "total_blocking_time": url_metrics["total_blocking_time"],
+                        "speed_index": url_metrics["speed_index"],
+                        "largest_contentful_paint": url_metrics["largest_contentful_paint"],
+                        "cumulative_layout_shift": url_metrics["cumulative_layout_shift"],
+                    }
+                    waiting_check.json_data = url_metrics["json_response"]
+                    # set all items where url is same their json_data to {}
+                    WebsiteCheck.objects.filter(url=waiting_check.url).update(json_data={})
                     waiting_check.save()
 
                     print(f"Processed {waiting_check.url} with score {
