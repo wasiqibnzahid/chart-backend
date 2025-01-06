@@ -138,7 +138,7 @@ def add_website_check(request):
                 'error': 'URL is required'
             }, status=400)
         
-        website_check = WebsiteCheck.objects.filter(url=url, status='waiting').first()
+        website_check = WebsiteCheck.objects.filter(url=url, status__in=['waiting', 'pending']).first()
         if not website_check:
             website_check = WebsiteCheck.objects.create(
                 url=url,
