@@ -31,10 +31,9 @@ class Command(BaseCommand):
         # Process pending website checks
         while True:
             # Get waiting items in batches of 10
-            # filter(
-            #     status='waiting'
-            # )
-            waiting_check = WebsiteCheck.objects.first()
+            waiting_check = WebsiteCheck.objects.filter(
+                status='waiting'
+            ).first()
             print(f"Waiting checks: {waiting_check}")
 
             if not waiting_check:
@@ -74,7 +73,8 @@ class Command(BaseCommand):
                     }
                     waiting_check.json_data = url_metrics["json_response"]
                     # set all items where url is same their json_data to {}
-                    WebsiteCheck.objects.filter(url=waiting_check.url).update(json_data={})
+                    WebsiteCheck.objects.filter(
+                        url=waiting_check.url).update(json_data={})
                     waiting_check.save()
 
                     print(f"Processed {waiting_check.url} with score {
