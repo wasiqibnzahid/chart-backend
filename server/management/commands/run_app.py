@@ -75,6 +75,7 @@ class Command(BaseCommand):
                     # set all items where url is same their json_data to {}
                     WebsiteCheck.objects.filter(
                         url=waiting_check.url).update(json_data={})
+                    waiting_check.status = 'done'
                     waiting_check.save()
 
                     print(f"Processed {waiting_check.url} with score {
