@@ -66,6 +66,7 @@ class Command(BaseCommand):
                     # Upload JSON to S3
                     if 'json_response' in url_metrics:
                         s3_url = upload_to_s3(url_metrics['json_response'], filename)
+                        print(f"Uploaded to S3: {s3_url}")
                         if s3_url:
                             waiting_check.json_url = s3_url
 
