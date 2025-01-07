@@ -247,7 +247,8 @@ def upload_to_s3(json_data, file_name):
     try:
         # Use instance profile credentials
         s3_client = boto3.client('s3')
-        
+        # just check if json_data is not empty inside log not pring the whole data
+        print(f"Uploading to S3: {file_name}, has data {json_data is not None} ")
         # Convert JSON to string if it's a dict
         if isinstance(json_data, dict):
             json_data = json.dumps(json_data)
