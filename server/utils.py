@@ -254,17 +254,20 @@ def upload_to_s3(json_data, file_name):
             json_data = json.dumps(json_data)
             
         # Upload the file
+        print(f"Starting upload ")
         s3_client.put_object(
             Bucket=settings.AWS_STORAGE_BUCKET_NAME,
             Key=file_name,
             Body=json_data,
             ContentType='application/json'
         )
-        
+        print(f"Uploaded to S3: {file_name}")
         # Generate the URL
         url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.{settings.AWS_REGION}.amazonaws.com/{file_name}"
+        print(f"Generated URL: {url}")
         return url
         
     except ClientError as e:
+        print("ERROR S3")
         print(f"Error uploading to S3: {e}")
         return None
