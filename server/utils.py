@@ -244,6 +244,7 @@ def upload_to_s3(json_data, file_name):
     Upload JSON data to S3 bucket
     Returns the URL of the uploaded file or None if failed
     """
+    json_data = {"hello": "world"}
     try:
         # Use instance profile credentials
         s3_client = boto3.client('s3')
@@ -254,7 +255,7 @@ def upload_to_s3(json_data, file_name):
             json_data = json.dumps(json_data)
             
         # Upload the file
-        print(f"Starting upload ")
+        print(f"Starting upload {file_name} {json_data}")
         s3_client.put_object(
             Bucket=settings.AWS_STORAGE_BUCKET_NAME,
             Key=file_name,
