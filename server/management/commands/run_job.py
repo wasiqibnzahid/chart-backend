@@ -122,7 +122,7 @@ def run_job():
 
     sites = Site.objects.all()
     create_empty_records(sites, Record)
-    semaphore = threading.Semaphore(4)
+    semaphore = threading.Semaphore(1)
     print(f"SITES ARE {sites}")
     
     with concurrent.futures.ThreadPoolExecutor() as executor:
