@@ -32,7 +32,7 @@ def process_sitemap(site, semaphore):
             # Process each URL entry
             for url in root.findall('.//ns:url', namespaces):
                 
-                if successful_urls >= 10:  # Only process up to 10 successful URLs
+                if successful_urls >= 1:  # Only process up to 10 successful URLs
                     break
                     
                 loc = url.find('ns:loc', namespaces)
