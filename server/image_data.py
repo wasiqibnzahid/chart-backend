@@ -38,9 +38,9 @@ def init_image_data(inner_data=None):
     df['Video Avg'] = df[[col for col in metric_columns if 'Video' in col]].replace(0, pd.NA).mean(axis=1).round(1)
     
     # Calculate changes
-    df['Image Pages Change'] = df['Image Pages Avg'].pct_change() or 0
-    df['Note Change'] = df['Note Avg'].pct_change() or 0
-    df['Video Change'] = df['Video Avg'].pct_change() or 0
+    df['Image Pages Change'] = df['Image Pages Avg'].pct_change() 
+    df['Note Change'] = df['Note Avg'].pct_change() 
+    df['Video Change'] = df['Video Avg'].pct_change() 
     
     
     return df
@@ -48,7 +48,12 @@ def init_image_data(inner_data=None):
 def get_image_data():
     inner_data = fetch_image_records()
     df = init_image_data(inner_data)
-    
+    if df.get('Image Pages Change') is None:
+        df['Image Pages Change'] = 0
+    if df.get('Note Change') is None:
+        df['Note Change'] = 0
+    if df.get('Video Change') is None:
+        df['Video Change'] = 0
     # Convert DataFrame to JSON format
     data = df.to_dict('records')
     
