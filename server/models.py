@@ -257,10 +257,13 @@ class ImageRecord(RecordCommonFields):
     name = models.CharField(max_length=255)
     site = models.ForeignKey(ImageSite, on_delete=models.CASCADE)
     url = models.URLField()
-    performance_score = models.FloatField(null=True, blank=True)
+    note_value = models.FloatField(null=True, blank=True)
+    video_value = models.FloatField(null=True, blank=True)
+    total_value = models.FloatField(null=True, blank=True)
     date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    azteca = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.name} - {self.performance_score} - {self.date}"
