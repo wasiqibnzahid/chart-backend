@@ -6,7 +6,7 @@ import concurrent.futures
 import threading
 
 from server.models import ImageSite, ImageRecord
-from server.helpers import get_lighthouse_mobile_score, write_text_to_file, create_or_update_record
+from server.helpers import get_lighthouse_mobile_score, write_text_to_file, create_or_update_record, create_empty_records
 from server.constants import OTHER_RECORD_FILEPATH, PERFORMANCE_METRICS
 
 def process_sitemap(site, semaphore):
@@ -92,7 +92,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         sites = ImageSite.objects.all()
         semaphore = threading.Semaphore(1)
-        
+        create_empty_records(sites, ImageRecord)
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future_to_site = {executor.submit(process_sitemap, site, semaphore): site for site in sites}
             for future in concurrent.futures.as_completed(future_to_site):
