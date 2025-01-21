@@ -1,4 +1,5 @@
 from django.urls import path
+from django.http import JsonResponse
 
 from server.amp_data.amp_apis import AmpPerformanceReportView
 from server.get_data import GeneralPerformanceReportView
@@ -20,6 +21,7 @@ urlpatterns = [
     path('amp/performance/', AmpPerformanceReportView.as_view(), name='amp-performance'),
     path('api/website-checks/', views.list_website_checks, name='list_website_checks'),
     path('api/website-checks/add/', views.add_website_check, name='add_website_check'),
+    path('image-data/', views.handle_image_request, name='handle_image_request'),
 
     # path('run_job', views.run_job, name='run_job'),
 ]

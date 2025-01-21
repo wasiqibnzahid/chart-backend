@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from .get_data import get_data, get_averages, get_insights
+from .image_data import get_image_data
 from .models import LocalErrorLog, WebsiteCheck
 from server.local_data import local_data,local_quarter,local_insights
 from server.amp_data import amp_data
@@ -191,3 +192,16 @@ def list_website_checks(request):
             'error': str(e)
         }, status=500)
 
+
+def handle_image_request(_request):
+    try:
+        data = get_image_data()
+        if not data:
+            raise ValueError("No data available")
+        return JsonResponse(data, safe=False)
+    except Exception as e:
+        return JsonResponse({
+            "error": str(e),
+            "details": "Failed to handle request",
+            "status": "error"
+        }, status=500)

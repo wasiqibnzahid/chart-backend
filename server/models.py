@@ -241,3 +241,26 @@ class LastJobRun(models.Model):
         last_run_not_today = obj.last_run.date() != now.date()
 
         return is_monday and is_time_window and last_run_not_today
+
+
+class ImageSite(models.Model):
+    name = models.CharField(max_length=255)
+    sitemap_url = models.URLField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+
+class ImageRecord(RecordCommonFields):
+    name = models.CharField(max_length=255)
+    site = models.ForeignKey(ImageSite, on_delete=models.CASCADE)
+    url = models.URLField()
+    performance_score = models.FloatField(null=True, blank=True)
+    date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.performance_score} - {self.date}"
