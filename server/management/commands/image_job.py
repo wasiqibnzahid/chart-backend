@@ -93,7 +93,7 @@ class Command(BaseCommand):
     help = 'Process image sitemaps and calculate Lighthouse scores'
 
     def handle(self, *args, **kwargs):
-        sites = ImageSite.objects.filter(name="Azteca Deportes")
+        sites = ImageSite.objects.filter(name="ADN 40")
         semaphore = threading.Semaphore(1)
         records_to_create = []
         today = datetime.today()
