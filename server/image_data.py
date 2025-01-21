@@ -41,6 +41,12 @@ def init_image_data(inner_data=None):
     df['Image Pages Change'] = df['Image Pages Avg'].pct_change()
     df['Note Change'] = df['Note Avg'].pct_change()
     df['Video Change'] = df['Video Avg'].pct_change()
+    if pd.isna(df['Image Pages Change']):
+        df['Image Pages Change'] = 0
+    if pd.isna(df['Note Change']):
+        df['Note Change'] = 0
+    if pd.isna(df['Video Change']):
+        df['Video Change'] = 0
     
     return df
 
