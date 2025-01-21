@@ -5,6 +5,7 @@ from server.amp_data.amp_apis import AmpPerformanceReportView
 from server.get_data import GeneralPerformanceReportView
 from server.local_data.local_insights import LocalPerformanceReportView
 from . import views
+from . import image_data
 
 urlpatterns = [
     path('', views.handle_request, name='handle_request'),
@@ -22,6 +23,7 @@ urlpatterns = [
     path('api/website-checks/', views.list_website_checks, name='list_website_checks'),
     path('api/website-checks/add/', views.add_website_check, name='add_website_check'),
     path('image-data/', views.handle_image_request, name='handle_image_request'),
+    path('image-data/quarter/', lambda request: JsonResponse(image_data.get_image_averages()), name='image_quarter'),
 
     # path('run_job', views.run_job, name='run_job'),
 ]
