@@ -31,15 +31,19 @@ def process_sitemap(site, semaphore):
             
             # Process each URL entry
             for url in root.findall('.//ns:url', namespaces):
+                
                 if successful_urls >= 10:  # Only process up to 10 successful URLs
                     break
                     
                 loc = url.find('ns:loc', namespaces)
                 if loc is None:
                     continue
+                print(f"Processing URL: {loc.text}")
                     
                 # Get all image elements for this URL
                 images = url.findall('.//image:image', namespaces)
+                if images is not None:
+                    print(f"Image count for url {loc.text}: {len(images)}")
                 if len(images) > 1:  # Only process if there's more than one image
                     page_url = loc.text
                     
