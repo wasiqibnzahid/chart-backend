@@ -255,7 +255,6 @@ class ImageSite(models.Model):
 
 class ImageRecord(RecordCommonFields):
     name = models.CharField(max_length=255)
-    site = models.ForeignKey(ImageSite, on_delete=models.CASCADE)
     url = models.URLField()
     note_value = models.FloatField(null=True, blank=True)
     video_value = models.FloatField(null=True, blank=True)
