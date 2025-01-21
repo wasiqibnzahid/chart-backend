@@ -50,12 +50,9 @@ def get_image_data():
     df = init_image_data(inner_data)
     # check for NaN instead of None
     
-    if pd.isna(df.get('Image Pages Change')):
-        df['Image Pages Change'] = 0
-    if pd.isna(df.get('Note Change')):
-        df['Note Change'] = 0
-    if pd.isna(df.get('Video Change')):
-        df['Video Change'] = 0
+    df['Image Pages Change'] = df['Image Pages Change'].fillna(0)
+    df['Note Change'] = df['Note Change'].fillna(0)
+    df['Video Change'] = df['Video Change'].fillna(0)
     # Convert DataFrame to JSON format
     data = df.to_dict('records')
     
