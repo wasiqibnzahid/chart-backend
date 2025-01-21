@@ -25,6 +25,7 @@ class Command(BaseCommand):
             call_command('run_job')
             call_command('local_job')
             call_command('amp_job')
+            call_command('image_job')
 
             # Update last run time
             LastJobRun.update_last_run()
