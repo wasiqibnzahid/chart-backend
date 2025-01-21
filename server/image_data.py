@@ -38,15 +38,10 @@ def init_image_data(inner_data=None):
     df['Video Avg'] = df[[col for col in metric_columns if 'Video' in col]].replace(0, pd.NA).mean(axis=1).round(1)
     
     # Calculate changes
-    df['Image Pages Change'] = df['Image Pages Avg'].pct_change()
-    df['Note Change'] = df['Note Avg'].pct_change()
-    df['Video Change'] = df['Video Avg'].pct_change()
-    if pd.isna(df['Image Pages Change']):
-        df['Image Pages Change'] = 0
-    if pd.isna(df['Note Change']):
-        df['Note Change'] = 0
-    if pd.isna(df['Video Change']):
-        df['Video Change'] = 0
+    df['Image Pages Change'] = df['Image Pages Avg'].pct_change() or 0
+    df['Note Change'] = df['Note Avg'].pct_change() or 0
+    df['Video Change'] = df['Video Avg'].pct_change() or 0
+    
     
     return df
 
