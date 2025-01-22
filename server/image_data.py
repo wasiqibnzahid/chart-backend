@@ -49,13 +49,12 @@ def calculate_weekly_averages(df):
     months = []
     df['Date'] = pd.to_datetime(df['Date'])
     df['Year'] = df['Date'].dt.year
-    df['Month'] = df['Date'].dt.to_period('M')
 
     # Group the data by date
     grouped = df.groupby(['Date'])
 
     for (date,), month_df in grouped:
-        metric_columns = [col for col in month_df.columns if col not in ['Date', 'Year', 'Month']]
+        metric_columns = [col for col in month_df.columns if col not in ['Date', 'Year']]
         
         # Calculate averages
         image_avg = month_df[metric_columns].replace(0, pd.NA).mean(axis=1).mean().round(1)
@@ -97,6 +96,7 @@ def calculate_quarterly_averages(df):
     grouped = df.groupby(['Year', 'Quarter'])
 
     for (year, quarter), quarter_df in grouped:
+        # Remove date-related columns before calculating metrics
         metric_columns = [col for col in quarter_df.columns if col not in ['Date', 'Year', 'Quarter']]
         
         # Calculate averages
@@ -138,7 +138,8 @@ def calculate_yearly_averages(df):
     grouped = df.groupby(['Year'])
 
     for (year,), year_df in grouped:
-        metric_columns = [col for col in year_df.columns if col not in ['Date', 'Year']]
+        # Remove date-related columns before calculating metrics
+        metric_columns = [col for col in year_df.columns if col not in ['Date', 'Year', 'Month', 'Quarter']]
         
         # Calculate averages
         image_avg = year_df[metric_columns].replace(0, pd.NA).mean(axis=1).mean().round(1)
@@ -171,6 +172,7 @@ def calculate_yearly_averages(df):
     return pd.DataFrame(years)
 
 def calculate_all_time_averages(df):
+    # Remove date-related columns before calculating metrics
     metric_columns = [col for col in df.columns if col not in ['Date', 'Year', 'Month', 'Quarter']]
     
     # Calculate all-time averages
