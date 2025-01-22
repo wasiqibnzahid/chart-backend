@@ -222,9 +222,70 @@ def get_image_averages():
     df = init_image_data()
     quarter_data = calculate_quarterly_averages(df).to_dict('records')
     week_data = calculate_weekly_averages(df).to_dict('records')
-    
+    yearly_data = calculate_yearly_averages(df).to_dict('records')
+    all_time_data = calculate_all_time_averages(df)
     
     return {
         "quarter": quarter_data,
+        "yearly": yearly_data,
         "week": week_data,
-    } 
+        "all_time": all_time_data
+    }
+
+def get_image_insights(date_filter=None):
+    df = init_image_data()
+    
+    if date_filter:
+        # Convert start and end dates from 'MM-YYYY' format to datetime
+        start_date = pd.to_datetime(date_filter['start'], format='%m-%Y')
+        end_date = pd.to_datetime(date_filter['end'], format='%m-%Y') + pd.offsets.MonthEnd(1)
+        
+        # Convert the 'Date' column to datetime format
+        df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d')
+        
+        # Filter the dataframe
+        df = df[(df['Date'] >= start_date) & (df['Date'] <= end_date)]
+    
+    # Calculate insights
+    if not df.empty:
+        initial_image = df['Image Pages Avg'].iloc[0]
+        final_image = df['Image Pages Avg'].iloc[-1]
+        initial_note = df['Note Avg'].iloc[0]
+        final_note = df['Note Avg'].iloc[-1]
+        initial_video = df['Video Avg'].iloc[0]
+        final_video = df['Video Avg'].iloc[-1]
+        
+        # Calculate percentage changes
+        image_change = ((final_image - initial_image) / initial_image) * 100 if initial_image != 0 else 0
+        note_change = ((final_note - initial_note) / initial_note) * 100 if initial_note != 0 else 0
+        video_change = ((final_video - initial_video) / initial_video) * 100 if initial_video != 0 else 0
+        
+        def get_change_description(change):
+            if abs(change) < 5:
+                return None
+            if abs(change) < 10:
+                return "mildly"
+            if abs(change) < 20:
+                return "moderately"
+            return "significantly"
+        
+        def format_insight(metric_name, change):
+            if abs(change) < 5:
+                return None
+            change_type = "decreased" if change < 0 else "increased"
+            change_desc = get_change_description(change)
+            return f"{metric_name} performance {change_type} {change_desc} by {abs(change):.1f}%"
+        
+        insights = {
+            "image": format_insight("Image pages", image_change),
+            "note": format_insight("Note pages", note_change),
+            "video": format_insight("Video pages", video_change)
+        }
+    else:
+        insights = {
+            "image": None,
+            "note": None,
+            "video": None
+        }
+    
+    return insights 

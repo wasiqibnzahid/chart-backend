@@ -24,6 +24,10 @@ urlpatterns = [
     path('api/website-checks/add/', views.add_website_check, name='add_website_check'),
     path('image-data/', views.handle_image_request, name='handle_image_request'),
     path('image-data/quarter/', lambda request: JsonResponse(image_data.get_image_averages()), name='image_quarter'),
+    path('image-data/insights/', lambda request: JsonResponse(image_data.get_image_insights({
+        'start': request.GET.get('start', '01-2024'),
+        'end': request.GET.get('end', '12-2024')
+    })), name='image_insights'),
 
     # path('run_job', views.run_job, name='run_job'),
 ]
