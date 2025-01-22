@@ -28,6 +28,7 @@ urlpatterns = [
         'start': request.GET.get('start', '01-2024'),
         'end': request.GET.get('end', '12-2024')
     })), name='image_insights'),
+    path('image-data/records/', image_data.GetImageRecordsView.as_view(), name='image_records'),
 
     # path('run_job', views.run_job, name='run_job'),
 ]
