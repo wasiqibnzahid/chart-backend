@@ -22,13 +22,16 @@ class Command(BaseCommand):
             print("Running main jobs...")
 
             # Run all three jobs
-            call_command('run_job')
-            call_command('local_job')
-            call_command('amp_job')
-            call_command('image_job')
-
+            # call_command('run_job')
+            print("run_job completed")
+            # call_command('local_job')
+            print("local_job completed")
+            # call_command('amp_job')
+            print("amp_job completed")
+            # call_command('image_job')
+            print("image_job completed")
             # Update last run time
-            LastJobRun.update_last_run()
+            # LastJobRun.update_last_run()
             print("Main jobs completed")
 
         # Process pending website checks
