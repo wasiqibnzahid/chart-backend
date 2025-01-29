@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 import time
 import threading
 from django.db import connection
-from ...models import WebsiteCheck
+from ...models import WebsiteCheck, LastJobRun
 import requests
 
 LAMBDA_URL = "https://hpuyeonhb3mctgalziaie3py7m0vnqfk.lambda-url.us-east-1.on.aws/"
@@ -11,7 +11,7 @@ def notify_waiting_items():
     """Function to check for waiting items and notify Lambda"""
     try:
         waiting_count = WebsiteCheck.objects.filter(status='waiting').count()
-        if waiting_count > 0:
+        if waiting_count > 0 or LastJobRun.should_run():
             print(f"Found {waiting_count} items waiting to be processed")
             try:
                 # Make request to Lambda
