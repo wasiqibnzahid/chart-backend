@@ -4,7 +4,7 @@ from datetime import datetime
 from django.core.management import call_command
 from ...models import LastJobRun, WebsiteCheck
 from .run_job import process_urls
-from ...helpers import get_lighthouse_mobile_score
+from ...helpers import get_lighthouse_mobile_score, run_with_timeout
 from ...utils import upload_to_s3
 from server.constants import PERFORMANCE_METRICS
 import time
@@ -57,7 +57,7 @@ class Command(BaseCommand):
                 unique_id = str(uuid.uuid4())[:8]
                 filename = f"lighthouse/{timestamp}_{unique_id}.json"
 
-                url_metrics = get_lighthouse_mobile_score(
+                url_metrics = run_with_timeout(
                     waiting_check.url,
                     job_type="WEBSITE_CHECK",
                     should_save_json=True

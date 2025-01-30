@@ -24,9 +24,9 @@ def sanitize_filename(url):
     return re.sub(r'[\/:*?"<>|]', '_', url)
 
 
-def run_with_timeout(url, job_type, log_file_name, timeout=600):
+def run_with_timeout(url, job_type, log_file_name, should_save_json=False, timeout=600):
     with concurrent.futures.ProcessPoolExecutor() as executor:
-        future = executor.submit(get_lighthouse_mobile_score, url, job_type, log_file_name)
+        future = executor.submit(get_lighthouse_mobile_score, url, job_type, log_file_name, should_save_json)
         
         try:
             result = future.result(timeout=timeout)  # Wait for up to 'timeout' seconds
@@ -147,7 +147,7 @@ def process_urls(extracted_urls, metrics, site, url_type="note", job_type="Not s
         if successful_site_performance >= 10:
             break
         try:
-            res = get_lighthouse_mobile_score(
+            res = run_with_timeout(
                 url, job_type, log_file_name=log_file_name)
             print(f"{job_type} Metrics for {url_type} URL {
                   url} for site {site.name}: {res}")
