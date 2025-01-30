@@ -6,7 +6,7 @@ import concurrent.futures
 import threading
 
 from server.models import ImageSite, ImageRecord
-from server.helpers import get_lighthouse_mobile_score, write_text_to_file, create_or_update_record, create_empty_records
+from server.helpers import get_lighthouse_mobile_score, write_text_to_file, create_or_update_record, create_empty_records, run_with_timeout
 from server.constants import OTHER_RECORD_FILEPATH, PERFORMANCE_METRICS
 
 
@@ -40,14 +40,13 @@ def process_sitemap(site, semaphore, date):
 
                 # Get all image elements for this URL
                 images = url.findall('.//image:image', namespaces)
-                if images is not None:
-                    print(f"Image count for url {loc.text}: {len(images)}")
                 if len(images) > 1:  # Only process if there's more than one image
+                    print(f"Image count for url {loc.text}: {len(images)}")
                     page_url = loc.text
 
                     try:
                         # Get Lighthouse score
-                        res = get_lighthouse_mobile_score(
+                        res = run_with_timeout(
                             page_url, "IMAGE JOB", log_file_name=OTHER_RECORD_FILEPATH)
 
                         if res["performance_score"] != 0:
