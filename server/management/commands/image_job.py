@@ -36,7 +36,6 @@ def process_sitemap(site, semaphore, date):
                 loc = url.find('ns:loc', namespaces)
                 if loc is None:
                     continue
-                print(f"Processing URL: {loc.text}")
 
                 # Get all image elements for this URL
                 images = url.findall('.//image:image', namespaces)
