@@ -46,6 +46,7 @@ def get_lighthouse_mobile_score(url, job_type, log_file_name=OTHER_RECORD_FILEPA
             f'lighthouse --no-enable-error-reporting '
             f'--chrome-flags="--headless --disable-gpu --no-sandbox" '
             f'--throttling-method=provided '
+            f'--max-wait-for-load=60000 '  # 60 seconds
             f'--output=json --output-path="{report_file_path_rel}" "{url}"'
         )
         result = subprocess.run(
