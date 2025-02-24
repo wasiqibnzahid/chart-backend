@@ -229,7 +229,8 @@ def get_image_data():
 def get_image_averages():
     df = init_image_data()
     quarter_data = calculate_quarterly_averages(df).to_dict('records')
-    week_data = calculate_weekly_averages(df).to_dict('records')
+    week_data = calculate_weekly_averages(df)
+    # .to_dict('records')
     yearly_data = calculate_yearly_averages(df).to_dict('records')
     all_time_data = calculate_all_time_averages(df)
     
