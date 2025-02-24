@@ -62,7 +62,11 @@ def calculate_weekly_averages(df):
         image_avg = [month_df[metric_columns].replace(0, pd.NA).mean(axis=1).mean()]
         note_avg = [month_df[[col for col in metric_columns if 'Note' in col]].replace(0, pd.NA).mean(axis=1).mean()]
         video_avg = [month_df[[col for col in metric_columns if 'Video' in col]].replace(0, pd.NA).mean(axis=1).mean()]
-        
+        return {
+            "image_avg": image_avg,
+            "note_avg": note_avg,
+            "video_avg": video_avg
+        }
         # Calculate changes
         if months:
             prev_month = months[-1]
