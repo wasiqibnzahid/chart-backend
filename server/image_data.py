@@ -59,7 +59,7 @@ def calculate_weekly_averages(df):
         metric_columns = [col for col in month_df.columns if col not in ['Date', 'Year']]
         
         # Calculate averages
-        image_avg = month_df[metric_columns].replace(0, pd.NA).mean(axis=1).mean().round(1)
+        image_avg = pd.Series([month_df[metric_columns].replace(0, pd.NA).mean(axis=1).mean()]).round(1).iloc[0]
         note_avg = month_df[[col for col in metric_columns if 'Note' in col]].replace(0, pd.NA).mean(axis=1).mean().round(1)
         video_avg = month_df[[col for col in metric_columns if 'Video' in col]].replace(0, pd.NA).mean(axis=1).mean().round(1)
         
