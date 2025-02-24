@@ -53,24 +53,33 @@ def init_image_data(inner_data=None):
     return df
 
 
-def non_zero_avg(row, cols):
-    values = row[cols]
-    non_zero_values = values[values != 0]
+def non_zero_avg(series):
+    """Compute average ignoring zeros"""
+    non_zero_values = series[series != 0]  # Exclude zeros
     return non_zero_values.mean() if not non_zero_values.empty else 0.0
+
+
+def safe_division(numerator, denominator):
+    """Safe division function to prevent division by zero"""
+    return (numerator / denominator - 1) if denominator else 0.0
 
 
 def calculate_weekly_averages(df: pd.DataFrame):
     months = []
     df['Date'] = pd.to_datetime(df['Date'])
+
     # Identify Note and Video columns
     cols = [col for col in df.columns if "(Note)" in col or "(Video)" in col]
 
-   
     grouped = df.groupby(['Date'])
 
     for (date,), month_df in grouped:
-        month_df.agg(Avg=(cols, lambda x: non_zero_avg(x.values.flatten())))
-        image_avg = month_df.iloc[0,0]
+        # Aggregate across all Note/Video columns
+        avg_value = month_df[cols].apply(
+            lambda x: non_zero_avg(x.values.flatten()), axis=1).mean()
+
+        image_avg = avg_value  # Use computed average
+
         # Calculate changes
         if months:
             prev_month = months[-1]
@@ -79,18 +88,15 @@ def calculate_weekly_averages(df: pd.DataFrame):
         else:
             image_change = 100
 
-        note_change = image_change
-        video_change = image_change
-        note_avg = image_avg
-        video_avg = image_avg
+        # Sync values
         res = {
             'Date': f"{date.date()}",
             'Image Pages Change': image_change,
-            'Note Change': note_change,
-            'Video Change': video_change,
+            'Note Change': image_change,
+            'Video Change': image_change,
             'Image Pages Avg': image_avg,
-            'Note Avg': note_avg,
-            'Video Avg': video_avg,
+            'Note Avg': image_avg,
+            'Video Avg': image_avg,
         }
 
         months.append(res)
