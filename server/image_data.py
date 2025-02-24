@@ -65,7 +65,8 @@ def calculate_weekly_averages(df):
         return {
             "image_avg": image_avg,
             "note_avg": note_avg,
-            "video_avg": video_avg
+            "video_avg": video_avg,
+            "s": df.to_dict('records')
         }
         # Calculate changes
         if months:
