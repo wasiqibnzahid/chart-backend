@@ -233,7 +233,8 @@ def get_image_data():
     # Fill NaN values with 0 for the weekly data
     df['Image Pages Change'] = df['Image Pages Change'].fillna(0)
     df['Note Change'] = df['Note Change'].fillna(0)
-    df['Video Change'] = df['Video Change'].fillna(0)
+    df['Video Change'] = df['Video Change'].fillna(0) 
+    df = df.fillna(0)
 
     # Convert DataFrame to JSON format
     data = df.to_dict('records')
