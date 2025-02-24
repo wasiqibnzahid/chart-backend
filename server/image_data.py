@@ -60,7 +60,6 @@ def non_zero_avg(series):
     return non_zero_values.mean() if not non_zero_values.empty else 0.0
 
 
-
 def safe_division(numerator, denominator):
     """Safe division function to prevent division by zero"""
     return (numerator / denominator - 1) if denominator else 0.0
@@ -86,7 +85,7 @@ def calculate_weekly_averages(df: pd.DataFrame):
         if months:
             prev_month = months[-1]
             image_change = safe_division(
-                image_avg, prev_month['Image Pages Avg'])
+                image_avg, prev_month['Image Pages Avg']) * 100
         else:
             image_change = 100
 
