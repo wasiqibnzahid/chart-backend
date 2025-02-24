@@ -56,7 +56,9 @@ def init_image_data(inner_data=None):
 def non_zero_avg(series):
     """Compute average ignoring zeros"""
     non_zero_values = series[series != 0]  # Exclude zeros
+    non_zero_values = pd.Series(non_zero_values)  # Ensure it's a Pandas Series
     return non_zero_values.mean() if not non_zero_values.empty else 0.0
+
 
 
 def safe_division(numerator, denominator):
