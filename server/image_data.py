@@ -234,7 +234,6 @@ def get_image_data():
     df['Image Pages Change'] = df['Image Pages Change'].fillna(0)
     df['Note Change'] = df['Note Change'].fillna(0)
     df['Video Change'] = df['Video Change'].fillna(0) 
-    df = df.fillna(0)
 
     # Convert DataFrame to JSON format
     data = df.to_dict('records')
@@ -244,19 +243,19 @@ def get_image_data():
         "weekly": {
             "data": [
                 {"name": "Image Pages Avg", "data": [
-                    {"x": row["Date"], "y": row["Image Pages Avg"]} for row in data]},
+                    {"x": row["Date"], "y": 0 if pd.isna(row["Image Pages Avg"]) else row["Image Pages Avg"]} for row in data]},
                 {"name": "Note Avg", "data": [
-                    {"x": row["Date"], "y": row["Note Avg"]} for row in data]},
+                    {"x": row["Date"], "y": 0 if pd.isna(row["Note Avg"]) else row["Note Avg"]} for row in data]},
                 {"name": "Video Avg", "data": [
-                    {"x": row["Date"], "y": row["Video Avg"]} for row in data]},
+                    {"x": row["Date"], "y": 0 if pd.isna(row["Video Avg"]) else row["Video Avg"]} for row in data]},
             ],
             "changes": [
                 {"name": "Image Pages Change", "data": [
-                    {"x": row["Date"], "y": row["Image Pages Change"]} for row in data]},
+                    {"x": row["Date"], "y": 0 if pd.isna(row["Image Pages Change"]) else row["Image Pages Change"]} for row in data]},
                 {"name": "Note Change", "data": [
-                    {"x": row["Date"], "y": row["Note Change"]} for row in data]},
+                    {"x": row["Date"], "y": 0 if pd.isna(row["Note Change"]) else row["Note Change"]} for row in data]},
                 {"name": "Video Change", "data": [
-                    {"x": row["Date"], "y": row["Video Change"]} for row in data]},
+                    {"x": row["Date"], "y": 0 if pd.isna(row["Video Change"]) else row["Video Change"]} for row in data]},
             ],
         }
     }
