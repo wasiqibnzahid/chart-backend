@@ -315,7 +315,7 @@ def calculate_weekly_averages(df):
                 company_change_video = 100
                 company_change_note = 100
             res["azteca"].append({
-                "name": company,
+                "name": company + " A",
                 "total": company_avg,
                 "video": company_avg_video,
                 "note": company_avg_note,
