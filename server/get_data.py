@@ -576,7 +576,6 @@ def calculate_yearly_averages(df):
             company_avg_video = month_df[[
                 col for col in tv_azteca_columns if 'Video' in col and company in col]][month_df[[
                 col for col in tv_azteca_columns if 'Video' in col and company in col]] != 0].mean(
-                col for col in tv_azteca_columns if 'Video' in col and company in col]].mean(
                 axis=1).mean().round(1)
             company_avg_note = month_df[[
                 col for col in tv_azteca_columns if 'Note' in col and company in col]].mean(
