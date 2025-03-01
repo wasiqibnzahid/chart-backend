@@ -157,11 +157,11 @@ def init(inner_data=None):
     # print('This is Amp Inner data',inner_data)
     df = pd.DataFrame(inner_data)
     
-    df['AMP Avg'] = df[amp_columns].mean(axis=1).round(1)
+    df['AMP Avg'] = df[amp_columns][df[amp_columns] != 0].mean(axis=1).round(1)
 
-    df['AMP Note Avg'] = df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).round(1)
+    df['AMP Note Avg'] = df[[col for col in amp_columns if 'Note' in col]][df[[col for col in amp_columns if 'Note' in col]] != 0].mean(axis=1).round(1)
 
-    df['AMP Video Avg'] = df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).round(1)
+    df['AMP Video Avg'] = df[[col for col in amp_columns if 'Video' in col]][df[[col for col in amp_columns if 'Video' in col]] != 0].mean(axis=1).round(1)
 
     def pct_change(series):
         return series.pct_change().apply(lambda x: x)
@@ -259,11 +259,11 @@ def calculate_weekly_averages(df):
     grouped = df.groupby(['Date'])
 
     for (date, ), month_df in grouped:
-        amp_avg = month_df[amp_columns].mean(axis=1).mean().round(1)
+        amp_avg = month_df[amp_columns][month_df[amp_columns] != 0].mean(axis=1).mean().round(1)
 
-        amp_avg_video = month_df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).mean().round(1)
+        amp_avg_video = month_df[[col for col in amp_columns if 'Video' in col]][month_df[[col for col in amp_columns if 'Video' in col]] != 0].mean(axis=1).mean().round(1)
 
-        amp_avg_note = month_df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1)
+        amp_avg_note = month_df[[col for col in amp_columns if 'Note' in col]][month_df[[col for col in amp_columns if 'Note' in col]] != 0].mean(axis=1).mean().round(1)
 
         amp_map = {}
 
