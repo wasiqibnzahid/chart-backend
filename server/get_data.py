@@ -239,21 +239,25 @@ def calculate_weekly_averages(df):
     grouped = df.groupby(['Date'])
 
     for (date,), month_df in grouped:
-        tv_azteca_avg = month_df[tv_azteca_columns].mean(
+        tv_azteca_avg = month_df[tv_azteca_columns][month_df[tv_azteca_columns] != 0].mean(
             axis=1).mean().round(1)
-        competition_avg = month_df[competition_columns].mean(
+        competition_avg = month_df[competition_columns][month_df[competition_columns] != 0].mean(
             axis=1).mean().round(1)
         tv_azteca_avg_video = month_df[[
-            col for col in tv_azteca_columns if 'Video' in col]].mean(
+            col for col in tv_azteca_columns if 'Video' in col]][month_df[[
+            col for col in tv_azteca_columns if 'Video' in col]] != 0].mean(
             axis=1).mean().round(1)
         competition_avg_video = month_df[[
-            col for col in competition_columns if 'Video' in col]].mean(
+            col for col in competition_columns if 'Video' in col]][month_df[[
+            col for col in competition_columns if 'Video' in col]] != 0].mean(
             axis=1).mean().round(1)
         tv_azteca_avg_note = month_df[[
-            col for col in tv_azteca_columns if 'Note' in col]].mean(
+            col for col in tv_azteca_columns if 'Note' in col]][month_df[[
+            col for col in tv_azteca_columns if 'Note' in col]] != 0].mean(
             axis=1).mean().round(1)
         competition_avg_note = month_df[[
-            col for col in competition_columns if 'Note' in col]].mean(
+            col for col in competition_columns if 'Note' in col]][month_df[[
+            col for col in competition_columns if 'Note' in col]] != 0].mean(
             axis=1).mean().round(1)
         azteca_map = {}
         competition_map = {}
