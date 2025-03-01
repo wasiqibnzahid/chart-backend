@@ -296,7 +296,8 @@ def calculate_weekly_averages(df):
             za = month_df[[
                 col for col in tv_azteca_columns if 'Video' in col and company in col]][month_df[[
                 col for col in tv_azteca_columns if 'Video' in col and company in col]] != 0].mean(
-                axis=1).mean() or 0
+                axis=1).mean()
+                print(f"ASDASD {za}")
             company_avg_video = round(month_df[[
                 col for col in tv_azteca_columns if 'Video' in col and company in col]][month_df[[
                 col for col in tv_azteca_columns if 'Video' in col and company in col]] != 0].mean(
