@@ -143,7 +143,10 @@ def init(inner_data=None):
 
     # Calculate averages excluding zeros
     df['TV Azteca Avg'] = df[azteca_columns][df[azteca_columns] != 0].mean(axis=1).round(1) or 0
+    df['TV Azteca Avg'] = 0 if pd.isna(df['TV Azteca Avg']) else df['TV Azteca Avg']
+
     df['Competition Avg'] = df[competition_columns][df[competition_columns] != 0].mean(axis=1).round(1) or 0
+    df['Competition Avg'] = 0 if pd.isna(df['Competition Avg']) else df['Competition Avg']
 
     df['TV Azteca Note Avg'] = df[[col for col in azteca_columns if 'Note' in col]][
         df[[col for col in azteca_columns if 'Note' in col]] != 0].mean(axis=1).round(1) or 0
@@ -265,8 +268,11 @@ def formatLolData(df, inner_data):
     totals = []
     for name, dates in combined_data.items():
         # Calculate averages for each date
-        data = [{'x': date, 'y': (values['sum'] / values['count']) or 0}
-                for date, values in sorted(dates.items())]
+        data = []
+        for date, values in sorted(dates.items()):
+            avg = (values['sum'] / values['count']) or 0
+            avg = 0 if pd.isna(avg) else avg
+            data.append({'x': date, 'y': avg})
         totals.append({'name': name, 'data': data})
     return {
         "videos": video,

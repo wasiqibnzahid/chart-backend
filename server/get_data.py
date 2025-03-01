@@ -239,7 +239,7 @@ def calculate_weekly_averages(df):
     # Helper function to calculate non-zero mean and handle nulls
     def calc_avg(df_slice, columns):
         avg = round(df_slice[columns][df_slice[columns] != 0].mean(axis=1).mean() or 0, 1)
-        return avg
+        return 0 if pd.isna(avg) else avg
 
     # Group the data by year and month
     grouped = df.groupby(['Date'])
@@ -293,20 +293,18 @@ def calculate_weekly_averages(df):
                 col for col in tv_azteca_columns if company in col]][month_df[[
                 col for col in tv_azteca_columns if company in col]] != 0].mean(
                 axis=1).mean() or 0, 1)
-            za = month_df[[
-                col for col in tv_azteca_columns if 'Video' in col and company in col]][month_df[[
-                col for col in tv_azteca_columns if 'Video' in col and company in col]] != 0].mean(
-                axis=1).mean()
-            if(company == "Azteca UNO"):
-                print(f"ASDASD {za} {pd.isna(za)}")
+            company_avg = 0 if pd.isna(company_avg) else company_avg
+            
             company_avg_video = round(month_df[[
                 col for col in tv_azteca_columns if 'Video' in col and company in col]][month_df[[
                 col for col in tv_azteca_columns if 'Video' in col and company in col]] != 0].mean(
                 axis=1).mean() or 0, 1)
+            company_avg_video = 0 if pd.isna(company_avg_video) else company_avg_video
             company_avg_note = round(month_df[[
                 col for col in tv_azteca_columns if 'Note' in col and company in col]][month_df[[
                 col for col in tv_azteca_columns if 'Note' in col and company in col]] != 0].mean(
                 axis=1).mean() or 0, 1)
+            company_avg_note = 0 if pd.isna(company_avg_note) else company_avg_note
             if (len(months) > 0):
                 item = prev_month.get("azteca")[index]
                 prev_company_avg_video = item["video"]
@@ -321,7 +319,7 @@ def calculate_weekly_averages(df):
                 company_change_video = 100
                 company_change_note = 100
             res["azteca"].append({
-                "name": company + " A",
+                "name": company,
                 "total": company_avg,
                 "video": company_avg_video,
                 "note": company_avg_note,
@@ -332,15 +330,21 @@ def calculate_weekly_averages(df):
             })
 
         for (index, company) in enumerate(competition_columns_raw):
-            company_avg = month_df[[
-                col for col in competition_columns if company in col]].mean(
-                axis=1).mean().round(1)
-            company_avg_video = month_df[[
-                col for col in competition_columns if "Video" in col and company in col]].mean(
-                axis=1).mean().round(1)
-            company_avg_note = month_df[[
-                col for col in competition_columns if "Note" in col and company in col]].mean(
-                axis=1).mean().round(1)
+            company_avg = round(month_df[[
+                col for col in competition_columns if company in col]][month_df[[
+                col for col in competition_columns if company in col]] != 0].mean(
+                axis=1).mean() or 0, 1)
+            company_avg = 0 if pd.isna(company_avg) else company_avg
+            company_avg_video = round(month_df[[
+                col for col in competition_columns if "Video" in col and company in col]][month_df[[
+                col for col in competition_columns if "Video" in col and company in col]] != 0].mean(
+                axis=1).mean() or 0, 1)
+            company_avg_video = 0 if pd.isna(company_avg_video) else company_avg_video
+            company_avg_note = round(month_df[[
+                col for col in competition_columns if "Note" in col and company in col]][month_df[[
+                col for col in competition_columns if "Note" in col and company in col]] != 0].mean(
+                axis=1).mean() or 0, 1)
+            company_avg_note = 0 if pd.isna(company_avg_note) else company_avg_note
             if (len(months) > 0):
                 item = prev_month.get("competition")[index]
                 prev_company_avg_video = item["video"]
@@ -380,20 +384,32 @@ def calculate_quarterly_averages(df):
     for (year, month), month_df in grouped:
         tv_azteca_avg = month_df[tv_azteca_columns].mean(
             axis=1).mean().round(1)
+        tv_azteca_avg = 0 if pd.isna(tv_azteca_avg) else tv_azteca_avg
+        
         competition_avg = month_df[competition_columns].mean(
             axis=1).mean().round(1)
+        competition_avg = 0 if pd.isna(competition_avg) else competition_avg
+        
         tv_azteca_avg_video = month_df[[
             col for col in tv_azteca_columns if 'Video' in col]].mean(
             axis=1).mean().round(1)
+        tv_azteca_avg_video = 0 if pd.isna(tv_azteca_avg_video) else tv_azteca_avg_video
+        
         competition_avg_video = month_df[[
             col for col in competition_columns if 'Video' in col]].mean(
             axis=1).mean().round(1)
+        competition_avg_video = 0 if pd.isna(competition_avg_video) else competition_avg_video
+        
         tv_azteca_avg_note = month_df[[
             col for col in tv_azteca_columns if 'Note' in col]].mean(
             axis=1).mean().round(1)
+        tv_azteca_avg_note = 0 if pd.isna(tv_azteca_avg_note) else tv_azteca_avg_note
+        
         competition_avg_note = month_df[[
             col for col in competition_columns if 'Note' in col]].mean(
             axis=1).mean().round(1)
+        competition_avg_note = 0 if pd.isna(competition_avg_note) else competition_avg_note
+        
         azteca_map = {}
         competition_map = {}
 
@@ -441,12 +457,18 @@ def calculate_quarterly_averages(df):
             company_avg = month_df[[
                 col for col in tv_azteca_columns if company in col]].mean(
                 axis=1).mean().round(1)
+            company_avg = 0 if pd.isna(company_avg) else company_avg
+            
             company_avg_video = month_df[[
                 col for col in tv_azteca_columns if 'Video' in col and company in col]].mean(
                 axis=1).mean().round(1)
+            company_avg_video = 0 if pd.isna(company_avg_video) else company_avg_video
+            
             company_avg_note = month_df[[
                 col for col in tv_azteca_columns if 'Note' in col and company in col]].mean(
                 axis=1).mean().round(1)
+            company_avg_note = 0 if pd.isna(company_avg_note) else company_avg_note
+            
             if (len(months) > 0):
                 item = prev_month.get("azteca")[index]
                 prev_company_avg_video = item["video"]
@@ -474,12 +496,14 @@ def calculate_quarterly_averages(df):
             company_avg = month_df[[
                 col for col in competition_columns if company in col]].mean(
                 axis=1).mean().round(1)
+            company_avg = 0 if pd.isna(company_avg) else company_avg
             company_avg_video = month_df[[
                 col for col in competition_columns if "Video" in col and company in col]].mean(
                 axis=1).mean().round(1)
             company_avg_note = month_df[[
                 col for col in competition_columns if "Note" in col and company in col]].mean(
                 axis=1).mean().round(1)
+            company_avg_note = 0 if pd.isna(company_avg_note) else company_avg_note
             if (len(months) > 0):
                 item = prev_month.get("competition")[index]
                 prev_company_avg_video = item["video"]
@@ -520,20 +544,24 @@ def calculate_yearly_averages(df):
         print(year)
         tv_azteca_avg = month_df[tv_azteca_columns].mean(
             axis=1).mean().round(1)
+        tv_azteca_avg = 0 if pd.isna(tv_azteca_avg) else tv_azteca_avg
         competition_avg = month_df[competition_columns].mean(
             axis=1).mean().round(1)
         tv_azteca_avg_video = month_df[[
             col for col in tv_azteca_columns if 'Video' in col]].mean(
             axis=1).mean().round(1)
+        tv_azteca_avg_video = 0 if pd.isna(tv_azteca_avg_video) else tv_azteca_avg_video
         competition_avg_video = month_df[[
             col for col in competition_columns if 'Video' in col]].mean(
             axis=1).mean().round(1)
         tv_azteca_avg_note = month_df[[
             col for col in tv_azteca_columns if 'Note' in col]].mean(
             axis=1).mean().round(1)
+        tv_azteca_avg_note = 0 if pd.isna(tv_azteca_avg_note) else tv_azteca_avg_note
         competition_avg_note = month_df[[
             col for col in competition_columns if 'Note' in col]].mean(
             axis=1).mean().round(1)
+        competition_avg_note = 0 if pd.isna(competition_avg_note) else competition_avg_note
         azteca_map = {}
         competition_map = {}
 
@@ -581,12 +609,15 @@ def calculate_yearly_averages(df):
             company_avg = month_df[[
                 col for col in tv_azteca_columns if company in col]].mean(
                 axis=1).mean().round(1)
+            company_avg = 0 if pd.isna(company_avg) else company_avg
             company_avg_video = month_df[[
                 col for col in tv_azteca_columns if 'Video' in col and company in col]].mean(
                 axis=1).mean().round(1)
+            company_avg_video = 0 if pd.isna(company_avg_video) else company_avg_video
             company_avg_note = month_df[[
                 col for col in tv_azteca_columns if 'Note' in col and company in col]].mean(
                 axis=1).mean().round(1)
+            company_avg_note = 0 if pd.isna(company_avg_note) else company_avg_note
             if (len(months) > 0):
                 item = prev_month.get("azteca")[index]
                 prev_company_avg_video = item["video"]
@@ -614,12 +645,14 @@ def calculate_yearly_averages(df):
             company_avg = month_df[[
                 col for col in competition_columns if company in col]].mean(
                 axis=1).mean().round(1)
+            company_avg = 0 if pd.isna(company_avg) else company_avg
             company_avg_video = month_df[[
                 col for col in competition_columns if "Video" in col and company in col]].mean(
                 axis=1).mean().round(1)
             company_avg_note = month_df[[
                 col for col in competition_columns if "Note" in col and company in col]].mean(
                 axis=1).mean().round(1)
+            company_avg_note = 0 if pd.isna(company_avg_note) else company_avg_note
             if (len(months) > 0):
                 item = prev_month.get("competition")[index]
                 prev_company_avg_video = item["video"]
@@ -651,20 +684,24 @@ def calculate_all_time_averages(df):
 
     tv_azteca_avg = df[tv_azteca_columns].mean(
         axis=1).mean().round(1) or 0
+    tv_azteca_avg = 0 if pd.isna(tv_azteca_avg) else tv_azteca_avg
     competition_avg = df[competition_columns].mean(
         axis=1).mean().round(1) or 0
     tv_azteca_avg_video = df[[
         col for col in tv_azteca_columns if 'Video' in col]].mean(
         axis=1).mean().round(1) or 0
+    tv_azteca_avg_video = 0 if pd.isna(tv_azteca_avg_video) else tv_azteca_avg_video
     competition_avg_video = df[[
         col for col in competition_columns if 'Video' in col]].mean(
         axis=1).mean().round(1) or 0
     tv_azteca_avg_note = df[[
         col for col in tv_azteca_columns if 'Note' in col]].mean(
         axis=1).mean().round(1) or 0
+    tv_azteca_avg_note = 0 if pd.isna(tv_azteca_avg_note) else tv_azteca_avg_note
     competition_avg_note = df[[
         col for col in competition_columns if 'Note' in col]].mean(
         axis=1).mean().round(1) or 0
+    competition_avg_note = 0 if pd.isna(competition_avg_note) else competition_avg_note
 
         
     res = {
@@ -689,13 +726,15 @@ def calculate_all_time_averages(df):
         company_avg = df[[
             col for col in tv_azteca_columns if company in col]].mean(
             axis=1).mean().round(1) or 0
+        company_avg = 0 if pd.isna(company_avg) else company_avg
         company_avg_video = df[[
             col for col in tv_azteca_columns if 'Video' in col and company in col]].mean(
             axis=1).mean().round(1) or 0
+        company_avg_video = 0 if pd.isna(company_avg_video) else company_avg_video
         company_avg_note = df[[
             col for col in tv_azteca_columns if 'Note' in col and company in col]].mean(
             axis=1).mean().round(1) or 0
-
+        company_avg_note = 0 if pd.isna(company_avg_note) else company_avg_note
         res["azteca"].append({
             "name": company,
             "total": company_avg,
@@ -710,12 +749,15 @@ def calculate_all_time_averages(df):
         company_avg = df[[
             col for col in competition_columns if company in col]].mean(
             axis=1).mean().round(1) or 0
+        company_avg = 0 if pd.isna(company_avg) else company_avg
         company_avg_video = df[[
             col for col in competition_columns if "Video" in col and company in col]].mean(
             axis=1).mean().round(1) or 0
+        company_avg_video = 0 if pd.isna(company_avg_video) else company_avg_video
         company_avg_note = df[[
             col for col in competition_columns if "Note" in col and company in col]].mean(
             axis=1).mean().round(1) or 0
+        company_avg_note = 0 if pd.isna(company_avg_note) else company_avg_note
 
         res["competition"].append({
             "name": company,
@@ -749,31 +791,40 @@ def calculate_changes(df):
     # Compute averages for the latest date
     tv_azteca_avg_latest = latest_df[tv_azteca_columns].mean(
         axis=1).mean().round(1) or 0
+    tv_azteca_avg_latest = 0 if pd.isna(tv_azteca_avg_latest) else tv_azteca_avg_latest
     competition_avg_latest = latest_df[competition_columns].mean(
         axis=1).mean().round(1) or 0
     tv_azteca_avg_video_latest = latest_df[[
         col for col in tv_azteca_columns if 'Video' in col]].mean(axis=1).mean().round(1) or 0
+    tv_azteca_avg_video_latest = 0 if pd.isna(tv_azteca_avg_video_latest) else tv_azteca_avg_video_latest
     competition_avg_video_latest = latest_df[[
         col for col in competition_columns if 'Video' in col]].mean(axis=1).mean().round(1) or 0
     tv_azteca_avg_note_latest = latest_df[[
         col for col in tv_azteca_columns if 'Note' in col]].mean(axis=1).mean().round(1) or 0
+    tv_azteca_avg_note_latest = 0 if pd.isna(tv_azteca_avg_note_latest) else tv_azteca_avg_note_latest
     competition_avg_note_latest = latest_df[[
         col for col in competition_columns if 'Note' in col]].mean(axis=1).mean().round(1) or 0
+    competition_avg_note_latest = 0 if pd.isna(competition_avg_note_latest) else competition_avg_note_latest
 
     # Compute averages for the second-to-last date
     tv_azteca_avg_second_last = second_last_df[tv_azteca_columns].mean(
         axis=1).mean().round(1) or 0
+    tv_azteca_avg_second_last = 0 if pd.isna(tv_azteca_avg_second_last) else tv_azteca_avg_second_last
     competition_avg_second_last = second_last_df[competition_columns].mean(
         axis=1).mean().round(1) or 0
+    competition_avg_second_last = 0 if pd.isna(competition_avg_second_last) else competition_avg_second_last
     tv_azteca_avg_video_second_last = second_last_df[[
         col for col in tv_azteca_columns if 'Video' in col]].mean(axis=1).mean().round(1) or 0
+    tv_azteca_avg_video_second_last = 0 if pd.isna(tv_azteca_avg_video_second_last) else tv_azteca_avg_video_second_last
     competition_avg_video_second_last = second_last_df[[
         col for col in competition_columns if 'Video' in col]].mean(axis=1).mean().round(1) or 0
+    competition_avg_video_second_last = 0 if pd.isna(competition_avg_video_second_last) else competition_avg_video_second_last
     tv_azteca_avg_note_second_last = second_last_df[[
         col for col in tv_azteca_columns if 'Note' in col]].mean(axis=1).mean().round(1) or 0
+    tv_azteca_avg_note_second_last = 0 if pd.isna(tv_azteca_avg_note_second_last) else tv_azteca_avg_note_second_last
     competition_avg_note_second_last = second_last_df[[
         col for col in competition_columns if 'Note' in col]].mean(axis=1).mean().round(1) or 0
-
+    competition_avg_note_second_last = 0 if pd.isna(competition_avg_note_second_last) else competition_avg_note_second_last
     # Calculate the changes
     tv_azteca_change = safe_division(tv_azteca_avg_latest, tv_azteca_avg_second_last)
     competition_change = safe_division(competition_avg_latest,competition_avg_second_last)
@@ -805,10 +856,15 @@ def calculate_changes(df):
     for (index, company) in enumerate(azteca_columns_raw):
         company_avg_latest = latest_df[[
             col for col in tv_azteca_columns if company in col]].mean(axis=1).mean().round(1) or 0
+        company_avg_latest = 0 if pd.isna(company_avg_latest) else company_avg_latest
+
         company_avg_video_latest = latest_df[[
             col for col in tv_azteca_columns if 'Video' in col and company in col]].mean(axis=1).mean().round(1) or 0
+        company_avg_video_latest = 0 if pd.isna(company_avg_video_latest) else company_avg_video_latest
+
         company_avg_note_latest = latest_df[[
             col for col in tv_azteca_columns if 'Note' in col and company in col]].mean(axis=1).mean().round(1) or 0
+        company_avg_note_latest = 0 if pd.isna(company_avg_note_latest) else company_avg_note_latest
 
         company_avg_second_last = second_last_df[[
             col for col in tv_azteca_columns if company in col]].mean(axis=1).mean().round(1) or 0

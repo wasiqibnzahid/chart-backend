@@ -264,7 +264,7 @@ def calculate_weekly_averages(df):
         # Helper function to calculate mean excluding zeros
         def calc_avg(df_slice, columns):
             avg = round(df_slice[columns][df_slice[columns] != 0].mean(axis=1).mean() or 0, 1)
-            return avg
+            return 0 if pd.isna(avg) else avg
 
         amp_avg = calc_avg(month_df, amp_columns)
         amp_avg_video = calc_avg(month_df, [col for col in amp_columns if 'Video' in col])
@@ -333,10 +333,13 @@ def calculate_quarterly_averages(df):
 
     for (year, month), month_df in grouped:
         amp_avg = month_df[amp_columns].mean(axis=1).mean().round(1) or 0
+        amp_avg = 0 if pd.isna(amp_avg) else amp_avg
 
         amp_avg_video = month_df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).mean().round(1) or 0
+        amp_avg_video = 0 if pd.isna(amp_avg_video) else amp_avg_video
 
         amp_avg_note = month_df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1) or 0
+        amp_avg_note = 0 if pd.isna(amp_avg_note) else amp_avg_note
 
         amp_map = {}
 
@@ -412,11 +415,14 @@ def calculate_yearly_averages(df):
     grouped = df.groupby(['Year'])
 
     for (year,), month_df in grouped:
-        amp_avg = month_df[amp_columns].mean(axis=1).mean().round(1) or 0
+        amp_avg = df[amp_columns].mean(axis=1).mean().round(1) or 0
+        amp_avg = 0 if pd.isna(amp_avg) else amp_avg
 
-        amp_avg_video = month_df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).mean().round(1) or 0
+        amp_avg_video = df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).mean().round(1) or 0
+        amp_avg_video = 0 if pd.isna(amp_avg_video) else amp_avg_video
 
-        amp_avg_note = month_df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1) or 0
+        amp_avg_note = df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1) or 0
+        amp_avg_note = 0 if pd.isna(amp_avg_note) else amp_avg_note
 
         amp_map = {}
 
@@ -486,10 +492,13 @@ def calculate_all_time_averages(df):
     date = timezone.now()
 
     amp_avg = df[amp_columns].mean(axis=1).mean().round(1) or 0
+    amp_avg = 0 if pd.isna(amp_avg) else amp_avg
 
     amp_avg_video = df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).mean().round(1) or 0
+    amp_avg_video = 0 if pd.isna(amp_avg_video) else amp_avg_video
 
     amp_avg_note = df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1) or 0
+    amp_avg_note = 0 if pd.isna(amp_avg_note) else amp_avg_note
 
     res = {
         'Date': f"{date.date()}",
@@ -538,22 +547,26 @@ def calculate_changes(df):
 
     # Compute averages for the latest date
     amp_avg_latest = latest_df[amp_columns].mean(axis=1).mean().round(1) or 0
+    amp_avg_latest = 0 if pd.isna(amp_avg_latest) else amp_avg_latest
 
     amp_avg_video_latest = latest_df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).mean().round(1) or 0
+    amp_avg_video_latest = 0 if pd.isna(amp_avg_video_latest) else amp_avg_video_latest
     
     amp_avg_note_latest = latest_df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1) or 0
+    amp_avg_note_latest = 0 if pd.isna(amp_avg_note_latest) else amp_avg_note_latest
     
     amp_avg_second_last = second_last_df[amp_columns].mean(axis=1).mean().round(1) or 0
+    amp_avg_second_last = 0 if pd.isna(amp_avg_second_last) else amp_avg_second_last
 
     amp_avg_video_second_last = second_last_df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).mean().round(1) or 0
+    amp_avg_video_second_last = 0 if pd.isna(amp_avg_video_second_last) else amp_avg_video_second_last
 
     amp_avg_note_second_last = second_last_df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1) or 0
+    amp_avg_note_second_last = 0 if pd.isna(amp_avg_note_second_last) else amp_avg_note_second_last
 
     # Calculate the changes
     amp_change = safe_division(amp_avg_latest , amp_avg_second_last)
-
     amp_change_video = safe_division(amp_avg_video_latest , amp_avg_video_second_last)
-
     amp_change_note = safe_division(amp_avg_note_latest, amp_avg_note_second_last)
 
     # Prepare the result dictionary
@@ -576,26 +589,32 @@ def calculate_changes(df):
         company_avg_latest = round(latest_df[
             [col for col in amp_columns if company in col]
         ].mean(axis=1).mean() or 0, 1)
+        company_avg_latest = 0 if pd.isna(company_avg_latest) else company_avg_latest
 
         company_avg_video_latest = round(latest_df[
             [col for col in amp_columns if 'Video' in col and company in col]
         ].mean(axis=1).mean() or 0, 1)
+        company_avg_video_latest = 0 if pd.isna(company_avg_video_latest) else company_avg_video_latest
 
         company_avg_note_latest = round(latest_df[
             [col for col in amp_columns if 'Note' in col and company in col]
         ].mean(axis=1).mean() or 0, 1)
+        company_avg_note_latest = 0 if pd.isna(company_avg_note_latest) else company_avg_note_latest
 
         company_avg_second_last = round(second_last_df[
             [col for col in amp_columns if company in col]
         ].mean(axis=1).mean() or 0, 1)
+        company_avg_second_last = 0 if pd.isna(company_avg_second_last) else company_avg_second_last
 
         company_avg_video_second_last = round(second_last_df[
             [col for col in amp_columns if 'Video' in col and company in col]
         ].mean(axis=1).mean() or 0, 1)
+        company_avg_video_second_last = 0 if pd.isna(company_avg_video_second_last) else company_avg_video_second_last
 
         company_avg_note_second_last = round(second_last_df[
             [col for col in amp_columns if 'Note' in col and company in col]
-        ].mean(axis=1).mean() or 0, 1)
+        ].mean(axis=1).mean() or 0, 1) 
+        company_avg_note_second_last = 0 if pd.isna(company_avg_note_second_last) else company_avg_note_second_last
 
         # Add AMP-level data comparison
         amp_change = safe_division(company_avg_latest, company_avg_second_last)

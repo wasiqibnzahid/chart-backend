@@ -40,6 +40,7 @@ def init_image_data(inner_data=None):
     # Helper function to calculate mean excluding zeros and handle nulls
     def calc_avg(df_slice, columns):
         result = df_slice[columns][df_slice[columns] != 0].mean(axis=1).round(1) or 0
+        result = 0 if pd.isna(result) else result
         return result.fillna(0)
 
     # Calculate averages excluding 0 values
