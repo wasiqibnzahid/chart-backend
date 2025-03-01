@@ -67,13 +67,13 @@ def calculate_weekly_averages(df: pd.DataFrame):
     df['Date'] = pd.to_datetime(df['Date'])
 
     # Identify Note and Video columns
-    cols = [col for col in df.columns if "(Note)" in col or "(Video)" in col][df[[col for col in df.columns if "(Note)" in col or "(Video)" in col]] != 0]
+    cols = [col for col in df.columns if "(Note)" in col or "(Video)" in col]
 
     grouped = df.groupby(['Date'])
 
     for (date,), month_df in grouped:
         # Aggregate across all Note/Video columns
-        avg_value = month_df[cols].apply(
+        avg_value = month_df[cols][month_df[cols] != 0].apply(
             lambda x: non_zero_avg(x.values.flatten()), axis=1).mean()
 
         image_avg = avg_value  # Use computed average
