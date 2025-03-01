@@ -323,7 +323,6 @@ def calculate_weekly_averages(df):
                 "total": company_avg,
                 "video": company_avg_video,
                 "note": company_avg_note,
-                "za": za,
                 "total_change": 0 if pd.isna(company_change) else (company_change or 0),
                 "video_change": 0 if pd.isna(company_change_video) else (company_change_video or 0),
                 "note_change": 0 if pd.isna(company_change_note) else (company_change_note or 0)
