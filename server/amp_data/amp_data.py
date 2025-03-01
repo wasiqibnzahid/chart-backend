@@ -261,9 +261,10 @@ def calculate_weekly_averages(df):
     grouped = df.groupby(['Date'])
 
     for (date, ), month_df in grouped:
+        # Helper function to calculate mean excluding zeros
         def calc_avg(df_slice, columns):
-            avg = round(df_slice[columns][df_slice[columns] != 0].mean(axis=1).mean(), 1)
-            return 0 if pd.isna(avg) else avg
+            avg = round(df_slice[columns][df_slice[columns] != 0].mean(axis=1).mean() or 0, 1)
+            return avg
 
         amp_avg = calc_avg(month_df, amp_columns)
         amp_avg_video = calc_avg(month_df, [col for col in amp_columns if 'Video' in col])
@@ -331,11 +332,11 @@ def calculate_quarterly_averages(df):
     grouped = df.groupby(['Year', 'Month'])
 
     for (year, month), month_df in grouped:
-        amp_avg = month_df[amp_columns].mean(axis=1).mean().round(1)
+        amp_avg = month_df[amp_columns].mean(axis=1).mean().round(1) or 0
 
-        amp_avg_video = month_df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).mean().round(1)
+        amp_avg_video = month_df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).mean().round(1) or 0
 
-        amp_avg_note = month_df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1)
+        amp_avg_note = month_df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1) or 0
 
         amp_map = {}
 
@@ -369,9 +370,9 @@ def calculate_quarterly_averages(df):
         }
         
         for (index, company) in enumerate(amp_columns_raw):
-            company_avg = round(month_df[[col for col in amp_columns if company in col]].mean(axis=1).mean(), 1)
-            company_avg_video = round(month_df[[col for col in amp_columns if 'Video' in col and company in col]].mean(axis=1).mean(), 1)
-            company_avg_note = round(month_df[[col for col in amp_columns if 'Note' in col and company in col]].mean(axis=1).mean(), 1)
+            company_avg = round(month_df[[col for col in amp_columns if company in col]].mean(axis=1).mean() or 0, 1)
+            company_avg_video = round(month_df[[col for col in amp_columns if 'Video' in col and company in col]].mean(axis=1).mean() or 0, 1)
+            company_avg_note = round(month_df[[col for col in amp_columns if 'Note' in col and company in col]].mean(axis=1).mean() or 0, 1)
         # Process AMP data
             if len(months) > 0:
                 prev_month = months[-1]
@@ -411,11 +412,11 @@ def calculate_yearly_averages(df):
     grouped = df.groupby(['Year'])
 
     for (year,), month_df in grouped:
-        amp_avg = month_df[amp_columns].mean(axis=1).mean().round(1)
+        amp_avg = month_df[amp_columns].mean(axis=1).mean().round(1) or 0
 
-        amp_avg_video = month_df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).mean().round(1)
+        amp_avg_video = month_df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).mean().round(1) or 0
 
-        amp_avg_note = month_df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1)
+        amp_avg_note = month_df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1) or 0
 
         amp_map = {}
 
@@ -449,9 +450,9 @@ def calculate_yearly_averages(df):
         }
         
         for (index, company) in enumerate(amp_columns_raw):
-            company_avg = round(month_df[[col for col in amp_columns if company in col]].mean(axis=1).mean(), 1)
-            company_avg_video = round(month_df[[col for col in amp_columns if 'Video' in col and company in col]].mean(axis=1).mean(), 1)
-            company_avg_note = round(month_df[[col for col in amp_columns if 'Note' in col and company in col]].mean(axis=1).mean(), 1)
+            company_avg = round(month_df[[col for col in amp_columns if company in col]].mean(axis=1).mean() or 0, 1)
+            company_avg_video = round(month_df[[col for col in amp_columns if 'Video' in col and company in col]].mean(axis=1).mean() or 0, 1)
+            company_avg_note = round(month_df[[col for col in amp_columns if 'Note' in col and company in col]].mean(axis=1).mean() or 0, 1)
         # Process AMP data
             if len(months) > 0:
                 prev_month = months[-1]
@@ -484,11 +485,11 @@ def calculate_yearly_averages(df):
 def calculate_all_time_averages(df):
     date = timezone.now()
 
-    amp_avg = df[amp_columns].mean(axis=1).mean().round(1)
+    amp_avg = df[amp_columns].mean(axis=1).mean().round(1) or 0
 
-    amp_avg_video = df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).mean().round(1)
+    amp_avg_video = df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).mean().round(1) or 0
 
-    amp_avg_note = df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1)
+    amp_avg_note = df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1) or 0
 
     res = {
         'Date': f"{date.date()}",
@@ -502,9 +503,9 @@ def calculate_all_time_averages(df):
     }
         
     for (index, company) in enumerate(amp_columns_raw):
-        company_avg = round(df[[col for col in amp_columns if company in col]].mean(axis=1).mean(), 1)
-        company_avg_video = round(df[[col for col in amp_columns if 'Video' in col and company in col]].mean(axis=1).mean(), 1)
-        company_avg_note = round(df[[col for col in amp_columns if 'Note' in col and company in col]].mean(axis=1).mean(), 1)
+        company_avg = round(df[[col for col in amp_columns if company in col]].mean(axis=1).mean() or 0, 1)
+        company_avg_video = round(df[[col for col in amp_columns if 'Video' in col and company in col]].mean(axis=1).mean() or 0, 1)
+        company_avg_note = round(df[[col for col in amp_columns if 'Note' in col and company in col]].mean(axis=1).mean() or 0, 1)
     
         res["amp"].append({
             "name": company,
@@ -536,17 +537,17 @@ def calculate_changes(df):
     second_last_df = df_copy[df_copy['Date'] == second_last_date]
 
     # Compute averages for the latest date
-    amp_avg_latest = latest_df[amp_columns].mean(axis=1).mean().round(1)
+    amp_avg_latest = latest_df[amp_columns].mean(axis=1).mean().round(1) or 0
 
-    amp_avg_video_latest = latest_df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).mean().round(1)
+    amp_avg_video_latest = latest_df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).mean().round(1) or 0
     
-    amp_avg_note_latest = latest_df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1)
+    amp_avg_note_latest = latest_df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1) or 0
     
-    amp_avg_second_last = second_last_df[amp_columns].mean(axis=1).mean().round(1)
+    amp_avg_second_last = second_last_df[amp_columns].mean(axis=1).mean().round(1) or 0
 
-    amp_avg_video_second_last = second_last_df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).mean().round(1)
+    amp_avg_video_second_last = second_last_df[[col for col in amp_columns if 'Video' in col]].mean(axis=1).mean().round(1) or 0
 
-    amp_avg_note_second_last = second_last_df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1)
+    amp_avg_note_second_last = second_last_df[[col for col in amp_columns if 'Note' in col]].mean(axis=1).mean().round(1) or 0
 
     # Calculate the changes
     amp_change = safe_division(amp_avg_latest , amp_avg_second_last)
@@ -574,27 +575,27 @@ def calculate_changes(df):
     for (index, company) in enumerate(amp_columns_raw):
         company_avg_latest = round(latest_df[
             [col for col in amp_columns if company in col]
-        ].mean(axis=1).mean(), 1)
+        ].mean(axis=1).mean() or 0, 1)
 
         company_avg_video_latest = round(latest_df[
             [col for col in amp_columns if 'Video' in col and company in col]
-        ].mean(axis=1).mean(), 1)
+        ].mean(axis=1).mean() or 0, 1)
 
         company_avg_note_latest = round(latest_df[
             [col for col in amp_columns if 'Note' in col and company in col]
-        ].mean(axis=1).mean(), 1)
+        ].mean(axis=1).mean() or 0, 1)
 
         company_avg_second_last = round(second_last_df[
             [col for col in amp_columns if company in col]
-        ].mean(axis=1).mean(), 1)
+        ].mean(axis=1).mean() or 0, 1)
 
         company_avg_video_second_last = round(second_last_df[
             [col for col in amp_columns if 'Video' in col and company in col]
-        ].mean(axis=1).mean(), 1)
+        ].mean(axis=1).mean() or 0, 1)
 
         company_avg_note_second_last = round(second_last_df[
             [col for col in amp_columns if 'Note' in col and company in col]
-        ].mean(axis=1).mean(), 1)
+        ].mean(axis=1).mean() or 0, 1)
 
         # Add AMP-level data comparison
         amp_change = safe_division(company_avg_latest, company_avg_second_last)

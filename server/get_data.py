@@ -238,8 +238,8 @@ def calculate_weekly_averages(df):
 
     # Helper function to calculate non-zero mean and handle nulls
     def calc_avg(df_slice, columns):
-        avg = round(df_slice[columns][df_slice[columns] != 0].mean(axis=1).mean(), 1)
-        return 0 if pd.isna(avg) else avg
+        avg = round(df_slice[columns][df_slice[columns] != 0].mean(axis=1).mean() or 0, 1)
+        return avg
 
     # Group the data by year and month
     grouped = df.groupby(['Date'])
@@ -292,15 +292,15 @@ def calculate_weekly_averages(df):
             company_avg = round(month_df[[
                 col for col in tv_azteca_columns if company in col]][month_df[[
                 col for col in tv_azteca_columns if company in col]] != 0].mean(
-                axis=1).mean(), 1)
+                axis=1).mean() or 0, 1)
             company_avg_video = round(month_df[[
                 col for col in tv_azteca_columns if 'Video' in col and company in col]][month_df[[
                 col for col in tv_azteca_columns if 'Video' in col and company in col]] != 0].mean(
-                axis=1).mean(), 1)
+                axis=1).mean() or 0, 1)
             company_avg_note = round(month_df[[
                 col for col in tv_azteca_columns if 'Note' in col and company in col]][month_df[[
                 col for col in tv_azteca_columns if 'Note' in col and company in col]] != 0].mean(
-                axis=1).mean(), 1)
+                axis=1).mean() or 0, 1)
             if (len(months) > 0):
                 item = prev_month.get("azteca")[index]
                 prev_company_avg_video = item["video"]
@@ -643,21 +643,21 @@ def calculate_all_time_averages(df):
     date = timezone.now()
 
     tv_azteca_avg = df[tv_azteca_columns].mean(
-        axis=1).mean().round(1)
+        axis=1).mean().round(1) or 0
     competition_avg = df[competition_columns].mean(
-        axis=1).mean().round(1)
+        axis=1).mean().round(1) or 0
     tv_azteca_avg_video = df[[
         col for col in tv_azteca_columns if 'Video' in col]].mean(
-        axis=1).mean().round(1)
+        axis=1).mean().round(1) or 0
     competition_avg_video = df[[
         col for col in competition_columns if 'Video' in col]].mean(
-        axis=1).mean().round(1)
+        axis=1).mean().round(1) or 0
     tv_azteca_avg_note = df[[
         col for col in tv_azteca_columns if 'Note' in col]].mean(
-        axis=1).mean().round(1)
+        axis=1).mean().round(1) or 0
     competition_avg_note = df[[
         col for col in competition_columns if 'Note' in col]].mean(
-        axis=1).mean().round(1)
+        axis=1).mean().round(1) or 0
 
         
     res = {
@@ -681,13 +681,13 @@ def calculate_all_time_averages(df):
     for (index, company) in enumerate(azteca_columns_raw):
         company_avg = df[[
             col for col in tv_azteca_columns if company in col]].mean(
-            axis=1).mean().round(1)
+            axis=1).mean().round(1) or 0
         company_avg_video = df[[
             col for col in tv_azteca_columns if 'Video' in col and company in col]].mean(
-            axis=1).mean().round(1)
+            axis=1).mean().round(1) or 0
         company_avg_note = df[[
             col for col in tv_azteca_columns if 'Note' in col and company in col]].mean(
-            axis=1).mean().round(1)
+            axis=1).mean().round(1) or 0
 
         res["azteca"].append({
             "name": company,
@@ -702,13 +702,13 @@ def calculate_all_time_averages(df):
     for (index, company) in enumerate(competition_columns_raw):
         company_avg = df[[
             col for col in competition_columns if company in col]].mean(
-            axis=1).mean().round(1)
+            axis=1).mean().round(1) or 0
         company_avg_video = df[[
             col for col in competition_columns if "Video" in col and company in col]].mean(
-            axis=1).mean().round(1)
+            axis=1).mean().round(1) or 0
         company_avg_note = df[[
             col for col in competition_columns if "Note" in col and company in col]].mean(
-            axis=1).mean().round(1)
+            axis=1).mean().round(1) or 0
 
         res["competition"].append({
             "name": company,
@@ -741,31 +741,31 @@ def calculate_changes(df):
 
     # Compute averages for the latest date
     tv_azteca_avg_latest = latest_df[tv_azteca_columns].mean(
-        axis=1).mean().round(1)
+        axis=1).mean().round(1) or 0
     competition_avg_latest = latest_df[competition_columns].mean(
-        axis=1).mean().round(1)
+        axis=1).mean().round(1) or 0
     tv_azteca_avg_video_latest = latest_df[[
-        col for col in tv_azteca_columns if 'Video' in col]].mean(axis=1).mean().round(1)
+        col for col in tv_azteca_columns if 'Video' in col]].mean(axis=1).mean().round(1) or 0
     competition_avg_video_latest = latest_df[[
-        col for col in competition_columns if 'Video' in col]].mean(axis=1).mean().round(1)
+        col for col in competition_columns if 'Video' in col]].mean(axis=1).mean().round(1) or 0
     tv_azteca_avg_note_latest = latest_df[[
-        col for col in tv_azteca_columns if 'Note' in col]].mean(axis=1).mean().round(1)
+        col for col in tv_azteca_columns if 'Note' in col]].mean(axis=1).mean().round(1) or 0
     competition_avg_note_latest = latest_df[[
-        col for col in competition_columns if 'Note' in col]].mean(axis=1).mean().round(1)
+        col for col in competition_columns if 'Note' in col]].mean(axis=1).mean().round(1) or 0
 
     # Compute averages for the second-to-last date
     tv_azteca_avg_second_last = second_last_df[tv_azteca_columns].mean(
-        axis=1).mean().round(1)
+        axis=1).mean().round(1) or 0
     competition_avg_second_last = second_last_df[competition_columns].mean(
-        axis=1).mean().round(1)
+        axis=1).mean().round(1) or 0
     tv_azteca_avg_video_second_last = second_last_df[[
-        col for col in tv_azteca_columns if 'Video' in col]].mean(axis=1).mean().round(1)
+        col for col in tv_azteca_columns if 'Video' in col]].mean(axis=1).mean().round(1) or 0
     competition_avg_video_second_last = second_last_df[[
-        col for col in competition_columns if 'Video' in col]].mean(axis=1).mean().round(1)
+        col for col in competition_columns if 'Video' in col]].mean(axis=1).mean().round(1) or 0
     tv_azteca_avg_note_second_last = second_last_df[[
-        col for col in tv_azteca_columns if 'Note' in col]].mean(axis=1).mean().round(1)
+        col for col in tv_azteca_columns if 'Note' in col]].mean(axis=1).mean().round(1) or 0
     competition_avg_note_second_last = second_last_df[[
-        col for col in competition_columns if 'Note' in col]].mean(axis=1).mean().round(1)
+        col for col in competition_columns if 'Note' in col]].mean(axis=1).mean().round(1) or 0
 
     # Calculate the changes
     tv_azteca_change = safe_division(tv_azteca_avg_latest, tv_azteca_avg_second_last)
@@ -797,18 +797,18 @@ def calculate_changes(df):
     # Add company-level data comparison (Azteca)
     for (index, company) in enumerate(azteca_columns_raw):
         company_avg_latest = latest_df[[
-            col for col in tv_azteca_columns if company in col]].mean(axis=1).mean().round(1)
+            col for col in tv_azteca_columns if company in col]].mean(axis=1).mean().round(1) or 0
         company_avg_video_latest = latest_df[[
-            col for col in tv_azteca_columns if 'Video' in col and company in col]].mean(axis=1).mean().round(1)
+            col for col in tv_azteca_columns if 'Video' in col and company in col]].mean(axis=1).mean().round(1) or 0
         company_avg_note_latest = latest_df[[
-            col for col in tv_azteca_columns if 'Note' in col and company in col]].mean(axis=1).mean().round(1)
+            col for col in tv_azteca_columns if 'Note' in col and company in col]].mean(axis=1).mean().round(1) or 0
 
         company_avg_second_last = second_last_df[[
-            col for col in tv_azteca_columns if company in col]].mean(axis=1).mean().round(1)
+            col for col in tv_azteca_columns if company in col]].mean(axis=1).mean().round(1) or 0
         company_avg_video_second_last = second_last_df[[
-            col for col in tv_azteca_columns if 'Video' in col and company in col]].mean(axis=1).mean().round(1)
+            col for col in tv_azteca_columns if 'Video' in col and company in col]].mean(axis=1).mean().round(1) or 0
         company_avg_note_second_last = second_last_df[[
-            col for col in tv_azteca_columns if 'Note' in col and company in col]].mean(axis=1).mean().round(1)
+            col for col in tv_azteca_columns if 'Note' in col and company in col]].mean(axis=1).mean().round(1) or 0
 
         company_change = safe_division(company_avg_latest, company_avg_second_last)
         company_change_video = safe_division(company_avg_video_latest, company_avg_video_second_last)
@@ -827,18 +827,18 @@ def calculate_changes(df):
     # Add company-level data comparison (Competition)
     for (index, company) in enumerate(competition_columns_raw):
         company_avg_latest = latest_df[[
-            col for col in competition_columns if company in col]].mean(axis=1).mean().round(1)
+            col for col in competition_columns if company in col]].mean(axis=1).mean().round(1) or 0
         company_avg_video_latest = latest_df[[
-            col for col in competition_columns if 'Video' in col and company in col]].mean(axis=1).mean().round(1)
+            col for col in competition_columns if 'Video' in col and company in col]].mean(axis=1).mean().round(1) or 0
         company_avg_note_latest = latest_df[[
-            col for col in competition_columns if 'Note' in col and company in col]].mean(axis=1).mean().round(1)
+            col for col in competition_columns if 'Note' in col and company in col]].mean(axis=1).mean().round(1) or 0
 
         company_avg_second_last = second_last_df[[
-            col for col in competition_columns if company in col]].mean(axis=1).mean().round(1)
+            col for col in competition_columns if company in col]].mean(axis=1).mean().round(1) or 0
         company_avg_video_second_last = second_last_df[[
-            col for col in competition_columns if 'Video' in col and company in col]].mean(axis=1).mean().round(1)
+            col for col in competition_columns if 'Video' in col and company in col]].mean(axis=1).mean().round(1) or 0
         company_avg_note_second_last = second_last_df[[
-            col for col in competition_columns if 'Note' in col and company in col]].mean(axis=1).mean().round(1)
+            col for col in competition_columns if 'Note' in col and company in col]].mean(axis=1).mean().round(1) or 0
 
         company_change = safe_division(company_avg_latest, company_avg_second_last)
         company_change_video = safe_division(company_avg_video_latest, company_avg_video_second_last)

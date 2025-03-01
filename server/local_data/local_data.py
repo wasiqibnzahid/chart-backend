@@ -142,18 +142,18 @@ def init(inner_data=None):
     df = pd.DataFrame(inner_data)
 
     # Calculate averages excluding zeros
-    df['TV Azteca Avg'] = df[azteca_columns][df[azteca_columns] != 0].mean(axis=1).round(1)
-    df['Competition Avg'] = df[competition_columns][df[competition_columns] != 0].mean(axis=1).round(1)
+    df['TV Azteca Avg'] = df[azteca_columns][df[azteca_columns] != 0].mean(axis=1).round(1) or 0
+    df['Competition Avg'] = df[competition_columns][df[competition_columns] != 0].mean(axis=1).round(1) or 0
 
     df['TV Azteca Note Avg'] = df[[col for col in azteca_columns if 'Note' in col]][
-        df[[col for col in azteca_columns if 'Note' in col]] != 0].mean(axis=1).round(1)
+        df[[col for col in azteca_columns if 'Note' in col]] != 0].mean(axis=1).round(1) or 0
     df['Competition Note Avg'] = df[[col for col in competition_columns if 'Note' in col]][
-        df[[col for col in competition_columns if 'Note' in col]] != 0].mean(axis=1).round(1)
+        df[[col for col in competition_columns if 'Note' in col]] != 0].mean(axis=1).round(1) or 0
 
     df['TV Azteca Video Avg'] = df[[col for col in azteca_columns if 'Video' in col]][
-        df[[col for col in azteca_columns if 'Video' in col]] != 0].mean(axis=1).round(1)
+        df[[col for col in azteca_columns if 'Video' in col]] != 0].mean(axis=1).round(1) or 0
     df['Competition Video Avg'] = df[[col for col in competition_columns if 'Video' in col]][
-        df[[col for col in competition_columns if 'Video' in col]] != 0].mean(axis=1).round(1)
+        df[[col for col in competition_columns if 'Video' in col]] != 0].mean(axis=1).round(1) or 0
 
     def pct_change(series):
         return series.pct_change().apply(lambda x: x)
@@ -265,7 +265,7 @@ def formatLolData(df, inner_data):
     totals = []
     for name, dates in combined_data.items():
         # Calculate averages for each date
-        data = [{'x': date, 'y': values['sum'] / values['count']}
+        data = [{'x': date, 'y': (values['sum'] / values['count']) or 0}
                 for date, values in sorted(dates.items())]
         totals.append({'name': name, 'data': data})
     return {
