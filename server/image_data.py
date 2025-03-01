@@ -38,9 +38,12 @@ def init_image_data(inner_data=None):
     metric_columns = [col for col in df.columns if col != 'Date']
 
     # Calculate averages excluding 0 values
-    df['Image Pages Avg'] = df[metric_columns][df[metric_columns] != 0].mean(axis=1).round(1)
-    df['Note Avg'] = df[[col for col in metric_columns if 'Note' in col]][df[[col for col in metric_columns if 'Note' in col]] != 0].mean(axis=1).round(1)
-    df['Video Avg'] = df[[col for col in metric_columns if 'Video' in col]][df[[col for col in metric_columns if 'Video' in col]] != 0].mean(axis=1).round(1)
+    df['Image Pages Avg'] = df[metric_columns].replace(
+        0, pd.NA).mean(axis=1).round(1)
+    df['Note Avg'] = df[[col for col in metric_columns if 'Note' in col]
+                        ].replace(0, pd.NA).mean(axis=1).round(1)
+    df['Video Avg'] = df[[col for col in metric_columns if 'Video' in col]
+                         ].replace(0, pd.NA).mean(axis=1).round(1)
 
     # Calculate changes
     df['Image Pages Change'] = df['Image Pages Avg'].pct_change()
@@ -67,7 +70,7 @@ def calculate_weekly_averages(df: pd.DataFrame):
     df['Date'] = pd.to_datetime(df['Date'])
 
     # Identify Note and Video columns
-    cols = [col for col in df.columns if "(Note)" in col or "(Video)" in col][df[[col for col in df.columns if "(Note)" in col or "(Video)" in col]] != 0]
+    cols = [col for col in df.columns if "(Note)" in col or "(Video)" in col]
 
     grouped = df.groupby(['Date'])
 
