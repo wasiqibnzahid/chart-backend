@@ -143,23 +143,22 @@ def init(inner_data=None):
 
     # Calculating averages
 
-    df['TV Azteca Avg'] = df[azteca_columns][df[[
-            col for col in azteca_columns if True]] != 0].mean(axis=1).round(1)
-    df['Competition Avg'] = df[competition_columns].mean(axis=1).round(1)
+    df['TV Azteca Avg'] = df[azteca_columns + competition_columns][df[azteca_columns + competition_columns] != 0].mean(axis=1).round(1)
+    df['Competition Avg'] = df[azteca_columns + competition_columns][df[azteca_columns + competition_columns] != 0].mean(axis=1).round(1)
 
     df['TV Azteca Note Avg'] = df[[
-        col for col in azteca_columns if True]][df[[
-        col for col in azteca_columns if True]] != 0].mean(axis=1).round(1)
+        col for col in azteca_columns + competition_columns if 'Note' in col]][df[[
+        col for col in azteca_columns + competition_columns if 'Note' in col]] != 0].mean(axis=1).round(1)
     df['Competition Note Avg'] = df[[
-        col for col in competition_columns if True]][df[[
-        col for col in competition_columns if True]] != 0].mean(axis=1).round(1)
+        col for col in azteca_columns + competition_columns if 'Note' in col]][df[[
+        col for col in azteca_columns + competition_columns if 'Note' in col]] != 0].mean(axis=1).round(1)
 
     df['TV Azteca Video Avg'] = df[[
-        col for col in azteca_columns if True]][df[[
-        col for col in azteca_columns if True]] != 0].mean(axis=1).round(1)
+        col for col in azteca_columns + competition_columns if 'Video' in col]][df[[
+        col for col in azteca_columns + competition_columns if 'Video' in col]] != 0].mean(axis=1).round(1)
     df['Competition Video Avg'] = df[[
-        col for col in competition_columns if True]][df[[
-        col for col in competition_columns if True]] != 0].mean(axis=1).round(1)
+        col for col in azteca_columns + competition_columns if 'Video' in col]][df[[
+        col for col in azteca_columns + competition_columns if 'Video' in col]] != 0].mean(axis=1).round(1)
 
     def pct_change(series):
         return series.pct_change().apply(lambda x: x)
