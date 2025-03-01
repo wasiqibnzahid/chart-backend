@@ -104,19 +104,19 @@ def init(inner_data=None):
         inner_data = fetch_records()
     df = pd.DataFrame(inner_data)
 
-    # Calculating averages
-    df['TV Azteca Avg'] = df[tv_azteca_columns].mean(axis=1).round(1)
-    df['Competition Avg'] = df[competition_columns].mean(axis=1).round(1)
+    # Helper function to calculate mean excluding zeros
+    def non_zero_mean(df, columns):
+        return df[columns][df[columns] != 0].mean(axis=1).round(1)
 
-    df['TV Azteca Note Avg'] = df[[
-        col for col in tv_azteca_columns if 'Note' in col]].mean(axis=1).round(1)
-    df['Competition Note Avg'] = df[[
-        col for col in competition_columns if 'Note' in col]].mean(axis=1).round(1)
+    # Calculating averages excluding zeros
+    df['TV Azteca Avg'] = non_zero_mean(df, tv_azteca_columns)
+    df['Competition Avg'] = non_zero_mean(df, competition_columns)
 
-    df['TV Azteca Video Avg'] = df[[
-        col for col in tv_azteca_columns if 'Video' in col]].mean(axis=1).round(1)
-    df['Competition Video Avg'] = df[[
-        col for col in competition_columns if 'Video' in col]].mean(axis=1).round(1)
+    df['TV Azteca Note Avg'] = non_zero_mean(df, [col for col in tv_azteca_columns if 'Note' in col])
+    df['Competition Note Avg'] = non_zero_mean(df, [col for col in competition_columns if 'Note' in col])
+
+    df['TV Azteca Video Avg'] = non_zero_mean(df, [col for col in tv_azteca_columns if 'Video' in col])
+    df['Competition Video Avg'] = non_zero_mean(df, [col for col in competition_columns if 'Video' in col])
 
     def pct_change(series):
         return series.pct_change().apply(lambda x: x)
@@ -129,6 +129,7 @@ def init(inner_data=None):
 
     df['TV Azteca Video Change'] = pct_change(df['TV Azteca Video Avg'])
     df['Competition Video Change'] = pct_change(df['Competition Video Avg'])
+
     return df
 
 
@@ -229,54 +230,37 @@ def calculate_relevant_insights(filtered_df, companies, title, date_filter=None)
 
 
 def calculate_weekly_averages(df):
-
     months = []
     df['Date'] = pd.to_datetime(df['Date'])
     df['Year'] = df['Date'].dt.year
     df['Month'] = df['Date'].dt.to_period('M')
 
+    # Helper function to calculate non-zero mean
+    def non_zero_mean(df, columns):
+        return df[columns][df[columns] != 0].mean(axis=1).mean().round(1)
+
     # Group the data by year and month
     grouped = df.groupby(['Date'])
 
     for (date,), month_df in grouped:
-        tv_azteca_avg = month_df[tv_azteca_columns][month_df[tv_azteca_columns] != 0].mean(
-            axis=1).mean().round(1)
-        competition_avg = month_df[competition_columns][month_df[competition_columns] != 0].mean(
-            axis=1).mean().round(1)
-        tv_azteca_avg_video = month_df[[
-            col for col in tv_azteca_columns if 'Video' in col]][month_df[[
-            col for col in tv_azteca_columns if 'Video' in col]] != 0].mean(
-            axis=1).mean().round(1)
-        competition_avg_video = month_df[[
-            col for col in competition_columns if 'Video' in col]][month_df[[
-            col for col in competition_columns if 'Video' in col]] != 0].mean(
-            axis=1).mean().round(1)
-        tv_azteca_avg_note = month_df[[
-            col for col in tv_azteca_columns if 'Note' in col]][month_df[[
-            col for col in tv_azteca_columns if 'Note' in col]] != 0].mean(
-            axis=1).mean().round(1)
-        competition_avg_note = month_df[[
-            col for col in competition_columns if 'Note' in col]][month_df[[
-            col for col in competition_columns if 'Note' in col]] != 0].mean(
-            axis=1).mean().round(1)
-        azteca_map = {}
-        competition_map = {}
+        tv_azteca_avg = non_zero_mean(month_df, tv_azteca_columns)
+        competition_avg = non_zero_mean(month_df, competition_columns)
+        
+        tv_azteca_avg_video = non_zero_mean(month_df, [col for col in tv_azteca_columns if 'Video' in col])
+        competition_avg_video = non_zero_mean(month_df, [col for col in competition_columns if 'Video' in col])
+        
+        tv_azteca_avg_note = non_zero_mean(month_df, [col for col in tv_azteca_columns if 'Note' in col])
+        competition_avg_note = non_zero_mean(month_df, [col for col in competition_columns if 'Note' in col])
 
+        # Calculate changes
         if months:
             prev_month = months[-1]
-            prev_tv_azteca_avg = prev_month['TV Azteca Avg']
-            prev_competition_avg = prev_month['Competition Avg']
-            prev_tv_azteca_avg_video = prev_month['TV Azteca Video Avg']
-            prev_competition_avg_video = prev_month['Competition Video Avg']
-            prev_tv_azteca_avg_note = prev_month['TV Azteca Note Avg']
-            prev_competition_avg_note = prev_month['Competition Note Avg']
-
-            tv_azteca_change = safe_division(tv_azteca_avg, prev_tv_azteca_avg)
-            competition_change = safe_division(competition_avg, prev_competition_avg)
-            tv_azteca_change_video = safe_division(tv_azteca_avg_video, prev_tv_azteca_avg_video)
-            competition_change_video = safe_division(competition_avg_video, prev_competition_avg_video)
-            tv_azteca_change_note = safe_division( tv_azteca_avg_note, prev_tv_azteca_avg_note)
-            competition_change_note = safe_division(competition_avg_note, prev_competition_avg_note)
+            tv_azteca_change = safe_division(tv_azteca_avg, prev_month['TV Azteca Avg'])
+            competition_change = safe_division(competition_avg, prev_month['Competition Avg'])
+            tv_azteca_change_video = safe_division(tv_azteca_avg_video, prev_month['TV Azteca Video Avg'])
+            competition_change_video = safe_division(competition_avg_video, prev_month['Competition Video Avg'])
+            tv_azteca_change_note = safe_division(tv_azteca_avg_note, prev_month['TV Azteca Note Avg'])
+            competition_change_note = safe_division(competition_avg_note, prev_month['Competition Note Avg'])
         else:
             tv_azteca_change = ""
             competition_change = ""
@@ -284,6 +268,7 @@ def calculate_weekly_averages(df):
             competition_change_note = ""
             tv_azteca_change_video = ""
             competition_change_video = ""
+
         res = {
             'Date': f"{date.date()}",
             'TV Azteca Change': tv_azteca_change,
@@ -303,14 +288,18 @@ def calculate_weekly_averages(df):
         }
 
         for (index, company) in enumerate(azteca_columns_raw):
+            # Update company averages to ignore zeros
             company_avg = month_df[[
-                col for col in tv_azteca_columns if company in col]].mean(
+                col for col in tv_azteca_columns if company in col]][month_df[[
+                col for col in tv_azteca_columns if company in col]] != 0].mean(
                 axis=1).mean().round(1)
             company_avg_video = month_df[[
-                col for col in tv_azteca_columns if 'Video' in col and company in col]].mean(
+                col for col in tv_azteca_columns if 'Video' in col and company in col]][month_df[[
+                col for col in tv_azteca_columns if 'Video' in col and company in col]] != 0].mean(
                 axis=1).mean().round(1)
             company_avg_note = month_df[[
-                col for col in tv_azteca_columns if 'Note' in col and company in col]].mean(
+                col for col in tv_azteca_columns if 'Note' in col and company in col]][month_df[[
+                col for col in tv_azteca_columns if 'Note' in col and company in col]] != 0].mean(
                 axis=1).mean().round(1)
             if (len(months) > 0):
                 item = prev_month.get("azteca")[index]
@@ -1035,8 +1024,10 @@ def get_averages():
     df = init()
     quarter_data = formatToJson(
         calculate_quarterly_averages(df))
+    
     week_data = formatToJson(
         calculate_weekly_averages(df))
+    
     yearly_data = formatToJson(
         calculate_yearly_averages(df)
     )

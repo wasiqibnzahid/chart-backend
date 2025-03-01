@@ -38,12 +38,11 @@ def init_image_data(inner_data=None):
     metric_columns = [col for col in df.columns if col != 'Date']
 
     # Calculate averages excluding 0 values
-    df['Image Pages Avg'] = df[metric_columns].replace(
-        0, pd.NA).mean(axis=1).round(1)
-    df['Note Avg'] = df[[col for col in metric_columns if 'Note' in col]
-                        ].replace(0, pd.NA).mean(axis=1).round(1)
-    df['Video Avg'] = df[[col for col in metric_columns if 'Video' in col]
-                         ].replace(0, pd.NA).mean(axis=1).round(1)
+    df['Image Pages Avg'] = df[metric_columns][df[metric_columns] != 0].mean(axis=1).round(1)
+    df['Note Avg'] = df[[col for col in metric_columns if 'Note' in col]][
+        df[[col for col in metric_columns if 'Note' in col]] != 0].mean(axis=1).round(1)
+    df['Video Avg'] = df[[col for col in metric_columns if 'Video' in col]][
+        df[[col for col in metric_columns if 'Video' in col]] != 0].mean(axis=1).round(1)
 
     # Calculate changes
     df['Image Pages Change'] = df['Image Pages Avg'].pct_change()
@@ -75,9 +74,8 @@ def calculate_weekly_averages(df: pd.DataFrame):
     grouped = df.groupby(['Date'])
 
     for (date,), month_df in grouped:
-        # Aggregate across all Note/Video columns
-        avg_value = month_df[cols].apply(
-            lambda x: non_zero_avg(x.values.flatten()), axis=1).mean()
+        # Aggregate across all Note/Video columns excluding zeros
+        avg_value = month_df[cols][month_df[cols] != 0].mean(axis=1).mean().round(1)
 
         image_avg = avg_value  # Use computed average
 
