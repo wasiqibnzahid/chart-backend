@@ -24,7 +24,7 @@ def dummy_reverse(apps, schema_editor):
     pass
 
 def safe_division(
-    numerator: Optional[float], denominator: Optional[float], default: float = 100.0
+    numerator: Optional[float], denominator: Optional[float], default: float = 1
 ) -> float:
     try:
         if denominator in [0, None] or pd.isna(denominator) or pd.isna(numerator):

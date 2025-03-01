@@ -293,6 +293,10 @@ def calculate_weekly_averages(df):
                 col for col in tv_azteca_columns if company in col]][month_df[[
                 col for col in tv_azteca_columns if company in col]] != 0].mean(
                 axis=1).mean() or 0, 1)
+            za = month_df[[
+                col for col in tv_azteca_columns if company in col]][month_df[[
+                col for col in tv_azteca_columns if company in col]] != 0].mean(
+                axis=1).mean() or 0, 1
             company_avg_video = round(month_df[[
                 col for col in tv_azteca_columns if 'Video' in col and company in col]][month_df[[
                 col for col in tv_azteca_columns if 'Video' in col and company in col]] != 0].mean(
@@ -319,6 +323,7 @@ def calculate_weekly_averages(df):
                 "total": company_avg,
                 "video": company_avg_video,
                 "note": company_avg_note,
+                "za": za,
                 "total_change": 0 if pd.isna(company_change) else (company_change or 0),
                 "video_change": 0 if pd.isna(company_change_video) else (company_change_video or 0),
                 "note_change": 0 if pd.isna(company_change_note) else (company_change_note or 0)
