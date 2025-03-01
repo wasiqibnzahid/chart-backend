@@ -37,15 +37,10 @@ def init_image_data(inner_data=None):
     # Get all column names except 'Date'
     metric_columns = [col for col in df.columns if col != 'Date']
 
-    # Helper function to calculate mean excluding zeros and handle nulls
-    def calc_avg(df_slice, columns):
-        result = df_slice[columns][df_slice[columns] != 0].mean(axis=1).round(1) or 0
-        return result.fillna(0)
-
     # Calculate averages excluding 0 values
-    df['Image Pages Avg'] = calc_avg(df, metric_columns)
-    df['Note Avg'] = calc_avg(df, [col for col in metric_columns if 'Note' in col])
-    df['Video Avg'] = calc_avg(df, [col for col in metric_columns if 'Video' in col])
+    df['Image Pages Avg'] = df[metric_columns][df[metric_columns] != 0].mean(axis=1).round(1)
+    df['Note Avg'] = df[[col for col in metric_columns if 'Note' in col]][df[[col for col in metric_columns if 'Note' in col]] != 0].mean(axis=1).round(1)
+    df['Video Avg'] = df[[col for col in metric_columns if 'Video' in col]][df[[col for col in metric_columns if 'Video' in col]] != 0].mean(axis=1).round(1)
 
     # Calculate changes
     df['Image Pages Change'] = df['Image Pages Avg'].pct_change()
@@ -59,7 +54,7 @@ def non_zero_avg(series):
     """Compute average ignoring zeros"""
     non_zero_values = series[series != 0]  # Exclude zeros
     non_zero_values = pd.Series(non_zero_values)  # Ensure it's a Pandas Series
-    return non_zero_values.mean() or 0.0 if not non_zero_values.empty else 0.0
+    return non_zero_values.mean() if not non_zero_values.empty else 0.0
 
 
 def safe_division(numerator, denominator):
@@ -72,14 +67,14 @@ def calculate_weekly_averages(df: pd.DataFrame):
     df['Date'] = pd.to_datetime(df['Date'])
 
     # Identify Note and Video columns
-    cols = [col for col in df.columns if "(Note)" in col or "(Video)" in col]
+    cols = [col for col in df.columns if "(Note)" in col or "(Video)" in col][df[[col for col in df.columns if "(Note)" in col or "(Video)" in col]] != 0]
 
     grouped = df.groupby(['Date'])
 
     for (date,), month_df in grouped:
-        # Aggregate across all Note/Video columns excluding zeros
-        avg_value = month_df[cols][month_df[[col for col in cols if True]] != 0].mean(axis=1).mean()
-        avg_value = 0 if pd.isna(avg_value) else avg_value
+        # Aggregate across all Note/Video columns
+        avg_value = month_df[cols].apply(
+            lambda x: non_zero_avg(x.values.flatten()), axis=1).mean()
 
         image_avg = avg_value  # Use computed average
 
@@ -123,11 +118,11 @@ def calculate_quarterly_averages(df):
 
         # Calculate averages
         image_avg = quarter_df[metric_columns].replace(
-            0, pd.NA).mean(axis=1).mean().round(1) or 0
+            0, pd.NA).mean(axis=1).mean().round(1)
         note_avg = quarter_df[[col for col in metric_columns if 'Note' in col]].replace(
-            0, pd.NA).mean(axis=1).mean().round(1) or 0
+            0, pd.NA).mean(axis=1).mean().round(1)
         video_avg = quarter_df[[col for col in metric_columns if 'Video' in col]].replace(
-            0, pd.NA).mean(axis=1).mean().round(1) or 0
+            0, pd.NA).mean(axis=1).mean().round(1)
 
         # Calculate changes
         if quarters:
@@ -171,11 +166,11 @@ def calculate_yearly_averages(df):
 
         # Calculate averages
         image_avg = year_df[metric_columns].replace(
-            0, pd.NA).mean(axis=1).mean().round(1) or 0
+            0, pd.NA).mean(axis=1).mean().round(1)
         note_avg = year_df[[col for col in metric_columns if 'Note' in col]].replace(
-            0, pd.NA).mean(axis=1).mean().round(1) or 0
+            0, pd.NA).mean(axis=1).mean().round(1)
         video_avg = year_df[[col for col in metric_columns if 'Video' in col]].replace(
-            0, pd.NA).mean(axis=1).mean().round(1) or 0
+            0, pd.NA).mean(axis=1).mean().round(1)
 
         # Calculate changes
         if years:
@@ -211,11 +206,11 @@ def calculate_all_time_averages(df):
 
     # Calculate all-time averages
     image_avg = df[metric_columns].replace(
-        0, pd.NA).mean(axis=1).mean().round(1) or 0
+        0, pd.NA).mean(axis=1).mean().round(1)
     note_avg = df[[col for col in metric_columns if 'Note' in col]].replace(
-        0, pd.NA).mean(axis=1).mean().round(1) or 0
+        0, pd.NA).mean(axis=1).mean().round(1)
     video_avg = df[[col for col in metric_columns if 'Video' in col]].replace(
-        0, pd.NA).mean(axis=1).mean().round(1) or 0
+        0, pd.NA).mean(axis=1).mean().round(1)
 
     return {
         'Date': timezone.now().date().isoformat(),
