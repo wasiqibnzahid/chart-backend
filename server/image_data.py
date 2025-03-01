@@ -78,7 +78,7 @@ def calculate_weekly_averages(df: pd.DataFrame):
 
     for (date,), month_df in grouped:
         # Aggregate across all Note/Video columns excluding zeros
-        avg_value = round(month_df[cols][month_df[cols] != 0].mean(axis=1).mean() or 0, 1)
+        avg_value = month_df[cols][month_df[[col for col in cols if True]] != 0].mean(axis=1).mean()
         avg_value = 0 if pd.isna(avg_value) else avg_value
 
         image_avg = avg_value  # Use computed average
