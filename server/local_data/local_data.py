@@ -142,10 +142,10 @@ def init(inner_data=None):
     df = pd.DataFrame(inner_data)
 
     # Calculate averages excluding zeros
-    df['TV Azteca Avg'] = df[azteca_columns][df[azteca_columns] != 0].mean(axis=1).round(1) or 0
+    df['TV Azteca Avg'] = df[[col for col in azteca_columns if True]][df[[col for col in azteca_columns if True]] != 0].mean(axis=1).round(1) or 0
     df['TV Azteca Avg'] = 0 if pd.isna(df['TV Azteca Avg']) else df['TV Azteca Avg']
 
-    df['Competition Avg'] = df[competition_columns][df[competition_columns] != 0].mean(axis=1).round(1) or 0
+    df['Competition Avg'] = df[[col for col in competition_columns if True]][df[[col for col in competition_columns if True]] != 0].mean(axis=1).round(1) or 0
     df['Competition Avg'] = 0 if pd.isna(df['Competition Avg']) else df['Competition Avg']
 
     df['TV Azteca Note Avg'] = df[[col for col in azteca_columns if 'Note' in col]][

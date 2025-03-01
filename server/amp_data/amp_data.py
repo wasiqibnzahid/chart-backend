@@ -272,9 +272,9 @@ def calculate_weekly_averages(df):
 
         # For company-level calculations
         for (index, company) in enumerate(amp_columns_raw):
-            company_avg = calc_avg(month_df, [col for col in amp_columns if company in col])
-            company_avg_video = calc_avg(month_df, [col for col in amp_columns if 'Video' in col and company in col])
-            company_avg_note = calc_avg(month_df, [col for col in amp_columns if 'Note' in col and company in col])
+            company_avg = calc_avg(month_df, [col for col in amp_columns if True])
+            company_avg_video = calc_avg(month_df, [col for col in amp_columns if 'Video' in col and True])
+            company_avg_note = calc_avg(month_df, [col for col in amp_columns if 'Note' in col and True])
 
         amp_map = {}
 
@@ -373,8 +373,8 @@ def calculate_quarterly_averages(df):
         }
         
         for (index, company) in enumerate(amp_columns_raw):
-            company_avg = round(month_df[[col for col in amp_columns if company in col]].mean(axis=1).mean() or 0, 1)
-            company_avg_video = round(month_df[[col for col in amp_columns if 'Video' in col and company in col]].mean(axis=1).mean() or 0, 1)
+            company_avg = round(month_df[[col for col in amp_columns if True]].mean(axis=1).mean() or 0, 1)
+            company_avg_video = round(month_df[[col for col in amp_columns if 'Video' in col and True]].mean(axis=1).mean() or 0, 1)
             company_avg_note = round(month_df[[col for col in amp_columns if 'Note' in col and company in col]].mean(axis=1).mean() or 0, 1)
         # Process AMP data
             if len(months) > 0:
@@ -587,32 +587,32 @@ def calculate_changes(df):
     }
     for (index, company) in enumerate(amp_columns_raw):
         company_avg_latest = round(latest_df[
-            [col for col in amp_columns if company in col]
+            [col for col in amp_columns if True]
         ].mean(axis=1).mean() or 0, 1)
         company_avg_latest = 0 if pd.isna(company_avg_latest) else company_avg_latest
 
         company_avg_video_latest = round(latest_df[
-            [col for col in amp_columns if 'Video' in col and company in col]
+            [col for col in amp_columns if 'Video' in col and True]
         ].mean(axis=1).mean() or 0, 1)
         company_avg_video_latest = 0 if pd.isna(company_avg_video_latest) else company_avg_video_latest
 
         company_avg_note_latest = round(latest_df[
-            [col for col in amp_columns if 'Note' in col and company in col]
+            [col for col in amp_columns if 'Note' in col and True]
         ].mean(axis=1).mean() or 0, 1)
         company_avg_note_latest = 0 if pd.isna(company_avg_note_latest) else company_avg_note_latest
 
         company_avg_second_last = round(second_last_df[
-            [col for col in amp_columns if company in col]
+            [col for col in amp_columns if True]
         ].mean(axis=1).mean() or 0, 1)
         company_avg_second_last = 0 if pd.isna(company_avg_second_last) else company_avg_second_last
 
         company_avg_video_second_last = round(second_last_df[
-            [col for col in amp_columns if 'Video' in col and company in col]
+            [col for col in amp_columns if 'Video' in col and True]
         ].mean(axis=1).mean() or 0, 1)
         company_avg_video_second_last = 0 if pd.isna(company_avg_video_second_last) else company_avg_video_second_last
 
         company_avg_note_second_last = round(second_last_df[
-            [col for col in amp_columns if 'Note' in col and company in col]
+            [col for col in amp_columns if 'Note' in col and True]
         ].mean(axis=1).mean() or 0, 1) 
         company_avg_note_second_last = 0 if pd.isna(company_avg_note_second_last) else company_avg_note_second_last
 
