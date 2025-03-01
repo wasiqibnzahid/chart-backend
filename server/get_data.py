@@ -289,18 +289,18 @@ def calculate_weekly_averages(df):
 
         for (index, company) in enumerate(azteca_columns_raw):
             # Update company averages to ignore zeros
-            company_avg = month_df[[
+            company_avg = round(month_df[[
                 col for col in tv_azteca_columns if company in col]][month_df[[
                 col for col in tv_azteca_columns if company in col]] != 0].mean(
-                axis=1).mean().round(1)
-            company_avg_video = month_df[[
+                axis=1).mean(), 1)
+            company_avg_video = round(month_df[[
                 col for col in tv_azteca_columns if 'Video' in col and company in col]][month_df[[
                 col for col in tv_azteca_columns if 'Video' in col and company in col]] != 0].mean(
-                axis=1).mean().round(1)
-            company_avg_note = month_df[[
+                axis=1).mean(), 1)
+            company_avg_note = round(month_df[[
                 col for col in tv_azteca_columns if 'Note' in col and company in col]][month_df[[
                 col for col in tv_azteca_columns if 'Note' in col and company in col]] != 0].mean(
-                axis=1).mean().round(1)
+                axis=1).mean(), 1)
             if (len(months) > 0):
                 item = prev_month.get("azteca")[index]
                 prev_company_avg_video = item["video"]
