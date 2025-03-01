@@ -106,7 +106,8 @@ def init(inner_data=None):
 
     # Helper function to calculate mean excluding zeros
     def non_zero_mean(df, columns):
-        return df[columns][df[columns] != 0].mean(axis=1).round(1)
+        result = df[columns][df[columns] != 0].mean(axis=1).round(1)
+        return result.fillna(0)  # Fill NaN values with 0
 
     # Calculating averages excluding zeros
     df['TV Azteca Avg'] = non_zero_mean(df, tv_azteca_columns)
@@ -235,22 +236,21 @@ def calculate_weekly_averages(df):
     df['Year'] = df['Date'].dt.year
     df['Month'] = df['Date'].dt.to_period('M')
 
-    # Helper function to calculate non-zero mean
-    def non_zero_mean(df, columns):
-        return df[columns][df[columns] != 0].mean(axis=1).mean().round(1)
+    # Helper function to calculate non-zero mean and handle nulls
+    def calc_avg(df_slice, columns):
+        avg = round(df_slice[columns][df_slice[columns] != 0].mean(axis=1).mean(), 1)
+        return 0 if pd.isna(avg) else avg
 
     # Group the data by year and month
     grouped = df.groupby(['Date'])
 
     for (date,), month_df in grouped:
-        tv_azteca_avg = non_zero_mean(month_df, tv_azteca_columns)
-        competition_avg = non_zero_mean(month_df, competition_columns)
-        
-        tv_azteca_avg_video = non_zero_mean(month_df, [col for col in tv_azteca_columns if 'Video' in col])
-        competition_avg_video = non_zero_mean(month_df, [col for col in competition_columns if 'Video' in col])
-        
-        tv_azteca_avg_note = non_zero_mean(month_df, [col for col in tv_azteca_columns if 'Note' in col])
-        competition_avg_note = non_zero_mean(month_df, [col for col in competition_columns if 'Note' in col])
+        tv_azteca_avg = calc_avg(month_df, tv_azteca_columns)
+        competition_avg = calc_avg(month_df, competition_columns)
+        tv_azteca_avg_video = calc_avg(month_df, [col for col in tv_azteca_columns if 'Video' in col])
+        competition_avg_video = calc_avg(month_df, [col for col in competition_columns if 'Video' in col])
+        tv_azteca_avg_note = calc_avg(month_df, [col for col in tv_azteca_columns if 'Note' in col])
+        competition_avg_note = calc_avg(month_df, [col for col in competition_columns if 'Note' in col])
 
         # Calculate changes
         if months:

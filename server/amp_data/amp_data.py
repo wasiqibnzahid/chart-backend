@@ -154,17 +154,17 @@ def fetch_records():
 def init(inner_data=None):
     if inner_data is None:
         inner_data = fetch_records()
-    # print('This is Amp Inner data',inner_data)
     df = pd.DataFrame(inner_data)
     
+    # Helper function to calculate mean excluding zeros and handle nulls
+    def calc_avg(df_slice, columns):
+        result = df_slice[columns][df_slice[columns] != 0].mean(axis=1).round(1)
+        return result.fillna(0)
+    
     # Calculate averages excluding zeros
-    df['AMP Avg'] = df[amp_columns][df[amp_columns] != 0].mean(axis=1).round(1)
-
-    df['AMP Note Avg'] = df[[col for col in amp_columns if 'Note' in col]][
-        df[[col for col in amp_columns if 'Note' in col]] != 0].mean(axis=1).round(1)
-
-    df['AMP Video Avg'] = df[[col for col in amp_columns if 'Video' in col]][
-        df[[col for col in amp_columns if 'Video' in col]] != 0].mean(axis=1).round(1)
+    df['AMP Avg'] = calc_avg(df, amp_columns)
+    df['AMP Note Avg'] = calc_avg(df, [col for col in amp_columns if 'Note' in col])
+    df['AMP Video Avg'] = calc_avg(df, [col for col in amp_columns if 'Video' in col])
 
     def pct_change(series):
         return series.pct_change().apply(lambda x: x)
@@ -261,13 +261,19 @@ def calculate_weekly_averages(df):
     grouped = df.groupby(['Date'])
 
     for (date, ), month_df in grouped:
-        amp_avg = round(month_df[amp_columns][month_df[amp_columns] != 0].mean(axis=1).mean(), 1)
+        def calc_avg(df_slice, columns):
+            avg = round(df_slice[columns][df_slice[columns] != 0].mean(axis=1).mean(), 1)
+            return 0 if pd.isna(avg) else avg
 
-        amp_avg_video = round(month_df[[col for col in amp_columns if 'Video' in col]][
-            month_df[[col for col in amp_columns if 'Video' in col]] != 0].mean(axis=1).mean(), 1)
+        amp_avg = calc_avg(month_df, amp_columns)
+        amp_avg_video = calc_avg(month_df, [col for col in amp_columns if 'Video' in col])
+        amp_avg_note = calc_avg(month_df, [col for col in amp_columns if 'Note' in col])
 
-        amp_avg_note = round(month_df[[col for col in amp_columns if 'Note' in col]][
-            month_df[[col for col in amp_columns if 'Note' in col]] != 0].mean(axis=1).mean(), 1)
+        # For company-level calculations
+        for (index, company) in enumerate(amp_columns_raw):
+            company_avg = calc_avg(month_df, [col for col in amp_columns if company in col])
+            company_avg_video = calc_avg(month_df, [col for col in amp_columns if 'Video' in col and company in col])
+            company_avg_note = calc_avg(month_df, [col for col in amp_columns if 'Note' in col and company in col])
 
         amp_map = {}
 
@@ -301,32 +307,14 @@ def calculate_weekly_averages(df):
         }
         
         for (index, company) in enumerate(amp_columns_raw):
-            company_avg = round(month_df[[col for col in amp_columns if company in col]][month_df[[col for col in amp_columns if company in col]] != 0].mean(axis=1).mean(), 1)
-            company_avg_video = round(month_df[[col for col in amp_columns if 'Video' in col and company in col]][month_df[[col for col in amp_columns if 'Video' in col and company in col]] != 0].mean(axis=1).mean(), 1)
-            company_avg_note = round(month_df[[col for col in amp_columns if 'Note' in col and company in col]][month_df[[col for col in amp_columns if 'Note' in col and company in col]] != 0].mean(axis=1).mean(), 1)
-        # Process AMP data
-            if len(months) > 0:
-                prev_month = months[-1]
-                prev_amp_avg = prev_month['AMP Avg']
-                prev_amp_video_avg = prev_month['AMP Video Avg']
-                prev_amp_note_avg = prev_month['AMP Note Avg']
-
-                amp_change = safe_division(company_avg, prev_amp_avg)
-                amp_video_change = safe_division(company_avg_video, prev_amp_video_avg)
-                amp_note_change = safe_division(company_avg_note, prev_amp_note_avg)
-            else:
-                amp_change = 100
-                amp_video_change = 100
-                amp_note_change = 100
-
             res["amp"].append({
                 "name": company,
                 "total": company_avg,
                 "video": company_avg_video,
                 "note": company_avg_note,
                 "total_change": 0 if pd.isna(amp_change) else (amp_change or 0),
-                "video_change": 0 if pd.isna(amp_video_change) else (amp_video_change or 0),
-                "note_change": 0 if pd.isna(amp_note_change) else (amp_note_change or 0)
+                "video_change": 0 if pd.isna(amp_change_video) else (amp_change_video or 0),
+                "note_change": 0 if pd.isna(amp_change_note) else (amp_change_note or 0)
             })
 
         months.append(res)
