@@ -54,6 +54,7 @@ class Command(BaseCommand):
                 last_job.save()
                 import os
                 os.system('sudo reboot')
+                return
 
 
         # Process pending website checks
