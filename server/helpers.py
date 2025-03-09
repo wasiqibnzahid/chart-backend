@@ -24,7 +24,7 @@ def sanitize_filename(url):
     return re.sub(r'[\/:*?"<>|]', '_', url)
 
 
-def run_with_timeout(url, job_type, log_file_name, should_save_json=False, timeout=600):
+def run_with_timeout(url, job_type, log_file_name=OTHER_RECORD_FILEPATH, should_save_json=False, timeout=600):
     with concurrent.futures.ProcessPoolExecutor() as executor:
         future = executor.submit(get_lighthouse_mobile_score, url, job_type, log_file_name, should_save_json)
         
