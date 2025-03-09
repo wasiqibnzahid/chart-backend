@@ -21,18 +21,35 @@ class Command(BaseCommand):
         if LastJobRun.should_run():
             print("Running main jobs...")
 
-            # Run all three jobs
-            call_command('run_job')
-            print("run_job completed")
-            call_command('local_job')
-            print("local_job completed")
-            call_command('amp_job')
-            print("amp_job completed")
-            call_command('image_job')
-            print("image_job completed")
-            # Update last run time
-            # LastJobRun.update_last_run()
-            print("Main jobs completed")
+            # Get current job state
+            last_job = LastJobRun.objects.get(id=1)
+            job_sequence = ['run_job', 'local_job', 'amp_job', 'image_job']
+            
+            # Find next job to run
+            current_job = getattr(last_job, 'current_job', None)
+            if not current_job:
+                current_job = job_sequence[0]
+            elif current_job in job_sequence:
+                next_index = job_sequence.index(current_job) + 1
+                if next_index < len(job_sequence):
+                    current_job = job_sequence[next_index]
+                else:
+                    # All jobs completed
+                    LastJobRun.update_last_run()
+                    print("All jobs completed")
+                    return
+
+            # Run current job
+            print(f"Running {current_job}...")
+            call_command(current_job)
+            print(f"{current_job} completed")
+
+            # Save state and restart
+            last_job.current_job = current_job
+            last_job.save()
+            
+            import os
+            os.system('sudo reboot')
 
         # Process pending website checks
         while True:

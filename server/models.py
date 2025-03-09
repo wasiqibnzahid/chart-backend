@@ -211,6 +211,8 @@ class WebsiteCheck(models.Model):
 
 class LastJobRun(models.Model):
     last_run = models.DateTimeField()
+    current_job = models.CharField(max_length=255, null=True, blank=True)
+
 
     def save(self, *args, **kwargs):
         self.id = 1
@@ -232,15 +234,19 @@ class LastJobRun(models.Model):
         now = timezone.now()
 
         # Check if it's Monday between 12am-12pm
+        is_sunday = now.weekday() == 6
         is_monday = now.weekday() == 0
-        is_time_window = 0 <= now.hour < 12
-        # add print to now time and compared time values
-        print(f"is_monday: {is_monday}, is_time_window: {
-              is_time_window}, now: {now}, last_run: {obj.last_run}")
-        # Check if last run was not today
-        last_run_not_today = obj.last_run.date() != now.date()
+        is_tuesday = now.weekday() == 1
+        is_wednesday = now.weekday() == 2
 
-        return is_monday and is_time_window and last_run_not_today
+        # Check if last run was more than 3 days ago
+        days_since_last_run = (now - obj.last_run).days
+        needs_run = days_since_last_run >= 3
+
+        # add print to now time and compared time values
+        print(f"is_monday: {is_monday}, is_tuesday: {is_tuesday}, is_wednesday: {is_wednesday}, is_sunday: {is_sunday}, now: {now}, last_run: {obj.last_run}, days_since: {days_since_last_run}")
+
+        return (is_sunday or is_monday or is_tuesday or is_wednesday) and needs_run
 
 
 class ImageSite(models.Model):
