@@ -27,6 +27,7 @@ class Command(BaseCommand):
             
             # Find next job to run
             current_job = getattr(last_job, 'current_job', None)
+            is_last_job = False
             if not current_job:
                 current_job = job_sequence[0]
             elif current_job in job_sequence:
@@ -35,7 +36,11 @@ class Command(BaseCommand):
                     current_job = job_sequence[next_index]
                 else:
                     # All jobs completed
+                    is_last_job = True
                     LastJobRun.update_last_run()
+                    # Reset current_job to start fresh next time
+                    last_job.current_job = None
+                    last_job.save()
                     print("All jobs completed")
                     return
 
@@ -45,9 +50,11 @@ class Command(BaseCommand):
             print(f"{current_job} completed")
 
             # Save state and restart
-            last_job.current_job = current_job
+            if is_last_job:
+                last_job.current_job = None
+            else:
+                last_job.current_job = current_job
             last_job.save()
-            
             import os
             os.system('sudo reboot')
 
