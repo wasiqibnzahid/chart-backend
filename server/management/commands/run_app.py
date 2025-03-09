@@ -56,8 +56,8 @@ class Command(BaseCommand):
             else:
                 last_job.current_job = current_job
             last_job.save()
-            import os
-            os.system('sudo reboot')
+            # import os
+            # os.system('sudo reboot')
 
         # Process pending website checks
         while True:
