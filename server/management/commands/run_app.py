@@ -28,6 +28,7 @@ class Command(BaseCommand):
             # Find next job to run
             current_job = getattr(last_job, 'current_job', None)
             is_last_job = False
+            print(f"Last job run: {current_job}")
             if not current_job:
                 current_job = job_sequence[0]
             elif current_job in job_sequence:
@@ -37,7 +38,7 @@ class Command(BaseCommand):
                 else:
                     # All jobs completed
                     is_last_job = True
-                    LastJobRun.update_last_run()
+                    # LastJobRun.update_last_run()
                     # Reset current_job to start fresh next time
                     last_job.current_job = None
                     last_job.save()
