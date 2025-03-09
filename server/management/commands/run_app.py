@@ -35,29 +35,26 @@ class Command(BaseCommand):
                 next_index = job_sequence.index(current_job) + 1
                 if next_index < len(job_sequence):
                     current_job = job_sequence[next_index]
-                else:
-                    # All jobs completed
-                    is_last_job = True
-                    # LastJobRun.update_last_run()
-                    # Reset current_job to start fresh next time
-                    last_job.current_job = None
-                    last_job.save()
-                    print("All jobs completed")
-                    return
+                    if(next_index == len(job_sequence) - 1):
+                        is_last_job = True
 
             # Run current job
             print(f"Running {current_job}...")
-            # call_command(current_job)
+            call_command(current_job)
             print(f"{current_job} completed")
 
             # Save state and restart
             if is_last_job:
                 last_job.current_job = None
+                last_job.save()
+                print("All jobs completed")
+
             else:
                 last_job.current_job = current_job
-            last_job.save()
-            # import os
-            # os.system('sudo reboot')
+                last_job.save()
+                import os
+                os.system('sudo reboot')
+
 
         # Process pending website checks
         while True:
