@@ -54,8 +54,9 @@ class Command(BaseCommand):
                 last_job.save()
                 import os
                 os.system('sudo reboot')
-                return
-
+                while True:
+                    print("Rebooting...")
+                    time.sleep(1)
 
         # Process pending website checks
         while True:
