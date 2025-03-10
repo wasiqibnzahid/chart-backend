@@ -40,7 +40,7 @@ class Command(BaseCommand):
 
             # Run current job
             print(f"Running {current_job}...")
-            # call_command(current_job)
+            call_command(current_job)
             print(f"{current_job} completed")
 
             # Save state and restart
@@ -55,7 +55,6 @@ class Command(BaseCommand):
                 last_job.save()
                 import os
                 print("REBOOTING")
-                time.sleep(60 * 5)
                 os.system('sudo reboot')
                 while True:
                     print("Rebooting...")
