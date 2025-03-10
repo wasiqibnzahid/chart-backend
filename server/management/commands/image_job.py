@@ -92,7 +92,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         sites = ImageSite.objects.all()
-        semaphore = threading.Semaphore(1)
+        semaphore = threading.Semaphore(3)
         records_to_create = []
         today = datetime.today()
         monday_of_current_week = today - timedelta(days=today.weekday())
