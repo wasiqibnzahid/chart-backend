@@ -54,6 +54,8 @@ class Command(BaseCommand):
                 last_job.current_job = current_job
                 last_job.save()
                 import os
+                print("REBOOTING")
+                time.sleep(60 * 5)
                 os.system('sudo reboot')
                 while True:
                     print("Rebooting...")
