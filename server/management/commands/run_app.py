@@ -40,23 +40,24 @@ class Command(BaseCommand):
 
             # Run current job
             print(f"Running {current_job}...")
-            # call_command(current_job)
+            call_command(current_job)
             print(f"{current_job} completed")
 
             # Save state and restart
             if is_last_job:
                 last_job.current_job = None
+                last_job.update_last_run()
                 last_job.save()
                 print("All jobs completed")
 
             else:
                 last_job.current_job = current_job
                 last_job.save()
-                # import os
-                # os.system('sudo reboot')
-                # while True:
-                #     print("Rebooting...")
-                #     time.sleep(1)
+                import os
+                os.system('sudo reboot')
+                while True:
+                    print("Rebooting...")
+                    time.sleep(1)
 
         # Process pending website checks
         while True:
