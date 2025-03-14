@@ -15,7 +15,7 @@ def process_sitemap(site, semaphore, date):
         print(f"Processing sitemap for {site.name}: {site.sitemap_url}")
         try:
             response = requests.get(site.sitemap_url)
-            print(f" SITEMAP URL IS {site.sitemap_url} ---------------------------- {response.content}")
+            print(f" SITEMAP URL IS {site.sitemap_url} ")
             root = ET.fromstring(response.content)
 
             # Define namespaces
