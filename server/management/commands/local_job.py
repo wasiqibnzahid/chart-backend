@@ -102,7 +102,7 @@ def run_job():
     sites = LocalSite.objects.all()
     create_empty_records(sites, LocalRecord)
     records = []
-    semaphore = threading.Semaphore(3)
+    semaphore = threading.Semaphore(1)
     print(f"SIOTES ARE {sites}")
     today = datetime.today()
     monday_of_current_week = today - timedelta(days=today.weekday())

@@ -92,7 +92,7 @@ def run_amp_site_job():
     
     create_empty_records(sites, AmpRecord)
     
-    semaphore = threading.Semaphore(3)
+    semaphore = threading.Semaphore(1)
     print(f"SIOTES ARE {sites}")
     with concurrent.futures.ThreadPoolExecutor() as executor:
         print(f"STARINT PROCESSING SITE A")
