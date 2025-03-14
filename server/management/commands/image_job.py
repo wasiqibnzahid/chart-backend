@@ -12,11 +12,12 @@ from server.constants import OTHER_RECORD_FILEPATH, PERFORMANCE_METRICS
 
 def process_sitemap(site, semaphore, date):
     with semaphore:
-        print(f"Processing sitemap for {site.name}: {site.sitemap_url}")
+        print(f"Processing sitemap for {site.name}: {site.sitemap_url} {"image-sitemap-latest.xml" not in site.sitemap_url and "image-sitemap.xml" in site.sitemap_url}")
         if "image-sitemap-latest.xml" not in site.sitemap_url and "image-sitemap.xml" in site.sitemap_url:
             site.sitemap_url = site.sitemap_url.replace("image-sitemap.xml", "image-sitemap-latest.xml");
             site.save();
         try:
+            
             response = requests.get(site.sitemap_url)
             print(f" SITEMAP URL IS {site.sitemap_url} ")
             root = ET.fromstring(response.content)
