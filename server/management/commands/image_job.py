@@ -88,7 +88,6 @@ def process_sitemap(site, semaphore, date):
 
         except Exception as e:
             print(f"Error processing sitemap for {site.name}: {str(e)}")
-            raise e
             write_text_to_file(f"Error processing sitemap for {
                                site.name}: {str(e)}", OTHER_RECORD_FILEPATH)
 
@@ -115,6 +114,5 @@ class Command(BaseCommand):
                     future.result()
                 except Exception as e:
                     print(f"Error processing site {site.name}: {str(e)}")
-                    raise e
                     write_text_to_file(f"Error processing site {site.name}: {
                         str(e)}", OTHER_RECORD_FILEPATH)
