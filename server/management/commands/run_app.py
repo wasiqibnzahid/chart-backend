@@ -23,7 +23,7 @@ class Command(BaseCommand):
 
             # Get current job state
             last_job = LastJobRun.objects.get(id=1)
-            job_sequence = ['run_job', 'local_job', 'amp_job', 'image_job']
+            job_sequence = ['run_job', 'local_job', 'image_job', 'amp_job']
             
             # Find next job to run
             current_job = getattr(last_job, 'current_job', None)
@@ -40,7 +40,7 @@ class Command(BaseCommand):
 
             # Run current job
             print(f"Running {current_job}...")
-            # call_command(current_job)
+            call_command(current_job)
             print(f"{current_job} completed")
 
             # Save state and restart
@@ -55,7 +55,7 @@ class Command(BaseCommand):
                 last_job.save()
                 import os
                 print("REBOOTING")
-                # os.system('sudo reboot')
+                os.system('sudo reboot')
                 while True:
                     print("Rebooting...")
                     time.sleep(1)
