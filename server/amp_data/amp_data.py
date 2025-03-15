@@ -251,6 +251,15 @@ def calculate_relevant_insights(filtered_df, companies, title, date_filter=None)
         insight = f"No significant changes were observed across the {title} companies."
 
     return insight
+
+def handle_num(num):
+        if(math.isnan(num)):
+            return 0
+        elif  (type(num) is not float):
+            return num.round(1)
+        else:
+            return num
+
 def calculate_weekly_averages(df):
     months = []
     df['Date'] = pd.to_datetime(df['Date'])
@@ -263,16 +272,11 @@ def calculate_weekly_averages(df):
     for (date, ), month_df in grouped:
         print(f"WASIQ {month_df[amp_columns][month_df[amp_columns] != 0].mean(axis=1)}")
         write_text_to_file(f"WASIQ {month_df[amp_columns][month_df[amp_columns] != 0].mean(axis=1)}", '/home/ubuntu/asd.txt')
-        mean = month_df[amp_columns][month_df[amp_columns] != 0].mean(axis=1)
-        if(math.isnan(mean)):
-            amp_avg = 0
-        elif  (type(mean) is not float):
-            amp_avg = mean.round(1)
-        else:
-            amp_avg = mean
-        amp_avg_video = month_df[[col for col in amp_columns if 'Video' in col]][month_df[[col for col in amp_columns if 'Video' in col]] != 0].mean(axis=1).mean().round(1)
+        amp_avg = handle_num(month_df[amp_columns][month_df[amp_columns] != 0].mean(axis=1))
+        
+        amp_avg_video = handle_num(month_df[[col for col in amp_columns if 'Video' in col]][month_df[[col for col in amp_columns if 'Video' in col]] != 0].mean(axis=1).mean())
 
-        amp_avg_note = month_df[[col for col in amp_columns if 'Note' in col]][month_df[[col for col in amp_columns if 'Note' in col]] != 0].mean(axis=1).mean().round(1)
+        amp_avg_note = handle_num(month_df[[col for col in amp_columns if 'Note' in col]][month_df[[col for col in amp_columns if 'Note' in col]] != 0].mean(axis=1).mean())
 
         amp_map = {}
 
