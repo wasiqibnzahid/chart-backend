@@ -266,9 +266,10 @@ def calculate_weekly_averages(df):
         mean = month_df[amp_columns][month_df[amp_columns] != 0].mean(axis=1)
         if(math.isnan(mean)):
             amp_avg = 0
-        else:
+        elif  (type(mean) is not float):
             amp_avg = mean.round(1)
-
+        else:
+            amp_avg = mean
         amp_avg_video = month_df[[col for col in amp_columns if 'Video' in col]][month_df[[col for col in amp_columns if 'Video' in col]] != 0].mean(axis=1).mean().round(1)
 
         amp_avg_note = month_df[[col for col in amp_columns if 'Note' in col]][month_df[[col for col in amp_columns if 'Note' in col]] != 0].mean(axis=1).mean().round(1)
