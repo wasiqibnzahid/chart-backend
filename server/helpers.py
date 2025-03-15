@@ -147,7 +147,11 @@ def process_urls(extracted_urls, metrics, site, url_type="note", job_type="Not s
         if successful_site_performance >= 10:
             break
         try:
-            res = run_with_timeout(
+            if is_amp:
+                res = res = get_lighthouse_mobile_score(
+                url, job_type, log_file_name=log_file_name)
+            else:
+                res = run_with_timeout(
                 url, job_type, log_file_name=log_file_name)
             print(f"{job_type} Metrics for {url_type} URL {
                   url} for site {site.name}: {res}")
