@@ -202,7 +202,7 @@ def transform_data(data, include_columns=[], start_date=None, end_date=None):
             if key != "Date" and (key in include_columns or len(include_columns) == 0):
                 if key not in series:
                     series[key] = []
-                series[key].append({"x": date.strftime("%Y-%m-%d"), "y": value})
+                series[key].append({"x": date.strftime("%Y-%m-%d"), "y": value or 0})
 
     # Convert series to a list of dictionaries
     result = [{"name": key, "data": value} for key, value in series.items()]
