@@ -259,6 +259,10 @@ def calculate_weekly_averages(df):
     grouped = df.groupby(['Date'])
 
     for (date, ), month_df in grouped:
+        return {
+            "f": "AS",
+            "d": month_df[amp_columns][month_df[amp_columns] != 0].mean(axis=1).mean()
+        };
         amp_avg = month_df[amp_columns][month_df[amp_columns] != 0].mean(axis=1).mean().round(1)
 
         amp_avg_video = month_df[[col for col in amp_columns if 'Video' in col]][month_df[[col for col in amp_columns if 'Video' in col]] != 0].mean(axis=1).mean().round(1)
