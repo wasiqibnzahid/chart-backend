@@ -818,7 +818,7 @@ def get_averages():
         calculate_yearly_averages(df))
     all_time_data = (
         calculate_all_time_averages(df))
-
+    return week_data
     return {
         "quarter": quarter_data,
         "week": week_data,
