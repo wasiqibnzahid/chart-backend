@@ -1,4 +1,5 @@
 import pandas as pd
+import math
 from ..helpers import write_text_to_file
 from collections import defaultdict
 from server.models import AmpRecord
@@ -262,7 +263,11 @@ def calculate_weekly_averages(df):
     for (date, ), month_df in grouped:
         print(f"WASIQ {month_df[amp_columns][month_df[amp_columns] != 0].mean(axis=1)}")
         write_text_to_file(f"WASIQ {month_df[amp_columns][month_df[amp_columns] != 0].mean(axis=1)}", '/home/ubuntu/asd.txt')
-        amp_avg = month_df[amp_columns][month_df[amp_columns] != 0].mean(axis=1).mean().round(1)
+        mean = month_df[amp_columns][month_df[amp_columns] != 0].mean(axis=1)
+        if(math.isnan(mean)):
+            mean = float(0)
+        
+        amp_avg = mean.round(1)
 
         amp_avg_video = month_df[[col for col in amp_columns if 'Video' in col]][month_df[[col for col in amp_columns if 'Video' in col]] != 0].mean(axis=1).mean().round(1)
 
