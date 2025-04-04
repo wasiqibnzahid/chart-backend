@@ -35,8 +35,8 @@ class Command(BaseCommand):
                 next_index = job_sequence.index(current_job) + 1
                 if next_index < len(job_sequence):
                     current_job = job_sequence[next_index]
-                    if(next_index == len(job_sequence) - 1):
-                        is_last_job = True
+                if(next_index == len(job_sequence) - 1):
+                    is_last_job = True
 
             # Run current job
             print(f"Running {current_job}...")
